@@ -5,7 +5,7 @@ make.crf <- function(adj.matrix, nstates)
 		stop("'adj.matrix' should be a square matrix")
 	data$n.nodes <- dim(adj.matrix)[1]
 
-	e <- which(adj.matrix != 0, arr.ind = TRUE)
+	e <- which((adj.matrix + t(adj.matrix)) != 0, arr.ind = TRUE)
 	data$edges <- matrix(e[e[,1] < e[,2],], ncol=2)
 	data$n.edges <- nrow(data$edges)
 
