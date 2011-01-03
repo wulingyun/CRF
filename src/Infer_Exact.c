@@ -2,35 +2,33 @@
 
 SEXP Infer_Exact(SEXP _crf)
 {
-	int nNodes, nEdges, *edges, *nStates, maxState;
 	SEXP _nNodes, _nEdges, _edges, _nStates, _maxState;
-	double *nodePot, *edgePot, *nodeBel, *edgeBel, *logZ;
-	SEXP _nodePot, _edgePot, _nodeBel, _edgeBel, _logZ;
-
 	PROTECT(_nNodes = AS_INTEGER(getListElement(_crf, "n.nodes")));
 	PROTECT(_nEdges = AS_INTEGER(getListElement(_crf, "n.edges")));
 	PROTECT(_edges = AS_INTEGER(getListElement(_crf, "edges")));
 	PROTECT(_nStates = AS_INTEGER(getListElement(_crf, "n.states")));
 	PROTECT(_maxState = AS_INTEGER(getListElement(_crf, "max.state")));
-	nNodes = INTEGER_POINTER(_nNodes)[0];
-	nEdges = INTEGER_POINTER(_nEdges)[0];
-	edges = INTEGER_POINTER(_edges);
-	nStates = INTEGER_POINTER(_nStates);
-	maxState = INTEGER_POINTER(_maxState)[0];
+	int nNodes = INTEGER_POINTER(_nNodes)[0];
+	int nEdges = INTEGER_POINTER(_nEdges)[0];
+	int *edges = INTEGER_POINTER(_edges);
+	int *nStates = INTEGER_POINTER(_nStates);
+	int maxState = INTEGER_POINTER(_maxState)[0];
 
+	SEXP _nodePot, _edgePot;
 	PROTECT(_nodePot = AS_NUMERIC(getListElement(_crf, "node.pot")));
 	PROTECT(_edgePot = AS_NUMERIC(getListElement(_crf, "edge.pot")));
-	nodePot = NUMERIC_POINTER(_nodePot);
-	edgePot = NUMERIC_POINTER(_edgePot);
+	double *nodePot = NUMERIC_POINTER(_nodePot);
+	double *edgePot = NUMERIC_POINTER(_edgePot);
 
+	SEXP _nodeBel, _edgeBel, _logZ;
 	PROTECT(_nodeBel = NEW_NUMERIC(nNodes * maxState));
 	PROTECT(_edgeBel = NEW_NUMERIC(maxState * maxState * nEdges));
 	PROTECT(_logZ = NEW_NUMERIC(1));
 	setDim2(_nodeBel, nNodes, maxState);
 	setDim3(_edgeBel, maxState, maxState, nEdges);
-	nodeBel = NUMERIC_POINTER(_nodeBel);
-	edgeBel = NUMERIC_POINTER(_edgeBel);
-	logZ = NUMERIC_POINTER(_logZ);
+	double *nodeBel = NUMERIC_POINTER(_nodeBel);
+	double *edgeBel = NUMERIC_POINTER(_edgeBel);
+	double *logZ = NUMERIC_POINTER(_logZ);
 
 	for (int i = 0; i < length(_nodeBel); i++)
 		nodeBel[i] = 0;
