@@ -23,6 +23,7 @@ SEXP Decode_Exact(SEXP _crf)
 	SEXP _labels;
 	PROTECT(_labels = NEW_INTEGER(nNodes));
 	int *labels = INTEGER_POINTER(_labels);
+	set_zeros(_labels, labels);
 
 	int *y = (int *) R_alloc(nNodes, sizeof(int));
 	for (int i = 0; i < nNodes; i++)
