@@ -53,3 +53,21 @@ void setDim3(SEXP array, int x1, int x2, int x3)
 	SET_DIM(array, _dim);
 	UNPROTECT(1);
 }
+
+/* sample from discret distribution */
+
+int sample(int n, double *prob)
+{
+	int select = n;
+	double cumulativeProb = 0, cutoff = (double) rand() / RAND_MAX;
+	for (int i = 0; i < n; i++)
+	{
+		cumulativeProb += prob[i];
+		if (cumulativeProb > cutoff)
+		{
+			select = i;
+			break;
+		}
+	}
+	return select;
+}
