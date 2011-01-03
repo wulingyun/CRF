@@ -1,7 +1,7 @@
 #include <R.h>
 #include <Rdefines.h>
 
-#define set_zeros(rarray, carray) for (int i = 0; i < length(rarray); i++) carray[i] = 0
+#define setValues(r, c, v) for (int i = 0; i < length(r); i++) c[i] = v
 
 SEXP getListElement(SEXP list, const char *tag);
 void setListElement(SEXP list, int i, const char *tag, SEXP value);

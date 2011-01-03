@@ -28,7 +28,7 @@ SEXP Sample_Exact(SEXP _crf, SEXP _size)
 	PROTECT(_samples = NEW_INTEGER(size * nNodes));
 	setDim2(_samples, size, nNodes);
 	int *samples = INTEGER_POINTER(_samples);
-	set_zeros(_samples, samples);
+	setValues(_samples, samples, 0);
 
 	int *y = (int *) R_alloc(nNodes, sizeof(int));
 	for (int i = 0; i < nNodes; i++)
