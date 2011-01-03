@@ -29,11 +29,8 @@ SEXP Infer_Exact(SEXP _crf)
 	double *nodeBel = NUMERIC_POINTER(_nodeBel);
 	double *edgeBel = NUMERIC_POINTER(_edgeBel);
 	double *logZ = NUMERIC_POINTER(_logZ);
-
-	for (int i = 0; i < length(_nodeBel); i++)
-		nodeBel[i] = 0;
-	for (int i = 0; i < length(_edgeBel); i++)
-		edgeBel[i] = 0;
+	set_zeros(_nodeBel, nodeBel);
+	set_zeros(_edgeBel, edgeBel);
 	*logZ = 0;
 
 	int *y = (int *) R_alloc(nNodes, sizeof(int));
