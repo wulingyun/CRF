@@ -49,7 +49,7 @@ belief <- infer.exact(crf)
 if (mean(abs(belief$node.bel - answer$node.bel)) < 1e-6 && mean(abs(belief$edge.bel - answer$edge.bel)) < 1e-6 && abs(belief$logZ - answer$logZ) < 1e-6) {
 	print("  Pass.")
 } else {
-	print("Inference is incorrect!")
+	stop("Inference is incorrect!")
 }
 
 print("Sampling ...")
