@@ -25,13 +25,15 @@ make.crf <- function(adj.matrix, nstates)
 		data$adj.nodes[[n1]] <- c(data$adj.nodes[[n1]], n2)
 		data$adj.nodes[[n2]] <- c(data$adj.nodes[[n2]], n1)
 	}
+	data$n.adj <- rep(0, length.out=data$n.nodes)
 	for (i in 1:data$n.nodes)
 	{
+		data$n.adj[i] <- length(data$adj.edges[[i]])
 		data$adj.edges[[i]] <- sort(data$adj.edges[[i]])
 		data$adj.nodes[[i]] <- sort(data$adj.nodes[[i]])
 	}
 
-	data$n.states <- rep(nstates, length.out = data$n.nodes)
+	data$n.states <- rep(nstates, length.out=data$n.nodes)
 	data$max.state <- max(nstates)
 
 	data$node.pot <- array(1, dim=c(data$n.nodes, data$max.state))
