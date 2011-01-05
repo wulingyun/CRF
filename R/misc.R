@@ -9,26 +9,26 @@ make.crf <- function(adj.matrix, nstates)
 	data$edges <- matrix(e[e[,1] < e[,2],], ncol=2)
 	data$n.edges <- nrow(data$edges)
 
-	data$neibor.edges <- list()
-	data$neibor.nodes <- list()
+	data$adj.edges <- list()
+	data$adj.nodes <- list()
 	for (i in 1:data$n.nodes)
 	{
-		data$neibor.edges[[i]] <- numeric(0)
-		data$neibor.nodes[[i]] <- numeric(0)
+		data$adj.edges[[i]] <- numeric(0)
+		data$adj.nodes[[i]] <- numeric(0)
 	}
 	for (i in 1:data$n.edges)
 	{
 		n1 <- data$edges[i, 1]
 		n2 <- data$edges[i, 2]
-		data$neibor.edges[[n1]] <- c(data$neibor.edges[[n1]], i)
-		data$neibor.edges[[n2]] <- c(data$neibor.edges[[n2]], i)
-		data$neibor.nodes[[n1]] <- c(data$neibor.nodes[[n1]], n2)
-		data$neibor.nodes[[n2]] <- c(data$neibor.nodes[[n2]], n1)
+		data$adj.edges[[n1]] <- c(data$adj.edges[[n1]], i)
+		data$adj.edges[[n2]] <- c(data$adj.edges[[n2]], i)
+		data$adj.nodes[[n1]] <- c(data$adj.nodes[[n1]], n2)
+		data$adj.nodes[[n2]] <- c(data$adj.nodes[[n2]], n1)
 	}
 	for (i in 1:data$n.nodes)
 	{
-		data$neibor.edges[[i]] <- sort(data$neibor.edges[[i]])
-		data$neibor.nodes[[i]] <- sort(data$neibor.nodes[[i]])
+		data$adj.edges[[i]] <- sort(data$adj.edges[[i]])
+		data$adj.nodes[[i]] <- sort(data$adj.nodes[[i]])
 	}
 
 	data$n.states <- rep(nstates, length.out = data$n.nodes)
