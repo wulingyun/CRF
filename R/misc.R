@@ -6,7 +6,8 @@ make.crf <- function(adj.matrix, nstates)
 	data$n.nodes <- dim(adj.matrix)[1]
 
 	e <- which((adj.matrix + t(adj.matrix)) != 0, arr.ind = TRUE)
-	data$edges <- matrix(e[e[,1] < e[,2],], ncol=2)
+	e <- matrix(e[e[,1] < e[,2],], ncol=2)
+	data$edges <- e[order(e[,1]),]
 	data$n.edges <- nrow(data$edges)
 
 	data$adj.edges <- list()

@@ -46,7 +46,7 @@ if (all(decode == answer$decode)) {
 print("Inferring ...")
 belief <- infer.exact(crf)
 
-if (mean(abs(belief$node.bel - answer$node.bel)) < 1e-6 && mean(abs(belief$edge.bel - answer$edge.bel)) < 1e-6 && abs(belief$logZ - answer$logZ) < 1e-6) {
+if (max(abs(c(belief$node.bel - answer$node.bel, belief$edge.bel - answer$edge.bel, belief$logZ - answer$logZ))) < 1e-8) {
 	print("  Pass.")
 } else {
 	stop("Inference is incorrect!")
