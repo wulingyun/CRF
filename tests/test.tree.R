@@ -1162,7 +1162,7 @@ if (max(abs(c(belief$node.bel - answer$node.bel, belief$edge.bel - answer$edge.b
 }
 
 print("Sampling ...")
-samples <- sample.chain(crf, 10000)
+samples <- sample.tree(crf, 10000)
 
 samples.node.bel <- array(0, dim=c(crf$n.nodes, crf$max.state))
 for (i in 1:crf$n.nodes)
