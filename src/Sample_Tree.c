@@ -297,7 +297,6 @@ SEXP Sample_Tree(SEXP _crf, SEXP _size)
 	int nOrdered = 0;
 	int *ordered = (int *) R_alloc(nNodes, sizeof(int));
 	int *order = (int *) R_alloc(nNodes, sizeof(int));
-	int *parentNode = (int *) R_alloc(nNodes, sizeof(int));
 	int *parentEdge = (int *) R_alloc(nNodes, sizeof(int));
 
 	for (int i = 0; i < nNodes; i++)
@@ -310,7 +309,6 @@ SEXP Sample_Tree(SEXP _crf, SEXP _size)
 
 		ordered[i] = 1;
 		order[nOrdered] = i;
-		parentNode[nOrdered] = -1;
 		parentEdge[nOrdered] = -1;
 		nOrdered++;
 
@@ -336,7 +334,6 @@ SEXP Sample_Tree(SEXP _crf, SEXP _size)
 
 				ordered[n2] = 1;
 				order[nOrdered] = n2;
-				parentNode[nOrdered] = n1;
 				parentEdge[nOrdered] = adjEdges[n1][j] - 1;
 				nOrdered++;
 
@@ -353,26 +350,25 @@ SEXP Sample_Tree(SEXP _crf, SEXP _size)
 	{
 		for (int j = 0; j < nNodes; j++)
 		{
-			n1 = order[j];
-			if (parentNode[j] == -1)
+			n = order[j];
+			e = parentEdge[j];
+			if (e == -1)
 			{
-				p_nodeBel = nodeBel + n1;
-				for (int k = 0; k < nStates[n1]; k++)
+				p_nodeBel = nodeBel + n;
+				for (int k = 0; k < nStates[n]; k++)
 				{
 					prob[k] = p_nodeBel[0];
 					p_nodeBel += nNodes;
 				}
-				y[n1] = sample(nStates[n1], prob);
 			}
 			else
 			{
-				e = parentEdge[j];
 				sumProb = 0;
-				if (edges[e] == n1)
+				if (edges[e] - 1 == n)
 				{
-					n2 = edges[e + nEdges] - 1;
-					p_edgeBel = edgeBel + maxState * (y[n2] + maxState * e);
-					for (int k = 0; k < nStates[n1]; k++)
+					s = edges[e + nEdges] - 1;
+					p_edgeBel = edgeBel + maxState * (y[s] + maxState * e);
+					for (int k = 0; k < nStates[n]; k++)
 					{
 						prob[k] = p_edgeBel[k];
 						sumProb += prob[k];
@@ -380,19 +376,19 @@ SEXP Sample_Tree(SEXP _crf, SEXP _size)
 				}
 				else
 				{
-					n2 = edges[e] - 1;
-					p_edgeBel = edgeBel + y[n2] + maxState * maxState * e;
-					for (int k = 0; k < nStates[n1]; k++)
+					s = edges[e] - 1;
+					p_edgeBel = edgeBel + y[s] + maxState * maxState * e;
+					for (int k = 0; k < nStates[n]; k++)
 					{
 						prob[k] = p_edgeBel[0];
 						sumProb += prob[k];
 						p_edgeBel += maxState;
 					}
 				}
-				for (int k = 0; k < nStates[n1]; k++)
+				for (int k = 0; k < nStates[n]; k++)
 					prob[k] /= sumProb;
-				y[n1] = sample(nStates[n1], prob);
 			}
+			y[n] = sample(nStates[n], prob);
 		}
 
 		for (int j = 0; j < nNodes; j++)
