@@ -121,9 +121,9 @@ SEXP Decode_Tree(SEXP _crf)
 						{
 							e = adjEdges[s][j] - 1;
 							if (edges[e] - 1 == s)
-								p_messages = messages_2;
-							else
 								p_messages = messages_1;
+							else
+								p_messages = messages_2;
 							p_messages += maxState * e;
 							for (int k = 0; k < nStates[s]; k++)
 								incoming[k] *= p_messages[k];
@@ -137,7 +137,7 @@ SEXP Decode_Tree(SEXP _crf)
 					p0_edgePot = edgePot + maxState * maxState * e;
 					if (edges[e] - 1 == s)
 					{
-						p_messages = messages_1 + maxState * e;
+						p_messages = messages_2 + maxState * e;
 						for (int j = 0; j < nStates[r]; j++)
 						{
 							p_edgePot = p0_edgePot;
@@ -154,7 +154,7 @@ SEXP Decode_Tree(SEXP _crf)
 					}
 					else
 					{
-						p_messages = messages_2 + maxState * e;
+						p_messages = messages_1 + maxState * e;
 						for (int j = 0; j < nStates[r]; j++)
 						{
 							p_edgePot = p0_edgePot++;
@@ -170,40 +170,41 @@ SEXP Decode_Tree(SEXP _crf)
 						}
 					}
 					for (int j = 0; j < nStates[r]; j++)
-					{
 						p_messages[j] /= sumMesg;
-					}
 				}
 				done = 0;
 			}
 		}
 	}
 
-	/* Node Belief */
+	/* Node beliefs */
 
 	double *nodeBel = (double *) R_alloc(nNodes * maxState, sizeof(double));
-	for (int i = 0; i < nNodes * maxState; i++)
+	for (int i = 0; i < length(_nodePot); i++)
 		nodeBel[i] = nodePot[i];
 
+	int n1, n2;
 	double *p_nodeBel;
+	double *p1_messages = messages_1;
+	double *p2_messages = messages_2;
 	for (int i = 0; i < nEdges; i++)
 	{
-		n = edges[i] - 1;
-		p_nodeBel = nodeBel + n;
-		p_messages = messages_2 + maxState * i;
-		for (int j = 0; j < nStates[n]; j++)
+		n1 = edges[i] - 1;
+		n2 = edges[i + nEdges] - 1;
+		p_nodeBel = nodeBel + n1;
+		for (int j = 0; j < nStates[n1]; j++)
 		{
-			p_nodeBel[0] *= p_messages[j];
+			p_nodeBel[0] *= p1_messages[j];
 			p_nodeBel += nNodes;
 		}
-		n = edges[i + nEdges] - 1;
-		p_nodeBel = nodeBel + n;
-		p_messages = messages_1 + maxState * i;
-		for (int j = 0; j < nStates[n]; j++)
+		p_nodeBel = nodeBel + n2;
+		for (int j = 0; j < nStates[n2]; j++)
 		{
-			p_nodeBel[0] *= p_messages[j];
+			p_nodeBel[0] *= p2_messages[j];
 			p_nodeBel += nNodes;
 		}
+		p1_messages += maxState;
+		p2_messages += maxState;
 	}
 
 	double sumBel;
@@ -224,7 +225,7 @@ SEXP Decode_Tree(SEXP _crf)
 		}
 	}
 
-	/* Get decode */
+	/* Labels */
 
 	double maxBel;
 	for (int i = 0; i < nNodes; i++)
