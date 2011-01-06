@@ -14,17 +14,19 @@ SEXP Decode_Tree(SEXP _crf)
 	int *nStates = INTEGER_POINTER(_nStates);
 	int maxState = INTEGER_POINTER(_maxState)[0];
 
-	SEXP _nAdj, _adjNodes, _adjEdges;
+	SEXP _nAdj, _adjNodes, _adjEdges, _temp;
 	PROTECT(_nAdj = AS_INTEGER(getListElement(_crf, "n.adj")));
-	PROTECT(_adjNodes = AS_INTEGER(getListElement(_crf, "adj.nodes")));
-	PROTECT(_adjEdges = AS_INTEGER(getListElement(_crf, "adj.edges")));
+	PROTECT(_adjNodes = AS_LIST(getListElement(_crf, "adj.nodes")));
+	PROTECT(_adjEdges = AS_LIST(getListElement(_crf, "adj.edges")));
 	int *nAdj = INTEGER_POINTER(_nAdj);
 	int **adjNodes = (int **) R_alloc(nNodes, sizeof(int *));
 	int **adjEdges = (int **) R_alloc(nNodes, sizeof(int *));
 	for (int i = 0; i < nNodes; i++)
 	{
-		adjNodes[i] = INTEGER_POINTER(VECTOR_ELT(_adjNodes, i));
-		adjEdges[i] = INTEGER_POINTER(VECTOR_ELT(_adjEdges, i));
+		PROTECT(_temp = AS_INTEGER(VECTOR_ELT(_adjNodes, i)));
+		adjNodes[i] = INTEGER_POINTER(_temp);
+		PROTECT(_temp = AS_INTEGER(VECTOR_ELT(_adjEdges, i)));
+		adjEdges[i] = INTEGER_POINTER(_temp);
 	}
 
 	SEXP _nodePot, _edgePot;
@@ -40,9 +42,6 @@ SEXP Decode_Tree(SEXP _crf)
 
 	/* Tree BP */
 
-	double *nodeBel = (double *) R_alloc(nNodes * maxState, sizeof(double));
-	for (int i = 0; i < nNodes * maxState; i++)
-		nodeBel[i] = nodePot[i];
 	double *messages_1 = (double *) R_alloc(maxState * nEdges, sizeof(double));
 	double *messages_2 = (double *) R_alloc(maxState * nEdges, sizeof(double));
 	for (int i = 0; i < maxState * nEdges; i++)
@@ -62,61 +61,177 @@ SEXP Decode_Tree(SEXP _crf)
 
 	int nQueue;
 	int *queue = (int *) R_alloc(nNodes, sizeof(int *));
+	double *incoming = (double *) R_alloc(maxState, sizeof(double));
 
-	int n, r, e;
+	int s, r, e, n;
+	double mesg, sumMesg, *p_nodePot, *p_edgePot, *p0_edgePot, *p_messages;
+
 	int done = 0;
 	while (!done)
 	{
 		done = 1;
-		for (int i = 0; i < nNodes; i++)
+		for (s = 0; s < nNodes; s++)
 		{
-			if (nUnsent[i] == 0 || nWaiting[i] > 1)
+			if (nUnsent[s] == 0 || nWaiting[s] > 1)
 				continue;
 
 			nQueue = 0;
-			if (nWaiting[i] == 1)
-				for (int j = 0; j < nAdj[i]; j++)
-					if (waiting[i][j] && unsent[i][j])
-						queue[nQueue++] = j;
+			if (nWaiting[s] == 1)
+			{
+				for (int i = 0; i < nAdj[s]; i++)
+					if (waiting[s][i] && unsent[s][i])
+						queue[nQueue++] = i;
+			}
 			else
-				for (int j = 0; j < nAdj[i]; j++)
-					if (unsent[i][j])
-						queue[nQueue++] = j;
+			{
+				for (int i = 0; i < nAdj[s]; i++)
+					if (unsent[s][i])
+						queue[nQueue++] = i;
+			}
 
 			if (nQueue > 0)
 			{
-				for (int j = 0; j < nQueue; j++)
+				for (int i = 0; i < nQueue; i++)
 				{
-					n = queue[j];
-					unsent[i][n] = 0;
-					nUnsent[i]--;
-					r = adjNodes[i][n];
-					e = adjEdges[i][n];
+					n = queue[i];
+					r = adjNodes[s][n] - 1;
 
-					/* todo: calculate messages */
+					unsent[s][n] = 0;
+					nUnsent[s]--;
 
-					for (int k = 0; k < nAdj[r]; k++)
-						if (adjNodes[r][k] == i)
+					for (int j = 0; j < nAdj[r]; j++)
+						if (adjNodes[r][j] - 1 == s)
 						{
-							waiting[r][k] = 0;
+							waiting[r][j] = 0;
 							nWaiting[r]--;
+							break;
 						}
+
+					/* gather incoming messages */
+
+					p_nodePot = nodePot + s;
+					for (int j = 0; j < nStates[s]; j++)
+					{
+						incoming[j] = p_nodePot[0];
+						p_nodePot += nNodes;
+					}
+					for (int j = 0; j < nAdj[s]; j++)
+					{
+						if (j != n)
+						{
+							e = adjEdges[s][j] - 1;
+							if (edges[e] - 1 == s)
+								p_messages = messages_2;
+							else
+								p_messages = messages_1;
+							p_messages += maxState * e;
+							for (int k = 0; k < nStates[s]; k++)
+								incoming[k] *= p_messages[k];
+						}
+					}
+
+					/* send messages */
+
+					e = adjEdges[s][n] - 1;
+					sumMesg = 0;
+					p0_edgePot = edgePot + maxState * maxState * e;
+					if (edges[e] - 1 == s)
+					{
+						p_messages = messages_1 + maxState * e;
+						for (int j = 0; j < nStates[r]; j++)
+						{
+							p_edgePot = p0_edgePot;
+							p0_edgePot += maxState;
+							p_messages[j] = -1;
+							for (int k = 0; k < nStates[s]; k++)
+							{
+								mesg = incoming[k] * p_edgePot[k];
+								if (mesg > p_messages[j])
+									p_messages[j] = mesg;
+							}
+							sumMesg += p_messages[j];
+						}
+					}
+					else
+					{
+						p_messages = messages_2 + maxState * e;
+						for (int j = 0; j < nStates[r]; j++)
+						{
+							p_edgePot = p0_edgePot++;
+							p_messages[j] = -1;
+							for (int k = 0; k < nStates[s]; k++)
+							{
+								mesg = incoming[k] * p_edgePot[0];
+								if (mesg > p_messages[j])
+									p_messages[j] = mesg;
+								p_edgePot += maxState;
+							}
+							sumMesg += p_messages[j];
+						}
+					}
+					for (int j = 0; j < nStates[r]; j++)
+					{
+						p_messages[j] /= sumMesg;
+					}
 				}
 				done = 0;
 			}
 		}
 	}
 
+	/* Node Belief */
+
+	double *nodeBel = (double *) R_alloc(nNodes * maxState, sizeof(double));
+	for (int i = 0; i < nNodes * maxState; i++)
+		nodeBel[i] = nodePot[i];
+
+	double *p_nodeBel;
+	for (int i = 0; i < nEdges; i++)
+	{
+		n = edges[i] - 1;
+		p_nodeBel = nodeBel + n;
+		p_messages = messages_2 + maxState * i;
+		for (int j = 0; j < nStates[n]; j++)
+		{
+			p_nodeBel[0] *= p_messages[j];
+			p_nodeBel += nNodes;
+		}
+		n = edges[i + nEdges] - 1;
+		p_nodeBel = nodeBel + n;
+		p_messages = messages_1 + maxState * i;
+		for (int j = 0; j < nStates[n]; j++)
+		{
+			p_nodeBel[0] *= p_messages[j];
+			p_nodeBel += nNodes;
+		}
+	}
+
+	double sumBel;
+	for (int i = 0; i < nNodes; i++)
+	{
+		sumBel = 0;
+		p_nodeBel = nodeBel + i;
+		for (int j = 0; j < nStates[i]; j++)
+		{
+			sumBel += p_nodeBel[0];
+			p_nodeBel += nNodes;
+		}
+		p_nodeBel = nodeBel + i;
+		for (int j = 0; j < nStates[i]; j++)
+		{
+			p_nodeBel[0] /= sumBel;
+			p_nodeBel += nNodes;
+		}
+	}
 
 	/* Get decode */
 
 	double maxBel;
-	double *p_nodeBel;
 	for (int i = 0; i < nNodes; i++)
 	{
 		maxBel = -1;
 		p_nodeBel = nodeBel + i;
-		for (int j = 0; j < nStates[i]; i++)
+		for (int j = 0; j < nStates[i]; j++)
 		{
 			if (p_nodeBel[0] > maxBel)
 			{
@@ -125,12 +240,12 @@ SEXP Decode_Tree(SEXP _crf)
 			}
 			p_nodeBel += nNodes;
 		}
-
 	}
 
 	for (int i = 0; i < nNodes; i++)
 		labels[i]++;
 
-	UNPROTECT(6);
+	UNPROTECT(11 + nNodes * 2);
+
 	return(_labels);
 }
