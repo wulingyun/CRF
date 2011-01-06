@@ -79,7 +79,7 @@ SEXP Sample_Chain(SEXP _crf, SEXP _size)
 
 	/* backward pass */
 
-	double *prob = (double *) R_alloc(maxState, sizeof(double));
+	double sumProb, *prob = (double *) R_alloc(maxState, sizeof(double));
 
 	srand((int) time(0));
 	for (int i = 0; i < size; i++)
@@ -95,15 +95,15 @@ SEXP Sample_Chain(SEXP _crf, SEXP _size)
 		{
 			p_alpha = alpha + j;
 			p_edgePot = edgePot + maxState * (y[j+1] + maxState * j);
-			sumPot = 0;
+			sumProb = 0;
 			for (int k = 0; k < nStates[j]; k++)
 			{
 				prob[k] = p_alpha[0] * p_edgePot[k];
-				sumPot += prob[k];
+				sumProb += prob[k];
 				p_alpha += nNodes;
 			}
 			for (int k = 0; k < nStates[j]; k++)
-				prob[k] /= sumPot;
+				prob[k] /= sumProb;
 			y[j] = sample(nStates[j], prob);
 		}
 

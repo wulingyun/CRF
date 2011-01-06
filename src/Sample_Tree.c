@@ -1,6 +1,7 @@
+#include <time.h>
 #include "CRF.h"
 
-SEXP Infer_Tree(SEXP _crf)
+SEXP Sample_Tree(SEXP _crf, SEXP _size)
 {
 	SEXP _nNodes, _nEdges, _edges, _nStates, _maxState;
 	PROTECT(_nNodes = AS_INTEGER(getListElement(_crf, "n.nodes")));
@@ -35,18 +36,18 @@ SEXP Infer_Tree(SEXP _crf)
 	double *nodePot = NUMERIC_POINTER(_nodePot);
 	double *edgePot = NUMERIC_POINTER(_edgePot);
 
-	SEXP _nodeBel, _edgeBel, _logZ;
-	PROTECT(_nodeBel = NEW_NUMERIC(nNodes * maxState));
-	PROTECT(_edgeBel = NEW_NUMERIC(maxState * maxState * nEdges));
-	PROTECT(_logZ = NEW_NUMERIC(1));
-	setDim2(_nodeBel, nNodes, maxState);
-	setDim3(_edgeBel, maxState, maxState, nEdges);
-	double *nodeBel = NUMERIC_POINTER(_nodeBel);
-	double *edgeBel = NUMERIC_POINTER(_edgeBel);
-	double *logZ = NUMERIC_POINTER(_logZ);
-	setValues(_nodeBel, nodeBel, 0);
-	setValues(_edgeBel, edgeBel, 0);
-	*logZ = 0;
+	PROTECT(_size = AS_INTEGER(_size));
+	int size = INTEGER_POINTER(_size)[0];
+
+	SEXP _samples;
+	PROTECT(_samples = NEW_INTEGER(size * nNodes));
+	setDim2(_samples, size, nNodes);
+	int *samples = INTEGER_POINTER(_samples);
+	setValues(_samples, samples, 0);
+
+	int *y = (int *) R_alloc(nNodes, sizeof(int));
+	for (int i = 0; i < nNodes; i++)
+		y[i] = 0;
 
 	/* Tree BP */
 
@@ -181,6 +182,7 @@ SEXP Infer_Tree(SEXP _crf)
 
 	/* Node beliefs */
 
+	double *nodeBel = (double *) R_alloc(nNodes * maxState, sizeof(double));
 	for (int i = 0; i < length(_nodePot); i++)
 		nodeBel[i] = nodePot[i];
 
@@ -228,6 +230,7 @@ SEXP Infer_Tree(SEXP _crf)
 
 	/* Edge beliefs */
 
+	double *edgeBel = (double *) R_alloc(maxState * maxState * nEdges, sizeof(double));
 	for (int i = 0; i < length(_edgePot); i++)
 		edgeBel[i] = edgePot[i];
 
@@ -289,64 +292,114 @@ SEXP Infer_Tree(SEXP _crf)
 		p2_messages += maxState;
 	}
 
-	/* Bethe free energy */
+	/* Sampling */
 
-	double nodeEnergy, nodeEntropy, edgeEnergy, edgeEntropy;
-	nodeEnergy = nodeEntropy = edgeEnergy = edgeEntropy = 0;
+	int nOrdered = 0;
+	int *ordered = (int *) R_alloc(nNodes, sizeof(int));
+	int *order = (int *) R_alloc(nNodes, sizeof(int));
+	int *parentNode = (int *) R_alloc(nNodes, sizeof(int));
+	int *parentEdge = (int *) R_alloc(nNodes, sizeof(int));
 
-	double entropy;
+	for (int i = 0; i < nNodes; i++)
+		ordered[i] = queue[i] = 0;
+
 	for (int i = 0; i < nNodes; i++)
 	{
-		entropy = 0;
-		p_nodeBel = nodeBel + i;
-		p_nodePot = nodePot + i;
-		for (int j = 0; j < nStates[i]; j++)
-		{
-			if (p_nodeBel[0] > 0)
-			{
-				nodeEnergy -= p_nodeBel[0] * log(p_nodePot[0]);
-				entropy += p_nodeBel[0] * log(p_nodeBel[0]);
-			}
-			p_nodeBel += nNodes;
-			p_nodePot += nNodes;
-		}
-		nodeEntropy += (nAdj[i] - 1) * entropy;
-	}
+		if (ordered[i])
+			continue;
 
-	p0_edgeBel = edgeBel;
-	p0_edgePot = edgePot;
-	for (int i = 0; i < nEdges; i++)
-	{
-		n1 = edges[i] - 1;
-		n2 = edges[i + nEdges] - 1;
-		p_edgeBel = p0_edgeBel;
-		p_edgePot = p0_edgePot;
-		for (int j = 0; j < nStates[n2]; j++)
+		ordered[i] = 1;
+		order[nOrdered] = i;
+		parentNode[nOrdered] = -1;
+		parentEdge[nOrdered] = -1;
+		nOrdered++;
+
+		queue[i] = 1;
+		nQueue = 1;
+		while (nQueue > 0)
 		{
-			for (int k = 0; k < nStates[n1]; k++)
-			{
-				if (p_edgeBel[k] > 0)
+			n1 = 0;
+			for (int j = 0; j < nNodes; j++)
+				if (queue[j])
 				{
-					edgeEnergy -= p_edgeBel[k] * log(p_edgePot[k]);
-					edgeEntropy -= p_edgeBel[k] * log(p_edgeBel[k]);
+					n1 = j;
+					queue[j] = 0;
+					nQueue--;
+					break;
 				}
+
+			for (int j = 0; j < nAdj[n1]; j++)
+			{
+				n2 = adjNodes[n1][j] - 1;
+				if (ordered[n2])
+					continue;
+
+				ordered[n2] = 1;
+				order[nOrdered] = n2;
+				parentNode[nOrdered] = n1;
+				parentEdge[nOrdered] = adjEdges[n1][j] - 1;
+				nOrdered++;
+
+				queue[n2] = 1;
+				nQueue++;
 			}
-			p_edgeBel += maxState;
-			p_edgePot += maxState;
 		}
-		p0_edgeBel += maxState * maxState;
-		p0_edgePot += maxState * maxState;
 	}
 
-	*logZ = - nodeEnergy + nodeEntropy - edgeEnergy + edgeEntropy;
+	double sumProb, *prob = (double *) R_alloc(maxState, sizeof(double));
 
-	SEXP _belief;
-	PROTECT(_belief = NEW_LIST(3));
-	setListElement(_belief, 0, "node.bel", _nodeBel);
-	setListElement(_belief, 1, "edge.bel", _edgeBel);
-	setListElement(_belief, 2, "logZ", _logZ);
+	srand((int) time(0));
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < nNodes; j++)
+		{
+			n1 = order[j];
+			if (parentNode[j] == -1)
+			{
+				p_nodeBel = nodeBel + n1;
+				for (int k = 0; k < nStates[n1]; k++)
+				{
+					prob[k] = p_nodeBel[0];
+					p_nodeBel += nNodes;
+				}
+				y[n1] = sample(nStates[n1], prob);
+			}
+			else
+			{
+				e = parentEdge[j];
+				sumProb = 0;
+				if (edges[e] == n1)
+				{
+					n2 = edges[e + nEdges] - 1;
+					p_edgeBel = edgeBel + maxState * (y[n2] + maxState * e);
+					for (int k = 0; k < nStates[n1]; k++)
+					{
+						prob[k] = p_edgeBel[k];
+						sumProb += prob[k];
+					}
+				}
+				else
+				{
+					n2 = edges[e] - 1;
+					p_edgeBel = edgeBel + y[n2] + maxState * maxState * e;
+					for (int k = 0; k < nStates[n1]; k++)
+					{
+						prob[k] = p_edgeBel[0];
+						sumProb += prob[k];
+						p_edgeBel += maxState;
+					}
+				}
+				for (int k = 0; k < nStates[n1]; k++)
+					prob[k] /= sumProb;
+				y[n1] = sample(nStates[n1], prob);
+			}
+		}
 
-	UNPROTECT(14 + nNodes * 2);
+		for (int j = 0; j < nNodes; j++)
+			samples[i + size * j] = y[j] + 1;
+	}
 
-	return(_belief);
+	UNPROTECT(12 + nNodes * 2);
+
+	return(_samples);
 }

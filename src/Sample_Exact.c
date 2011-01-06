@@ -65,6 +65,8 @@ SEXP Sample_Exact(SEXP _crf, SEXP _size)
 			break;
 	}
 
+	/* Sampling */
+
 	srand((int) time(0));
 	for (int k = 0; k < size; k++)
 	{
