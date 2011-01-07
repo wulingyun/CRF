@@ -50,8 +50,8 @@ SEXP Infer_Tree(SEXP _crf)
 
 	/* Tree BP */
 
-	double *messages_1 = (double *) R_alloc(maxState * nEdges, sizeof(double));
-	double *messages_2 = (double *) R_alloc(maxState * nEdges, sizeof(double));
+	double *messages_1 = (double *) R_alloc(maxState * nEdges, sizeof(double)); // Messages from n2 to n1 at edge (n1, n2)
+	double *messages_2 = (double *) R_alloc(maxState * nEdges, sizeof(double)); // Messages from n1 to n2 at edge (n1, n2)
 	for (int i = 0; i < maxState * nEdges; i++)
 		messages_1[i] = messages_2[i] = 0;
 	int *nWaiting = (int *) R_alloc(nNodes, sizeof(int));
