@@ -1,6 +1,6 @@
 #include "CRF.h"
 
-SEXP Decode_Tree(SEXP _crf)
+SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _debug)
 {
 	SEXP _nNodes, _nEdges, _edges, _nStates, _maxState;
 	PROTECT(_nNodes = AS_INTEGER(getListElement(_crf, "n.nodes")));
@@ -35,147 +35,150 @@ SEXP Decode_Tree(SEXP _crf)
 	double *nodePot = NUMERIC_POINTER(_nodePot);
 	double *edgePot = NUMERIC_POINTER(_edgePot);
 
+	PROTECT(_maxIter = AS_INTEGER(_maxIter));
+	int maxIter = INTEGER_POINTER(_maxIter)[0];
+	PROTECT(_cutoff = AS_NUMERIC(_cutoff));
+	double cutoff = NUMERIC_POINTER(_cutoff)[0];
+	PROTECT(_debug = AS_INTEGER(_debug));
+	int debug = INTEGER_POINTER(_debug)[0];
+
 	SEXP _labels;
 	PROTECT(_labels = NEW_INTEGER(nNodes));
 	int *labels = INTEGER_POINTER(_labels);
 	setValues(_labels, labels, -1);
 
-	/* Tree BP */
+	/* Loopy BP */
 
 	double *messages_1 = (double *) R_alloc(maxState * nEdges, sizeof(double)); // Messages from n2 to n1 at edge (n1, n2)
 	double *messages_2 = (double *) R_alloc(maxState * nEdges, sizeof(double)); // Messages from n1 to n2 at edge (n1, n2)
+	double *old_messages_1 = (double *) R_alloc(maxState * nEdges, sizeof(double));
+	double *old_messages_2 = (double *) R_alloc(maxState * nEdges, sizeof(double));
 	for (int i = 0; i < maxState * nEdges; i++)
-		messages_1[i] = messages_2[i] = 0;
-	int *nWaiting = (int *) R_alloc(nNodes, sizeof(int));
-	int **waiting = (int **) R_alloc(nNodes, sizeof(int *));
-	int *nUnsent = (int *) R_alloc(nNodes, sizeof(int));
-	int **unsent = (int **) R_alloc(nNodes, sizeof(int *));
-	for (int i = 0; i < nNodes; i++)
-	{
-		nWaiting[i] = nUnsent[i] = nAdj[i];
-		waiting[i] = (int *) R_alloc(nAdj[i], sizeof(int));
-		unsent[i] = (int *) R_alloc(nAdj[i], sizeof(int));
-		for (int j = 0; j < nAdj[i]; j++)
-			waiting[i][j] = unsent[i][j] = 1;
-	}
+		messages_1[i] = messages_2[i] = old_messages_1[i] = old_messages_2[i] = 0;
 
-	int nQueue;
-	int *queue = (int *) R_alloc(nNodes, sizeof(int *));
 	double *incoming = (double *) R_alloc(maxState, sizeof(double));
 
 	int s, r, e, n;
 	double mesg, sumMesg, *p_nodePot, *p_edgePot, *p0_edgePot, *p_messages;
 
-	int done = 0;
-	while (!done)
+	for (int i = 0; i < nEdges; i++)
 	{
-		done = 1;
+		p_messages = messages_1 + maxState * i;
+		n = edges[i] - 1;
+		for (int j = 0; j < nStates[n]; j++)
+			p_messages[j] = 1.0 / nStates[n];
+		p_messages = messages_2 + maxState * i;
+		n = edges[i + nEdges] - 1;
+		for (int j = 0; j < nStates[n]; j++)
+			p_messages[j] = 1.0 / nStates[n];
+	}
+	for (int i = 0; i < maxState * nEdges; i++)
+	{
+		old_messages_1[i] = messages_1[i];
+		old_messages_2[i] = messages_2[i];
+	}
+
+	int iterations = 0;
+	double difference = 0;
+	for (int iter = 0; iter < maxIter; iter++)
+	{
 		for (s = 0; s < nNodes; s++)
 		{
-			if (nUnsent[s] == 0 || nWaiting[s] > 1)
-				continue;
+			for (int i = 0; i < nAdj[s]; i++)
+			{
+				r = adjNodes[s][i] - 1;
 
-			nQueue = 0;
-			if (nWaiting[s] == 1)
-			{
-				for (int i = 0; i < nAdj[s]; i++)
-					if (waiting[s][i] && unsent[s][i])
-						queue[nQueue++] = i;
-			}
-			else
-			{
-				for (int i = 0; i < nAdj[s]; i++)
-					if (unsent[s][i])
-						queue[nQueue++] = i;
-			}
+				/* gather incoming messages */
 
-			if (nQueue > 0)
-			{
-				for (int i = 0; i < nQueue; i++)
+				p_nodePot = nodePot + s;
+				for (int j = 0; j < nStates[s]; j++)
 				{
-					n = queue[i];
-					r = adjNodes[s][n] - 1;
-
-					unsent[s][n] = 0;
-					nUnsent[s]--;
-
-					for (int j = 0; j < nAdj[r]; j++)
-						if (adjNodes[r][j] - 1 == s)
-						{
-							waiting[r][j] = 0;
-							nWaiting[r]--;
-							break;
-						}
-
-					/* gather incoming messages */
-
-					p_nodePot = nodePot + s;
-					for (int j = 0; j < nStates[s]; j++)
-					{
-						incoming[j] = p_nodePot[0];
-						p_nodePot += nNodes;
-					}
-					for (int j = 0; j < nAdj[s]; j++)
-					{
-						if (j != n)
-						{
-							e = adjEdges[s][j] - 1;
-							if (edges[e] - 1 == s)
-								p_messages = messages_1;
-							else
-								p_messages = messages_2;
-							p_messages += maxState * e;
-							for (int k = 0; k < nStates[s]; k++)
-								incoming[k] *= p_messages[k];
-						}
-					}
-
-					/* send messages */
-
-					e = adjEdges[s][n] - 1;
-					sumMesg = 0;
-					p0_edgePot = edgePot + maxState * maxState * e;
-					if (edges[e] - 1 == s)
-					{
-						p_messages = messages_2 + maxState * e;
-						for (int j = 0; j < nStates[r]; j++)
-						{
-							p_edgePot = p0_edgePot;
-							p0_edgePot += maxState;
-							p_messages[j] = -1;
-							for (int k = 0; k < nStates[s]; k++)
-							{
-								mesg = incoming[k] * p_edgePot[k];
-								if (mesg > p_messages[j])
-									p_messages[j] = mesg;
-							}
-							sumMesg += p_messages[j];
-						}
-					}
-					else
-					{
-						p_messages = messages_1 + maxState * e;
-						for (int j = 0; j < nStates[r]; j++)
-						{
-							p_edgePot = p0_edgePot++;
-							p_messages[j] = -1;
-							for (int k = 0; k < nStates[s]; k++)
-							{
-								mesg = incoming[k] * p_edgePot[0];
-								if (mesg > p_messages[j])
-									p_messages[j] = mesg;
-								p_edgePot += maxState;
-							}
-							sumMesg += p_messages[j];
-						}
-					}
-					for (int j = 0; j < nStates[r]; j++)
-						p_messages[j] /= sumMesg;
+					incoming[j] = p_nodePot[0];
+					p_nodePot += nNodes;
 				}
-				done = 0;
+				for (int j = 0; j < nAdj[s]; j++)
+				{
+					if (j != i)
+					{
+						e = adjEdges[s][j] - 1;
+						if (edges[e] - 1 == s)
+							p_messages = messages_1;
+						else
+							p_messages = messages_2;
+						p_messages += maxState * e;
+						for (int k = 0; k < nStates[s]; k++)
+							incoming[k] *= p_messages[k];
+					}
+				}
+
+				/* send messages */
+
+				e = adjEdges[s][i] - 1;
+				sumMesg = 0;
+				p0_edgePot = edgePot + maxState * maxState * e;
+				if (edges[e] - 1 == s)
+				{
+					p_messages = messages_2 + maxState * e;
+					for (int j = 0; j < nStates[r]; j++)
+					{
+						p_edgePot = p0_edgePot;
+						p0_edgePot += maxState;
+						p_messages[j] = -1;
+						for (int k = 0; k < nStates[s]; k++)
+						{
+							mesg = incoming[k] * p_edgePot[k];
+							if (mesg > p_messages[j])
+								p_messages[j] = mesg;
+						}
+						sumMesg += p_messages[j];
+					}
+				}
+				else
+				{
+					p_messages = messages_1 + maxState * e;
+					for (int j = 0; j < nStates[r]; j++)
+					{
+						p_edgePot = p0_edgePot++;
+						p_messages[j] = -1;
+						for (int k = 0; k < nStates[s]; k++)
+						{
+							mesg = incoming[k] * p_edgePot[0];
+							if (mesg > p_messages[j])
+								p_messages[j] = mesg;
+							p_edgePot += maxState;
+						}
+						sumMesg += p_messages[j];
+					}
+				}
+				for (int j = 0; j < nStates[r]; j++)
+					p_messages[j] /= sumMesg;
 			}
 		}
+
+		difference = 0;
+		for (int i = 0; i < maxState * nEdges; i++)
+		{
+			difference += fabs(messages_1[i] - old_messages_1[i]);
+			difference += fabs(messages_2[i] - old_messages_2[i]);
+		}
+		if (difference <= cutoff)
+		{
+			iterations = iter + 1;
+			break;
+		}
+
+		p_messages = old_messages_1;
+		old_messages_1 = messages_1;
+		messages_1 = p_messages;
+		p_messages = old_messages_2;
+		old_messages_2 = messages_2;
+		messages_2 = p_messages;
 	}
+
+	if (difference > cutoff)
+		warning("Loopy BP did not converge in %d iterations! (diff = %f)", maxIter, difference);
+	if (debug)
+		Rprintf("LBP: Iterations = %d, Difference = %f\n", iterations, difference);
 
 	/* Node beliefs */
 
@@ -246,7 +249,7 @@ SEXP Decode_Tree(SEXP _crf)
 	for (int i = 0; i < nNodes; i++)
 		labels[i]++;
 
-	UNPROTECT(11 + nNodes * 2);
+	UNPROTECT(14 + nNodes * 2);
 
 	return(_labels);
 }
