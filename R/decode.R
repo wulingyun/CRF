@@ -10,11 +10,11 @@ decode.tree <- function(crf)
 decode.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 	.Call("Decode_LBP", crf, max.iter, cutoff, verbose)
 
-decode.infer <- function(crf, infer, ...)
-	apply(infer(crf, ...)$node.bel, 1, which.max)
+decode.marginal <- function(crf, infer.method, ...)
+	apply(infer.method(crf, ...)$node.bel, 1, which.max)
 
-decode.sample <- function(crf, sample, ...)
+decode.sample <- function(crf, sample.method, ...)
 {
-	s <- sample(crf, ...)
+	s <- sample.method(crf, ...)
 	s[which.max(apply(s, 1, function(x) log.potential(crf, x))),]
 }
