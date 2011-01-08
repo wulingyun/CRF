@@ -58,8 +58,9 @@ void setDim3(SEXP array, int x1, int x2, int x3)
 
 int sample(int n, double *prob)
 {
-	int select = n;
-	double cumulativeProb = 0, cutoff = (double) rand() / RAND_MAX;
+	int select = n-1;
+	double cutoff = unif_rand();
+	double cumulativeProb = 0;
 	for (int i = 0; i < n; i++)
 	{
 		cumulativeProb += prob[i];
