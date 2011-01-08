@@ -81,7 +81,7 @@ SEXP Sample_Chain(SEXP _crf, SEXP _size)
 
 	double sumProb, *prob = (double *) R_alloc(maxState, sizeof(double));
 
-	srand((int) time(0));
+	GetRNGstate();
 	for (int i = 0; i < size; i++)
 	{
 		p_alpha = alpha + nNodes - 1;
@@ -110,6 +110,7 @@ SEXP Sample_Chain(SEXP _crf, SEXP _size)
 		for (int j = 0; j < nNodes; j++)
 			samples[i + size * j] = y[j] + 1;
 	}
+	PutRNGstate();
 
 	UNPROTECT(7);
 	return(_samples);

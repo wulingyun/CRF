@@ -345,7 +345,7 @@ SEXP Sample_Tree(SEXP _crf, SEXP _size)
 
 	double sumProb, *prob = (double *) R_alloc(maxState, sizeof(double));
 
-	srand((int) time(0));
+	GetRNGstate();
 	for (int i = 0; i < size; i++)
 	{
 		for (int j = 0; j < nNodes; j++)
@@ -394,6 +394,7 @@ SEXP Sample_Tree(SEXP _crf, SEXP _size)
 		for (int j = 0; j < nNodes; j++)
 			samples[i + size * j] = y[j] + 1;
 	}
+	PutRNGstate();
 
 	UNPROTECT(12 + nNodes * 2);
 

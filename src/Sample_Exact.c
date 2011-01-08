@@ -67,14 +67,15 @@ SEXP Sample_Exact(SEXP _crf, SEXP _size)
 
 	/* Sampling */
 
-	srand((int) time(0));
+	double cutoff, cumulativePot;
+	GetRNGstate();
 	for (int k = 0; k < size; k++)
 	{
 		for (int i = 0; i < nNodes; i++)
 			y[i] = 0;
 
-		double cutoff = (double) rand() / RAND_MAX;
-		double cumulativePot = 0;
+		cutoff = unif_rand();
+		cumulativePot = 0;
 		while(1)
 		{
 			pot = 1;
@@ -110,6 +111,7 @@ SEXP Sample_Exact(SEXP _crf, SEXP _size)
 		for (int i = 0; i < nNodes; i++)
 			samples[k + size * i] = y[i] + 1;
 	}
+	PutRNGstate();
 
 	UNPROTECT(9);
 	return(_samples);
