@@ -1,6 +1,6 @@
 #include "CRF.h"
 
-SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _debug)
+SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose)
 {
 	SEXP _nNodes, _nEdges, _edges, _nStates, _maxState;
 	PROTECT(_nNodes = AS_INTEGER(getListElement(_crf, "n.nodes")));
@@ -39,8 +39,8 @@ SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _debug)
 	int maxIter = INTEGER_POINTER(_maxIter)[0];
 	PROTECT(_cutoff = AS_NUMERIC(_cutoff));
 	double cutoff = NUMERIC_POINTER(_cutoff)[0];
-	PROTECT(_debug = AS_INTEGER(_debug));
-	int debug = INTEGER_POINTER(_debug)[0];
+	PROTECT(_verbose = AS_INTEGER(_verbose));
+	int verbose = INTEGER_POINTER(_verbose)[0];
 
 	SEXP _labels;
 	PROTECT(_labels = NEW_INTEGER(nNodes));
@@ -63,20 +63,26 @@ SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _debug)
 
 	for (int i = 0; i < nEdges; i++)
 	{
-		p_messages = old_messages_1 + maxState * i;
+		p_messages = messages_1 + maxState * i;
 		n = edges[i] - 1;
 		for (int j = 0; j < nStates[n]; j++)
 			p_messages[j] = 1.0 / nStates[n];
-		p_messages = old_messages_2 + maxState * i;
+		p_messages = messages_2 + maxState * i;
 		n = edges[i + nEdges] - 1;
 		for (int j = 0; j < nStates[n]; j++)
 			p_messages[j] = 1.0 / nStates[n];
 	}
 
-	int iterations = 0;
 	double difference = 0;
-	for (int iter = 0; iter < maxIter; iter++)
+	for (int iter = 1; iter <= maxIter; iter++)
 	{
+		p_messages = old_messages_1;
+		old_messages_1 = messages_1;
+		messages_1 = p_messages;
+		p_messages = old_messages_2;
+		old_messages_2 = messages_2;
+		messages_2 = p_messages;
+
 		for (s = 0; s < nNodes; s++)
 		{
 			for (int i = 0; i < nAdj[s]; i++)
@@ -156,24 +162,14 @@ SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _debug)
 			difference += fabs(messages_1[i] - old_messages_1[i]);
 			difference += fabs(messages_2[i] - old_messages_2[i]);
 		}
+		if (verbose)
+			Rprintf("LBP: Iteration %d, Difference = %f\n", iter, difference);
 		if (difference <= cutoff)
-		{
-			iterations = iter + 1;
 			break;
-		}
-
-		p_messages = old_messages_1;
-		old_messages_1 = messages_1;
-		messages_1 = p_messages;
-		p_messages = old_messages_2;
-		old_messages_2 = messages_2;
-		messages_2 = p_messages;
 	}
 
 	if (difference > cutoff)
 		warning("Loopy BP did not converge in %d iterations! (diff = %f)", maxIter, difference);
-	if (debug)
-		Rprintf("LBP: Iterations = %d, Difference = %f\n", iterations, difference);
 
 	/* Node beliefs */
 
