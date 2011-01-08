@@ -63,19 +63,14 @@ SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _debug)
 
 	for (int i = 0; i < nEdges; i++)
 	{
-		p_messages = messages_1 + maxState * i;
+		p_messages = old_messages_1 + maxState * i;
 		n = edges[i] - 1;
 		for (int j = 0; j < nStates[n]; j++)
 			p_messages[j] = 1.0 / nStates[n];
-		p_messages = messages_2 + maxState * i;
+		p_messages = old_messages_2 + maxState * i;
 		n = edges[i + nEdges] - 1;
 		for (int j = 0; j < nStates[n]; j++)
 			p_messages[j] = 1.0 / nStates[n];
-	}
-	for (int i = 0; i < maxState * nEdges; i++)
-	{
-		old_messages_1[i] = messages_1[i];
-		old_messages_2[i] = messages_2[i];
 	}
 
 	int iterations = 0;
@@ -102,9 +97,9 @@ SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _debug)
 					{
 						e = adjEdges[s][j] - 1;
 						if (edges[e] - 1 == s)
-							p_messages = messages_1;
+							p_messages = old_messages_1;
 						else
-							p_messages = messages_2;
+							p_messages = old_messages_2;
 						p_messages += maxState * e;
 						for (int k = 0; k < nStates[s]; k++)
 							incoming[k] *= p_messages[k];
