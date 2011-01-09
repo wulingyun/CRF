@@ -12,14 +12,3 @@ infer.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 
 infer.sample <- function(crf, sample.method, ...)
 	.Call("Infer_Sample", crf, sample.method(crf, ...))
-
-infer.sample.logZ <- function(crf, sample.method, ...)
-{
-	s <- sample.method(crf, ...)
-	belief <- .Call("Infer_Sample", crf, s)
-	p <- apply(s, 1, function(x) potential(crf, x))
-	i <- which.max(p)
-	freq <- sum(rowSums(s == matrix(rep.int(s[i,], dim(s)[1]), byrow=TRUE, ncol=crf$n.nodes)) == crf$n.nodes)
-	belief$logZ <- log(p[i] * dim(s)[1] / freq)
-	belief
-}
