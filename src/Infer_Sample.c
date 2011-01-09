@@ -36,19 +36,23 @@ SEXP Infer_Sample(SEXP _crf, SEXP _samples)
 	*logZ = 0;
 
 	double pot, maxPot = -1;
-	int maxSample = -1;
+	int k, maxSample = -1;
 	for (int i = 0; i < nSamples; i++)
 	{
-		for (int j = 0; j < nNodes; j++)
-			nodeBel[j + nNodes * (samples[i + nSamples * j] - 1)]++;
-		for (int j = 0; j < nEdges; j++)
-			edgeBel[samples[i + nSamples * (edges[j] - 1)] - 1 + maxState * (samples[i + nSamples * (edges[j + nEdges] - 1)] - 1 + maxState * j)]++;
-
 		pot = 1;
 		for (int j = 0; j < nNodes; j++)
-			pot *= nodePot[j + nNodes * (samples[i + nSamples * j] - 1)];
+		{
+			k = j + nNodes * (samples[i + nSamples * j] - 1);
+			nodeBel[k]++;
+			pot *= nodePot[k];
+		}
 		for (int j = 0; j < nEdges; j++)
-			pot *= edgePot[samples[i + nSamples * (edges[j] - 1)] - 1 + maxState * (samples[i + nSamples * (edges[j + nEdges] - 1)] - 1 + maxState * j)];
+		{
+			k = samples[i + nSamples * (edges[j] - 1)] - 1 + maxState * (samples[i + nSamples * (edges[j + nEdges] - 1)] - 1 + maxState * j);
+			edgeBel[k]++;
+			pot *= edgePot[k];
+		}
+
 		if (pot > maxPot)
 		{
 			maxPot = pot;
