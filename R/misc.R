@@ -43,8 +43,8 @@ make.crf <- function(adj.matrix, nstates)
 	data
 }
 
-potential <- function(crf, configuration)
+get.potential <- function(crf, configuration)
 	.Call("Potential", crf, configuration)
 
-log.potential <- function(crf, configuration)
+get.logPotential <- function(crf, configuration)
 	.Call("Log_Potential", crf, configuration)
