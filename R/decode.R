@@ -14,7 +14,4 @@ decode.marginal <- function(crf, infer.method, ...)
 	apply(infer.method(crf, ...)$node.bel, 1, which.max)
 
 decode.sample <- function(crf, sample.method, ...)
-{
-	s <- sample.method(crf, ...)
-	s[which.max(apply(s, 1, function(x) log.potential(crf, x))),]
-}
+	.Call("Decode_Sample", crf, sample.method(crf, ...))
