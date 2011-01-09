@@ -17,6 +17,9 @@ infer.sample.logZ <- function(crf, sample.method, ...)
 {
 	s <- sample.method(crf, ...)
 	belief <- .Call("Infer_Sample", crf, s)
-	belief$logZ <- log(sum(apply(unique(s), 1, function(x) potential(crf, x))))
+	p <- apply(s, 1, function(x) potential(crf, x))
+	i <- which.max(p)
+	freq <- sum(rowSums(s == matrix(rep.int(s[i,], dim(s)[1]), byrow=TRUE, ncol=crf$n.nodes)) == crf$n.nodes)
+	belief$logZ <- log(p[i] * dim(s)[1] / freq)
 	belief
 }
