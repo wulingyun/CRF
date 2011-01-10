@@ -1,4 +1,3 @@
-#include <time.h>
 #include "CRF.h"
 
 SEXP Sample_Exact(SEXP _crf, SEXP _size)

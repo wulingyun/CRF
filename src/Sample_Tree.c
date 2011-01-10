@@ -1,4 +1,3 @@
-#include <time.h>
 #include "CRF.h"
 
 SEXP Sample_Tree(SEXP _crf, SEXP _size)

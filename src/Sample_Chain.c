@@ -1,4 +1,3 @@
-#include <time.h>
 #include "CRF.h"
 
 SEXP Sample_Chain(SEXP _crf, SEXP _size)
