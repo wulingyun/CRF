@@ -1,5 +1,7 @@
 useDynLib(CRF)
 export(make.crf)
+export(clamp.crf)
+export(clamp.reset)
 export(get.potential)
 export(get.logPotential)
 export(decode.exact)
