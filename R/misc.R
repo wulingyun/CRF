@@ -10,6 +10,20 @@ make.crf <- function(adj.matrix, nstates)
 	data$edges <- e[order(e[,1]),]
 	data$n.edges <- nrow(data$edges)
 
+	data <- make.adj.info(data)
+
+	data$n.states <- rep(nstates, length.out=data$n.nodes)
+	data$max.state <- max(nstates)
+
+	data$node.pot <- array(1, dim=c(data$n.nodes, data$max.state))
+	data$edge.pot <- array(1, dim=c(data$max.state, data$max.state, data$n.edges))
+
+	class(data) <- "CRF"
+	data
+}
+
+make.adj.info <- function(data)
+{
 	data$adj.edges <- list()
 	data$adj.nodes <- list()
 	for (i in 1:data$n.nodes)
@@ -33,13 +47,6 @@ make.crf <- function(adj.matrix, nstates)
 		data$adj.edges[[i]] <- sort(data$adj.edges[[i]])
 		data$adj.nodes[[i]] <- sort(data$adj.nodes[[i]])
 	}
-
-	data$n.states <- rep(nstates, length.out=data$n.nodes)
-	data$max.state <- max(nstates)
-
-	data$node.pot <- array(1, dim=c(data$n.nodes, data$max.state))
-	data$edge.pot <- array(1, dim=c(data$max.state, data$max.state, data$n.edges))
-
 	data
 }
 
