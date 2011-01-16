@@ -1,8 +1,37 @@
 #include <R.h>
 #include <Rdefines.h>
 
+/* Interfaces to R */
 
-typedef struct __CRFinfo {
+extern "C" {
+	/* Decoding */
+	SEXP Decode_Exact(SEXP _crf);
+	SEXP Decode_Chain(SEXP _crf);
+	SEXP Decode_Tree(SEXP _crf);
+	SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
+	SEXP Decode_Sample(SEXP _crf, SEXP _samples);
+
+	/* Inference */
+	SEXP Infer_Exact(SEXP _crf);
+	SEXP Infer_Chain(SEXP _crf);
+	SEXP Infer_Tree(SEXP _crf);
+	SEXP Infer_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
+	SEXP Infer_Sample(SEXP _crf, SEXP _samples);
+
+	/* Sampling */
+	SEXP Sample_Exact(SEXP _crf, SEXP _size);
+	SEXP Sample_Chain(SEXP _crf, SEXP _size);
+	SEXP Sample_Tree(SEXP _crf, SEXP _size);
+	SEXP Sample_Gibbs(SEXP _crf, SEXP _size, SEXP _burnIn, SEXP _start);
+
+	/* Utils */
+	SEXP Clamp_NodePot(SEXP _crfClamped);
+}
+
+/* CRF class */
+
+class CRF {
+public:
 	SEXP _nNodes, _nEdges, _edges, _nStates, _maxState;
 	int nNodes, nEdges, *edges, *nStates, maxState;
 
@@ -11,24 +40,26 @@ typedef struct __CRFinfo {
 
 	SEXP _nodePot, _edgePot;
 	double *nodePot, *edgePot;
-} CRFinfo;
 
-void openCRF(CRFinfo *crf, SEXP _crf);
-void closeCRF(CRFinfo *crf);
+	CRF(SEXP _crf);
+	~CRF();
 
-void TreeBP(CRFinfo *crf, double *messages_1, double *messages_2);
-void TreeBP_max(CRFinfo *crf, double *messages_1, double *messages_2);
-void LoopyBP(CRFinfo *crf, double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose);
-void LoopyBP_max(CRFinfo *crf, double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose);
-void Message2NodeBelief(CRFinfo *crf, double *messages_1, double *messages_2, double *nodeBel);
-void Message2EdgeBelief(CRFinfo *crf, double *messages_1, double *messages_2, double *nodeBel, double *edgeBel);
+	void Clamp_Reset(int *clamped, int *nodeMap, int nNodesNew, double *nodePotNew);
 
-void _Decode_Tree(CRFinfo *crf, int *labels);
-void _Decode_LBP(CRFinfo *crf, int *labels, int maxIter, double cutoff, int verbose);
-void _Infer_Tree(CRFinfo *crf, double *nodeBel, double *edgeBel, double *logZ);
-void _Infer_LBP(CRFinfo *crf, double *nodeBel, double *edgeBel, double *logZ, int maxIter, double cutoff, int verbose);
-void _Sample_Tree(CRFinfo *ctf, int size, int *samples);
-void _Sample_LBP(CRFinfo *ctf, int size, int *samples, int maxIter, double cutoff, int verbose);
+	void TreeBP(double *messages_1, double *messages_2);
+	void TreeBP_max(double *messages_1, double *messages_2);
+	void LoopyBP(double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose);
+	void LoopyBP_max(double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose);
+	void Message2NodeBelief(double *messages_1, double *messages_2, double *nodeBel);
+	void Message2EdgeBelief(double *messages_1, double *messages_2, double *nodeBel, double *edgeBel);
+
+	void Decode_Tree(int *labels);
+	void Decode_LBP(int *labels, int maxIter, double cutoff, int verbose);
+	void Infer_Tree(double *nodeBel, double *edgeBel, double *logZ);
+	void Infer_LBP(double *nodeBel, double *edgeBel, double *logZ, int maxIter, double cutoff, int verbose);
+	void Sample_Tree(int size, int *samples);
+	void Sample_LBP(int size, int *samples, int maxIter, double cutoff, int verbose);
+};
 
 /* initialize the list */
 #define setValues(r, c, v) for (int i = 0; i < length(r); i++) c[i] = v
