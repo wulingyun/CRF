@@ -1,50 +1,50 @@
 #include "CRF.h"
 
-void Clamp_Reset(CRFinfo *crf, int *clamped, int *nodeMap, int nNodesNew, double *nodePotNew)
+void CRF::Clamp_Reset(int *clamped, int *nodeMap, int nNodesNew, double *nodePotNew)
 {
 	int e, n1, n2;
 	double *p_nodePot, *p_edgePot, *p_nodePotNew;
 
-	for (int i = 0; i < crf->nNodes; i++)
+	for (int i = 0; i < nNodes; i++)
 	{
 		if (nodeMap[i] > 0)
 		{
-			p_nodePot = crf->nodePot + i;
+			p_nodePot = nodePot + i;
 			p_nodePotNew = nodePotNew + nodeMap[i] - 1;
-			for (int j = 0; j < crf->nStates[i]; j++)
+			for (int j = 0; j < nStates[i]; j++)
 			{
 				p_nodePotNew[0] = p_nodePot[0];
-				p_nodePot += crf->nNodes;
+				p_nodePot += nNodes;
 				p_nodePotNew += nNodesNew;
 			}
 		}
 	}
 
-	for (int i = 0; i < crf->nNodes; i++)
+	for (int i = 0; i < nNodes; i++)
 	{
 		if (clamped[i])
 		{
-			for (int j = 0; j < crf->nAdj[i]; j++)
+			for (int j = 0; j < nAdj[i]; j++)
 			{
-				e = crf->adjEdges[i][j] - 1;
-				n1 = crf->edges[e] - 1;
-				n2 = crf->edges[e + crf->nEdges] - 1;
+				e = adjEdges[i][j] - 1;
+				n1 = edges[e] - 1;
+				n2 = edges[e + nEdges] - 1;
 				if (n1 == i && clamped[n2] == 0)
 				{
-					p_edgePot = crf->edgePot + clamped[i] - 1 + crf->maxState * crf->maxState * e;
+					p_edgePot = edgePot + clamped[i] - 1 + maxState * maxState * e;
 					p_nodePotNew = nodePotNew + nodeMap[n2] - 1;
-					for (int k = 0; k < crf->nStates[n2]; k++)
+					for (int k = 0; k < nStates[n2]; k++)
 					{
 						p_nodePotNew[0] *= p_edgePot[0];
-						p_edgePot += crf->maxState;
+						p_edgePot += maxState;
 						p_nodePotNew += nNodesNew;
 					}
 				}
 				else if (n2 == i && clamped[n1] == 0)
 				{
-					p_edgePot = crf->edgePot + crf->maxState * (clamped[i] - 1 + crf->maxState * e);
+					p_edgePot = edgePot + maxState * (clamped[i] - 1 + maxState * e);
 					p_nodePotNew = nodePotNew + nodeMap[n1] - 1;
-					for (int k = 0; k < crf->nStates[n1]; k++)
+					for (int k = 0; k < nStates[n1]; k++)
 					{
 						p_nodePotNew[0] *= p_edgePot[k];
 						p_nodePotNew += nNodesNew;
@@ -59,8 +59,7 @@ SEXP Clamp_NodePot(SEXP _crfClamped)
 {
 	SEXP _crf;
 	PROTECT(_crf = AS_LIST(getListElement(_crfClamped, "original")));
-	CRFinfo crf;
-	openCRF(&crf, _crf);
+	CRF crf(_crf);
 
 	SEXP _clamped, _nodeMap, _nNodes, _maxState;
 	PROTECT(_clamped = AS_INTEGER(getListElement(_crfClamped, "clamped")));
@@ -78,10 +77,9 @@ SEXP Clamp_NodePot(SEXP _crfClamped)
 	double *nodePot = NUMERIC_POINTER(_nodePot);
 	setValues(_nodePot, nodePot, 0);
 
-	Clamp_Reset(&crf, clamped, nodeMap, nNodes, nodePot);
+	crf.Clamp_Reset(clamped, nodeMap, nNodes, nodePot);
 
 	UNPROTECT(6);
-	closeCRF(&crf);
 
 	return(_nodePot);
 }
