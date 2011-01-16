@@ -18,12 +18,17 @@ void closeCRF(CRFinfo *crf);
 
 void TreeBP(CRFinfo *crf, double *messages_1, double *messages_2);
 void TreeBP_max(CRFinfo *crf, double *messages_1, double *messages_2);
+void LoopyBP(CRFinfo *crf, double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose);
+void LoopyBP_max(CRFinfo *crf, double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose);
 void Message2NodeBelief(CRFinfo *crf, double *messages_1, double *messages_2, double *nodeBel);
 void Message2EdgeBelief(CRFinfo *crf, double *messages_1, double *messages_2, double *nodeBel, double *edgeBel);
 
 void _Decode_Tree(CRFinfo *crf, int *labels);
+void _Decode_LBP(CRFinfo *crf, int *labels, int maxIter, double cutoff, int verbose);
 void _Infer_Tree(CRFinfo *crf, double *nodeBel, double *edgeBel, double *logZ);
+void _Infer_LBP(CRFinfo *crf, double *nodeBel, double *edgeBel, double *logZ, int maxIter, double cutoff, int verbose);
 void _Sample_Tree(CRFinfo *ctf, int size, int *samples);
+void _Sample_LBP(CRFinfo *ctf, int size, int *samples, int maxIter, double cutoff, int verbose);
 
 /* initialize the list */
 #define setValues(r, c, v) for (int i = 0; i < length(r); i++) c[i] = v

@@ -1,5 +1,7 @@
 #include "CRF.h"
 
+/* Tree BP (sum product) */
+
 void TreeBP(CRFinfo *crf, double *messages_1, double *messages_2)
 {
 	for (int i = 0; i < crf->maxState * crf->nEdges; i++)
@@ -129,6 +131,8 @@ void TreeBP(CRFinfo *crf, double *messages_1, double *messages_2)
 		}
 	}
 }
+
+/* Tree BP (max product) */
 
 void TreeBP_max(CRFinfo *crf, double *messages_1, double *messages_2)
 {
@@ -264,6 +268,250 @@ void TreeBP_max(CRFinfo *crf, double *messages_1, double *messages_2)
 			}
 		}
 	}
+}
+
+/* Loopy BP (sum product) */
+
+void LoopyBP(CRFinfo *crf, double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose)
+{
+	double *old_messages_1 = (double *) R_alloc(crf->maxState * crf->nEdges, sizeof(double));
+	double *old_messages_2 = (double *) R_alloc(crf->maxState * crf->nEdges, sizeof(double));
+	for (int i = 0; i < crf->maxState * crf->nEdges; i++)
+		messages_1[i] = messages_2[i] = old_messages_1[i] = old_messages_2[i] = 0;
+
+	double *incoming = (double *) R_alloc(crf->maxState, sizeof(double));
+
+	int s, r, e, n;
+	double sumMesg, *p_nodePot, *p_edgePot, *p0_edgePot, *p_messages;
+
+	for (int i = 0; i < crf->nEdges; i++)
+	{
+		p_messages = messages_1 + crf->maxState * i;
+		n = crf->edges[i] - 1;
+		for (int j = 0; j < crf->nStates[n]; j++)
+			p_messages[j] = 1.0 / crf->nStates[n];
+		p_messages = messages_2 + crf->maxState * i;
+		n = crf->edges[i + crf->nEdges] - 1;
+		for (int j = 0; j < crf->nStates[n]; j++)
+			p_messages[j] = 1.0 / crf->nStates[n];
+	}
+
+	double difference = 0;
+	for (int iter = 1; iter <= maxIter; iter++)
+	{
+		p_messages = old_messages_1;
+		old_messages_1 = messages_1;
+		messages_1 = p_messages;
+		p_messages = old_messages_2;
+		old_messages_2 = messages_2;
+		messages_2 = p_messages;
+
+		for (s = 0; s < crf->nNodes; s++)
+		{
+			for (int i = 0; i < crf->nAdj[s]; i++)
+			{
+				r = crf->adjNodes[s][i] - 1;
+
+				/* gather incoming messages */
+
+				p_nodePot = crf->nodePot + s;
+				for (int j = 0; j < crf->nStates[s]; j++)
+				{
+					incoming[j] = p_nodePot[0];
+					p_nodePot += crf->nNodes;
+				}
+				for (int j = 0; j < crf->nAdj[s]; j++)
+				{
+					if (j != i)
+					{
+						e = crf->adjEdges[s][j] - 1;
+						if (crf->edges[e] - 1 == s)
+							p_messages = old_messages_1;
+						else
+							p_messages = old_messages_2;
+						p_messages += crf->maxState * e;
+						for (int k = 0; k < crf->nStates[s]; k++)
+							incoming[k] *= p_messages[k];
+					}
+				}
+
+				/* send messages */
+
+				e = crf->adjEdges[s][i] - 1;
+				sumMesg = 0;
+				p0_edgePot = crf->edgePot + crf->maxState * crf->maxState * e;
+				if (crf->edges[e] - 1 == s)
+				{
+					p_messages = messages_2 + crf->maxState * e;
+					for (int j = 0; j < crf->nStates[r]; j++)
+					{
+						p_edgePot = p0_edgePot;
+						p0_edgePot += crf->maxState;
+						p_messages[j] = 0;
+						for (int k = 0; k < crf->nStates[s]; k++)
+							p_messages[j] += incoming[k] * p_edgePot[k];
+						sumMesg += p_messages[j];
+					}
+				}
+				else
+				{
+					p_messages = messages_1 + crf->maxState * e;
+					for (int j = 0; j < crf->nStates[r]; j++)
+					{
+						p_edgePot = p0_edgePot++;
+						p_messages[j] = 0;
+						for (int k = 0; k < crf->nStates[s]; k++)
+						{
+							p_messages[j] += incoming[k] * p_edgePot[0];
+							p_edgePot += crf->maxState;
+						}
+						sumMesg += p_messages[j];
+					}
+				}
+				for (int j = 0; j < crf->nStates[r]; j++)
+					p_messages[j] /= sumMesg;
+			}
+		}
+
+		difference = 0;
+		for (int i = 0; i < crf->maxState * crf->nEdges; i++)
+		{
+			difference += fabs(messages_1[i] - old_messages_1[i]);
+			difference += fabs(messages_2[i] - old_messages_2[i]);
+		}
+		if (verbose)
+			Rprintf("LBP: Iteration %d, Difference = %f\n", iter, difference);
+		if (difference <= cutoff)
+			break;
+	}
+
+	if (difference > cutoff)
+		warning("Loopy BP did not converge in %d iterations! (diff = %f)", maxIter, difference);
+}
+
+/* Loopy BP (max product) */
+
+void LoopyBP_max(CRFinfo *crf, double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose)
+{
+	double *old_messages_1 = (double *) R_alloc(crf->maxState * crf->nEdges, sizeof(double));
+	double *old_messages_2 = (double *) R_alloc(crf->maxState * crf->nEdges, sizeof(double));
+	for (int i = 0; i < crf->maxState * crf->nEdges; i++)
+		messages_1[i] = messages_2[i] = old_messages_1[i] = old_messages_2[i] = 0;
+
+	double *incoming = (double *) R_alloc(crf->maxState, sizeof(double));
+
+	int s, r, e, n;
+	double mesg, sumMesg, *p_nodePot, *p_edgePot, *p0_edgePot, *p_messages;
+
+	for (int i = 0; i < crf->nEdges; i++)
+	{
+		p_messages = messages_1 + crf->maxState * i;
+		n = crf->edges[i] - 1;
+		for (int j = 0; j < crf->nStates[n]; j++)
+			p_messages[j] = 1.0 / crf->nStates[n];
+		p_messages = messages_2 + crf->maxState * i;
+		n = crf->edges[i + crf->nEdges] - 1;
+		for (int j = 0; j < crf->nStates[n]; j++)
+			p_messages[j] = 1.0 / crf->nStates[n];
+	}
+
+	double difference = 0;
+	for (int iter = 1; iter <= maxIter; iter++)
+	{
+		p_messages = old_messages_1;
+		old_messages_1 = messages_1;
+		messages_1 = p_messages;
+		p_messages = old_messages_2;
+		old_messages_2 = messages_2;
+		messages_2 = p_messages;
+
+		for (s = 0; s < crf->nNodes; s++)
+		{
+			for (int i = 0; i < crf->nAdj[s]; i++)
+			{
+				r = crf->adjNodes[s][i] - 1;
+
+				/* gather incoming messages */
+
+				p_nodePot = crf->nodePot + s;
+				for (int j = 0; j < crf->nStates[s]; j++)
+				{
+					incoming[j] = p_nodePot[0];
+					p_nodePot += crf->nNodes;
+				}
+				for (int j = 0; j < crf->nAdj[s]; j++)
+				{
+					if (j != i)
+					{
+						e = crf->adjEdges[s][j] - 1;
+						if (crf->edges[e] - 1 == s)
+							p_messages = old_messages_1;
+						else
+							p_messages = old_messages_2;
+						p_messages += crf->maxState * e;
+						for (int k = 0; k < crf->nStates[s]; k++)
+							incoming[k] *= p_messages[k];
+					}
+				}
+
+				/* send messages */
+
+				e = crf->adjEdges[s][i] - 1;
+				sumMesg = 0;
+				p0_edgePot = crf->edgePot + crf->maxState * crf->maxState * e;
+				if (crf->edges[e] - 1 == s)
+				{
+					p_messages = messages_2 + crf->maxState * e;
+					for (int j = 0; j < crf->nStates[r]; j++)
+					{
+						p_edgePot = p0_edgePot;
+						p0_edgePot += crf->maxState;
+						p_messages[j] = -1;
+						for (int k = 0; k < crf->nStates[s]; k++)
+						{
+							mesg = incoming[k] * p_edgePot[k];
+							if (mesg > p_messages[j])
+								p_messages[j] = mesg;
+						}
+						sumMesg += p_messages[j];
+					}
+				}
+				else
+				{
+					p_messages = messages_1 + crf->maxState * e;
+					for (int j = 0; j < crf->nStates[r]; j++)
+					{
+						p_edgePot = p0_edgePot++;
+						p_messages[j] = -1;
+						for (int k = 0; k < crf->nStates[s]; k++)
+						{
+							mesg = incoming[k] * p_edgePot[0];
+							if (mesg > p_messages[j])
+								p_messages[j] = mesg;
+							p_edgePot += crf->maxState;
+						}
+						sumMesg += p_messages[j];
+					}
+				}
+				for (int j = 0; j < crf->nStates[r]; j++)
+					p_messages[j] /= sumMesg;
+			}
+		}
+
+		difference = 0;
+		for (int i = 0; i < crf->maxState * crf->nEdges; i++)
+		{
+			difference += fabs(messages_1[i] - old_messages_1[i]);
+			difference += fabs(messages_2[i] - old_messages_2[i]);
+		}
+		if (verbose)
+			Rprintf("LBP: Iteration %d, Difference = %f\n", iter, difference);
+		if (difference <= cutoff)
+			break;
+	}
+
+	if (difference > cutoff)
+		warning("Loopy BP did not converge in %d iterations! (diff = %f)", maxIter, difference);
 }
 
 /* Node beliefs */
