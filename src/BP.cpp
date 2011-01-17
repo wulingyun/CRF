@@ -516,7 +516,7 @@ void CRF::LoopyBP_max(double *messages_1, double *messages_2, int maxIter, doubl
 
 /* Node beliefs */
 
-void CRF::Message2NodeBelief(double *messages_1, double *messages_2, double *nodeBel)
+void CRF::Message2NodeBelief(double *messages_1, double *messages_2)
 {
 	for (int i = 0; i < length(_nodePot); i++)
 		nodeBel[i] = nodePot[i];
@@ -565,7 +565,7 @@ void CRF::Message2NodeBelief(double *messages_1, double *messages_2, double *nod
 
 /* Edge beliefs */
 
-void CRF::Message2EdgeBelief(double *messages_1, double *messages_2, double *nodeBel, double *edgeBel)
+void CRF::Message2EdgeBelief(double *messages_1, double *messages_2)
 {
 	for (int i = 0; i < length(_edgePot); i++)
 		edgeBel[i] = edgePot[i];
@@ -632,7 +632,7 @@ void CRF::Message2EdgeBelief(double *messages_1, double *messages_2, double *nod
 
 /* Decoding by max of marginals */
 
-void CRF::MaxOfMarginals(double *nodeBel, int *labels)
+void CRF::MaxOfMarginals()
 {
 	double maxBel, *p_nodeBel;
 	for (int i = 0; i < nNodes; i++)
@@ -656,7 +656,7 @@ void CRF::MaxOfMarginals(double *nodeBel, int *labels)
 
 /* Bethe free energy */
 
-void CRF::BetheFreeEnergy(double *nodeBel, double *edgeBel, double *logZ)
+void CRF::BetheFreeEnergy()
 {
 	double nodeEnergy, nodeEntropy, edgeEnergy, edgeEntropy;
 	nodeEnergy = nodeEntropy = edgeEnergy = edgeEntropy = 0;

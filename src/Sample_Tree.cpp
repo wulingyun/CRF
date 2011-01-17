@@ -7,20 +7,14 @@ SEXP Sample_Tree(SEXP _crf, SEXP _size)
 	PROTECT(_size = AS_INTEGER(_size));
 	int size = INTEGER_POINTER(_size)[0];
 
-	SEXP _samples;
-	PROTECT(_samples = NEW_INTEGER(size * crf.nNodes));
-	setDim2(_samples, size, crf.nNodes);
-	int *samples = INTEGER_POINTER(_samples);
-	setValues(_samples, samples, 0);
+	crf.Init_Sampling2(size);
+	crf.Sample_Tree(size);
 
-	crf.Sample_Tree(size, samples);
-
-	UNPROTECT(2);
-
-	return(_samples);
+	UNPROTECT(1);
+	return(crf._samples);
 }
 
-void CRF::Sample_Tree(int size, int *samples)
+void CRF::Sample_Tree(int size)
 {
 	int *y = (int *) R_alloc(nNodes, sizeof(int));
 	for (int i = 0; i < nNodes; i++)
@@ -34,10 +28,8 @@ void CRF::Sample_Tree(int size, int *samples)
 
 	/* Beliefs */
 
-	double *nodeBel = (double *) R_alloc(nNodes * maxState, sizeof(double));
-	double *edgeBel = (double *) R_alloc(maxState * maxState * nEdges, sizeof(double));
-	Message2NodeBelief(messages_1, messages_2, nodeBel);
-	Message2EdgeBelief(messages_1, messages_2, nodeBel, edgeBel);
+	Message2NodeBelief(messages_1, messages_2);
+	Message2EdgeBelief(messages_1, messages_2);
 
 	/* Sampling */
 
