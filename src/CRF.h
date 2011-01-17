@@ -46,17 +46,23 @@ public:
 
 	void Clamp_Reset(int *clamped, int *nodeMap, int nNodesNew, double *nodePotNew);
 
+	/* BP functions */
 	void TreeBP(double *messages_1, double *messages_2);
 	void TreeBP_max(double *messages_1, double *messages_2);
 	void LoopyBP(double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose);
 	void LoopyBP_max(double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose);
 	void Message2NodeBelief(double *messages_1, double *messages_2, double *nodeBel);
 	void Message2EdgeBelief(double *messages_1, double *messages_2, double *nodeBel, double *edgeBel);
+	void MaxOfMarginals(double *nodeBel, int *labels);
+	void BetheFreeEnergy(double *nodeBel, double *edgeBel, double *logZ);
 
+	/* Decoding methods */
 	void Decode_Tree(int *labels);
 	void Decode_LBP(int *labels, int maxIter, double cutoff, int verbose);
+	/* Inference methods */
 	void Infer_Tree(double *nodeBel, double *edgeBel, double *logZ);
 	void Infer_LBP(double *nodeBel, double *edgeBel, double *logZ, int maxIter, double cutoff, int verbose);
+	/* Sampling methods */
 	void Sample_Tree(int size, int *samples);
 	void Sample_LBP(int size, int *samples, int maxIter, double cutoff, int verbose);
 };
