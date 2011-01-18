@@ -2,8 +2,6 @@
 
 SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose)
 {
-	CRF crf(_crf);
-
 	PROTECT(_maxIter = AS_INTEGER(_maxIter));
 	int maxIter = INTEGER_POINTER(_maxIter)[0];
 	PROTECT(_cutoff = AS_NUMERIC(_cutoff));
@@ -11,6 +9,7 @@ SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose)
 	PROTECT(_verbose = AS_INTEGER(_verbose));
 	int verbose = INTEGER_POINTER(_verbose)[0];
 
+	CRF crf(_crf);
 	crf.Init_Labels();
 	crf.Init_NodeBel();
 	crf.Decode_LBP(maxIter, cutoff, verbose);

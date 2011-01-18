@@ -2,29 +2,14 @@
 
 SEXP Decode_Exact(SEXP _crf)
 {
-	SEXP _nNodes, _nEdges, _edges, _nStates, _maxState;
-	PROTECT(_nNodes = AS_INTEGER(getListElement(_crf, "n.nodes")));
-	PROTECT(_nEdges = AS_INTEGER(getListElement(_crf, "n.edges")));
-	PROTECT(_edges = AS_INTEGER(getListElement(_crf, "edges")));
-	PROTECT(_nStates = AS_INTEGER(getListElement(_crf, "n.states")));
-	PROTECT(_maxState = AS_INTEGER(getListElement(_crf, "max.state")));
-	int nNodes = INTEGER_POINTER(_nNodes)[0];
-	int nEdges = INTEGER_POINTER(_nEdges)[0];
-	int *edges = INTEGER_POINTER(_edges);
-	int *nStates = INTEGER_POINTER(_nStates);
-	int maxState = INTEGER_POINTER(_maxState)[0];
+	CRF crf(_crf);
+	crf.Init_Labels();
+	crf.Decode_Exact();
+	return(crf._labels);
+}
 
-	SEXP _nodePot, _edgePot;
-	PROTECT(_nodePot = AS_NUMERIC(getListElement(_crf, "node.pot")));
-	PROTECT(_edgePot = AS_NUMERIC(getListElement(_crf, "edge.pot")));
-	double *nodePot = NUMERIC_POINTER(_nodePot);
-	double *edgePot = NUMERIC_POINTER(_edgePot);
-
-	SEXP _labels;
-	PROTECT(_labels = NEW_INTEGER(nNodes));
-	int *labels = INTEGER_POINTER(_labels);
-	setValues(_labels, labels, 0);
-
+void CRF::Decode_Exact()
+{
 	int *y = (int *) R_alloc(nNodes, sizeof(int));
 	for (int i = 0; i < nNodes; i++)
 		y[i] = 0;
@@ -64,7 +49,4 @@ SEXP Decode_Exact(SEXP _crf)
 		if (index == nNodes)
 			break;
 	}
-
-	UNPROTECT(8);
-	return(_labels);
 }
