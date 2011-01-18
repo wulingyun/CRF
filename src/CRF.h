@@ -66,6 +66,9 @@ public:
 	void Init_Samples(int size);
 	void Init_Samples(SEXP _size);
 
+	/* Set members */
+	void Set_Samples(SEXP _otherSamples);
+
 	/* BP functions */
 	void TreeBP(double *messages_1, double *messages_2);
 	void TreeBP_max(double *messages_1, double *messages_2);
@@ -80,8 +83,11 @@ public:
 	void Decode_Tree();
 	void Decode_LBP(int maxIter, double cutoff, int verbose);
 	/* Inference methods */
+	void Infer_Exact();
+	void Infer_Chain();
 	void Infer_Tree();
 	void Infer_LBP(int maxIter, double cutoff, int verbose);
+	void Infer_Sample();
 	/* Sampling methods */
 	void Sample_Exact();
 	void Sample_Chain();

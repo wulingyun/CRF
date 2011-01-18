@@ -2,35 +2,14 @@
 
 SEXP Infer_Chain(SEXP _crf)
 {
-	SEXP _nNodes, _nEdges, _nStates, _maxState;
-	PROTECT(_nNodes = AS_INTEGER(getListElement(_crf, "n.nodes")));
-	PROTECT(_nEdges = AS_INTEGER(getListElement(_crf, "n.edges")));
-	PROTECT(_nStates = AS_INTEGER(getListElement(_crf, "n.states")));
-	PROTECT(_maxState = AS_INTEGER(getListElement(_crf, "max.state")));
-	int nNodes = INTEGER_POINTER(_nNodes)[0];
-	int nEdges = INTEGER_POINTER(_nEdges)[0];
-	int *nStates = INTEGER_POINTER(_nStates);
-	int maxState = INTEGER_POINTER(_maxState)[0];
+	CRF crf(_crf);
+	crf.Init_Belief();
+	crf.Infer_Chain();
+	return(crf._belief);
+}
 
-	SEXP _nodePot, _edgePot;
-	PROTECT(_nodePot = AS_NUMERIC(getListElement(_crf, "node.pot")));
-	PROTECT(_edgePot = AS_NUMERIC(getListElement(_crf, "edge.pot")));
-	double *nodePot = NUMERIC_POINTER(_nodePot);
-	double *edgePot = NUMERIC_POINTER(_edgePot);
-
-	SEXP _nodeBel, _edgeBel, _logZ;
-	PROTECT(_nodeBel = NEW_NUMERIC(nNodes * maxState));
-	PROTECT(_edgeBel = NEW_NUMERIC(maxState * maxState * nEdges));
-	PROTECT(_logZ = NEW_NUMERIC(1));
-	setDim2(_nodeBel, nNodes, maxState);
-	setDim3(_edgeBel, maxState, maxState, nEdges);
-	double *nodeBel = NUMERIC_POINTER(_nodeBel);
-	double *edgeBel = NUMERIC_POINTER(_edgeBel);
-	double *logZ = NUMERIC_POINTER(_logZ);
-	setValues(_nodeBel, nodeBel, 0);
-	setValues(_edgeBel, edgeBel, 0);
-	*logZ = 0;
-
+void CRF::Infer_Chain()
+{
 	/* forward pass */
 
 	double *alpha = (double *) R_alloc(nNodes * maxState, sizeof(double));
@@ -178,13 +157,4 @@ SEXP Infer_Chain(SEXP _crf)
 
 	for (int i = 0; i < nNodes; i++)
 		*logZ += log(kappa[i]);
-
-	SEXP _belief;
-	PROTECT(_belief = NEW_LIST(3));
-	setListElement(_belief, 0, "node.bel", _nodeBel);
-	setListElement(_belief, 1, "edge.bel", _edgeBel);
-	setListElement(_belief, 2, "logZ", _logZ);
-
-	UNPROTECT(10);
-	return(_belief);
 }
