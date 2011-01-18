@@ -3,16 +3,10 @@
 SEXP Sample_Tree(SEXP _crf, SEXP _size)
 {
 	CRF crf(_crf);
-
-	PROTECT(_size = AS_INTEGER(_size));
-	int size = INTEGER_POINTER(_size)[0];
-
-	crf.Init_Samples(size);
+	crf.Init_Samples(_size);
 	crf.Init_NodeBel();
 	crf.Init_EdgeBel();
 	crf.Sample_Tree();
-
-	UNPROTECT(1);
 	return(crf._samples);
 }
 

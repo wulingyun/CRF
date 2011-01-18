@@ -96,3 +96,10 @@ void CRF::Init_Samples(int size)
 	setValues(_samples, samples, 0);
 	numProtect++;
 }
+
+void CRF::Init_Samples(SEXP _size)
+{
+	PROTECT(_size = AS_INTEGER(_size));
+	Init_Samples(INTEGER_POINTER(_size)[0]);
+	UNPROTECT(1);
+}

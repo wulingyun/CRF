@@ -2,29 +2,14 @@
 
 SEXP Sample_Chain(SEXP _crf, SEXP _size)
 {
-	SEXP _nNodes, _nStates, _maxState;
-	PROTECT(_nNodes = AS_INTEGER(getListElement(_crf, "n.nodes")));
-	PROTECT(_nStates = AS_INTEGER(getListElement(_crf, "n.states")));
-	PROTECT(_maxState = AS_INTEGER(getListElement(_crf, "max.state")));
-	int nNodes = INTEGER_POINTER(_nNodes)[0];
-	int *nStates = INTEGER_POINTER(_nStates);
-	int maxState = INTEGER_POINTER(_maxState)[0];
+	CRF crf(_crf);
+	crf.Init_Samples(_size);
+	crf.Sample_Chain();
+	return(crf._samples);
+}
 
-	SEXP _nodePot, _edgePot;
-	PROTECT(_nodePot = AS_NUMERIC(getListElement(_crf, "node.pot")));
-	PROTECT(_edgePot = AS_NUMERIC(getListElement(_crf, "edge.pot")));
-	double *nodePot = NUMERIC_POINTER(_nodePot);
-	double *edgePot = NUMERIC_POINTER(_edgePot);
-
-	PROTECT(_size = AS_INTEGER(_size));
-	int size = INTEGER_POINTER(_size)[0];
-
-	SEXP _samples;
-	PROTECT(_samples = NEW_INTEGER(size * nNodes));
-	setDim2(_samples, size, nNodes);
-	int *samples = INTEGER_POINTER(_samples);
-	setValues(_samples, samples, 0);
-
+void CRF::Sample_Chain()
+{
 	int *y = (int *) R_alloc(nNodes, sizeof(int));
 	for (int i = 0; i < nNodes; i++)
 		y[i] = 0;
@@ -81,7 +66,7 @@ SEXP Sample_Chain(SEXP _crf, SEXP _size)
 	double sumProb, *prob = (double *) R_alloc(maxState, sizeof(double));
 
 	GetRNGstate();
-	for (int i = 0; i < size; i++)
+	for (int i = 0; i < nSamples; i++)
 	{
 		p_alpha = alpha + nNodes - 1;
 		for (int j = 0; j < nStates[nNodes-1]; j++)
@@ -107,10 +92,7 @@ SEXP Sample_Chain(SEXP _crf, SEXP _size)
 		}
 
 		for (int j = 0; j < nNodes; j++)
-			samples[i + size * j] = y[j] + 1;
+			samples[i + nSamples * j] = y[j] + 1;
 	}
 	PutRNGstate();
-
-	UNPROTECT(7);
-	return(_samples);
 }

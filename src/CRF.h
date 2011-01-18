@@ -64,6 +64,7 @@ public:
 	void Init_LogZ();
 	void Init_Belief();
 	void Init_Samples(int size);
+	void Init_Samples(SEXP _size);
 
 	/* BP functions */
 	void TreeBP(double *messages_1, double *messages_2);
@@ -82,8 +83,11 @@ public:
 	void Infer_Tree();
 	void Infer_LBP(int maxIter, double cutoff, int verbose);
 	/* Sampling methods */
+	void Sample_Exact();
+	void Sample_Chain();
 	void Sample_Tree();
 	void Sample_LBP(int maxIter, double cutoff, int verbose);
+	void Sample_Gibbs(int burnIn, int *start);
 };
 
 /* initialize the list */
