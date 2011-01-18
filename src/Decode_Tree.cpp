@@ -3,7 +3,8 @@
 SEXP Decode_Tree(SEXP _crf)
 {
 	CRF crf(_crf);
-	crf.Init_Decoding2();
+	crf.Init_Labels();
+	crf.Init_NodeBel();
 	crf.Decode_Tree();
 	return(crf._labels);
 }

@@ -48,7 +48,7 @@ public:
 	double *nodeBel, *edgeBel, *logZ;
 
 	SEXP _samples;
-	int *samples;
+	int *samples, nSamples;
 
 	int numProtect;
 
@@ -58,11 +58,12 @@ public:
 	void Clamp_Reset(int *clamped, int *nodeMap, int nNodesNew, double *nodePotNew);
 
 	/* Initialize results */
-	void Init_Decoding();
-	void Init_Decoding2();
-	void Init_Inference();
-	void Init_Sampling(int size);
-	void Init_Sampling2(int size);
+	void Init_Labels();
+	void Init_NodeBel();
+	void Init_EdgeBel();
+	void Init_LogZ();
+	void Init_Belief();
+	void Init_Samples(int size);
 
 	/* BP functions */
 	void TreeBP(double *messages_1, double *messages_2);
@@ -81,8 +82,8 @@ public:
 	void Infer_Tree();
 	void Infer_LBP(int maxIter, double cutoff, int verbose);
 	/* Sampling methods */
-	void Sample_Tree(int size);
-	void Sample_LBP(int size, int maxIter, double cutoff, int verbose);
+	void Sample_Tree();
+	void Sample_LBP(int maxIter, double cutoff, int verbose);
 };
 
 /* initialize the list */

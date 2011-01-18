@@ -41,7 +41,7 @@ CRF::~CRF()
 	UNPROTECT(numProtect);
 }
 
-void CRF::Init_Decoding()
+void CRF::Init_Labels()
 {
 	PROTECT(_labels = NEW_INTEGER(nNodes));
 	labels = INTEGER_POINTER(_labels);
@@ -49,9 +49,8 @@ void CRF::Init_Decoding()
 	numProtect++;
 }
 
-void CRF::Init_Decoding2()
+void CRF::Init_NodeBel()
 {
-	Init_Decoding();
 	PROTECT(_nodeBel = NEW_NUMERIC(nNodes * maxState));
 	setDim2(_nodeBel, nNodes, maxState);
 	nodeBel = NUMERIC_POINTER(_nodeBel);
@@ -59,45 +58,41 @@ void CRF::Init_Decoding2()
 	numProtect++;
 }
 
-void CRF::Init_Inference()
+void CRF::Init_EdgeBel()
 {
-	PROTECT(_nodeBel = NEW_NUMERIC(nNodes * maxState));
 	PROTECT(_edgeBel = NEW_NUMERIC(maxState * maxState * nEdges));
-	PROTECT(_logZ = NEW_NUMERIC(1));
-	PROTECT(_belief = NEW_LIST(3));
-	setDim2(_nodeBel, nNodes, maxState);
 	setDim3(_edgeBel, maxState, maxState, nEdges);
+	edgeBel = NUMERIC_POINTER(_edgeBel);
+	setValues(_edgeBel, edgeBel, 0);
+	numProtect++;
+}
+
+void CRF::Init_LogZ()
+{
+	PROTECT(_logZ = NEW_NUMERIC(1));
+	logZ = NUMERIC_POINTER(_logZ);
+	*logZ = 0;
+	numProtect++;
+}
+
+void CRF::Init_Belief()
+{
+	Init_NodeBel();
+	Init_EdgeBel();
+	Init_LogZ();
+	PROTECT(_belief = NEW_LIST(3));
 	setListElement(_belief, 0, "node.bel", _nodeBel);
 	setListElement(_belief, 1, "edge.bel", _edgeBel);
 	setListElement(_belief, 2, "logZ", _logZ);
-	nodeBel = NUMERIC_POINTER(_nodeBel);
-	edgeBel = NUMERIC_POINTER(_edgeBel);
-	logZ = NUMERIC_POINTER(_logZ);
-	setValues(_nodeBel, nodeBel, 0);
-	setValues(_edgeBel, edgeBel, 0);
-	*logZ = 0;
-	numProtect += 4;
+	numProtect++;
 }
 
-void CRF::Init_Sampling(int size)
+void CRF::Init_Samples(int size)
 {
+	nSamples = size;
 	PROTECT(_samples = NEW_INTEGER(size * nNodes));
 	setDim2(_samples, size, nNodes);
 	samples = INTEGER_POINTER(_samples);
 	setValues(_samples, samples, 0);
 	numProtect++;
-}
-
-void CRF::Init_Sampling2(int size)
-{
-	Init_Sampling(size);
-	PROTECT(_nodeBel = NEW_NUMERIC(nNodes * maxState));
-	PROTECT(_edgeBel = NEW_NUMERIC(maxState * maxState * nEdges));
-	setDim2(_nodeBel, nNodes, maxState);
-	setDim3(_edgeBel, maxState, maxState, nEdges);
-	nodeBel = NUMERIC_POINTER(_nodeBel);
-	edgeBel = NUMERIC_POINTER(_edgeBel);
-	setValues(_nodeBel, nodeBel, 0);
-	setValues(_edgeBel, edgeBel, 0);
-	numProtect += 2;
 }

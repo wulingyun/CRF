@@ -3,7 +3,7 @@
 SEXP Infer_Tree(SEXP _crf)
 {
 	CRF crf(_crf);
-	crf.Init_Inference();
+	crf.Init_Belief();
 	crf.Infer_Tree();
 	return(crf._belief);
 }
