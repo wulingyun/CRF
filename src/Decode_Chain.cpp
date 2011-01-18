@@ -2,25 +2,14 @@
 
 SEXP Decode_Chain(SEXP _crf)
 {
-	SEXP _nNodes, _nStates, _maxState;
-	PROTECT(_nNodes = AS_INTEGER(getListElement(_crf, "n.nodes")));
-	PROTECT(_nStates = AS_INTEGER(getListElement(_crf, "n.states")));
-	PROTECT(_maxState = AS_INTEGER(getListElement(_crf, "max.state")));
-	int nNodes = INTEGER_POINTER(_nNodes)[0];
-	int *nStates = INTEGER_POINTER(_nStates);
-	int maxState = INTEGER_POINTER(_maxState)[0];
+	CRF crf(_crf);
+	crf.Init_Labels();
+	crf.Decode_Chain();
+	return(crf._labels);
+}
 
-	SEXP _nodePot, _edgePot;
-	PROTECT(_nodePot = AS_NUMERIC(getListElement(_crf, "node.pot")));
-	PROTECT(_edgePot = AS_NUMERIC(getListElement(_crf, "edge.pot")));
-	double *nodePot = NUMERIC_POINTER(_nodePot);
-	double *edgePot = NUMERIC_POINTER(_edgePot);
-
-	SEXP _labels;
-	PROTECT(_labels = NEW_INTEGER(nNodes));
-	int *labels = INTEGER_POINTER(_labels);
-	setValues(_labels, labels, -1);
-
+void CRF::Decode_Chain()
+{
 	/* forward pass */
 
 	double *alpha = (double *) R_alloc(nNodes * maxState, sizeof(double));
@@ -104,7 +93,4 @@ SEXP Decode_Chain(SEXP _crf)
 
 	for (int i = 0; i < nNodes; i++)
 		labels[i]++;
-
-	UNPROTECT(6);
-	return(_labels);
 }

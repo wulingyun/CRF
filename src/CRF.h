@@ -80,8 +80,11 @@ public:
 	void BetheFreeEnergy();
 
 	/* Decoding methods */
+	void Decode_Exact();
+	void Decode_Chain();
 	void Decode_Tree();
 	void Decode_LBP(int maxIter, double cutoff, int verbose);
+	void Decode_Sample();
 	/* Inference methods */
 	void Infer_Exact();
 	void Infer_Chain();
