@@ -103,3 +103,12 @@ void CRF::Init_Samples(SEXP _size)
 	Init_Samples(INTEGER_POINTER(_size)[0]);
 	UNPROTECT(1);
 }
+
+void CRF::Set_Samples(SEXP _otherSamples)
+{
+	_samples = _otherSamples;
+	PROTECT(_samples = AS_INTEGER(_samples));
+	samples = INTEGER_POINTER(_samples);
+	nSamples = length(_samples) / nNodes;
+	UNPROTECT(1);
+}
