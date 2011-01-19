@@ -70,10 +70,8 @@ public:
 	void Set_Samples(SEXP _otherSamples);
 
 	/* BP functions */
-	void TreeBP(double *messages_1, double *messages_2);
-	void TreeBP_max(double *messages_1, double *messages_2);
-	void LoopyBP(double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose);
-	void LoopyBP_max(double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose);
+	void TreeBP(double *messages_1, double *messages_2, bool maximize = false);
+	void LoopyBP(double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose, bool maximize = false);
 	void Message2NodeBelief(double *messages_1, double *messages_2);
 	void Message2EdgeBelief(double *messages_1, double *messages_2);
 	void MaxOfMarginals();
