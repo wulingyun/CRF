@@ -4,7 +4,7 @@ crf <- tree.crf
 answer <- tree.answer
 
 print("Decoding ...")
-decode <- decode.tree(crf)
+decode <- decode.lbp(crf)
 
 if (all(decode == answer$decode)) {
 	print("  Pass.")
@@ -14,7 +14,7 @@ if (all(decode == answer$decode)) {
 
 
 print("Inferring ...")
-belief <- infer.tree(crf)
+belief <- infer.lbp(crf)
 
 if (max(abs(c(belief$node.bel - answer$node.bel, belief$edge.bel - answer$edge.bel, belief$logZ - answer$logZ))) < 1e-8) {
 	print("  Pass.")
