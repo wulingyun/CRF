@@ -70,7 +70,7 @@ library(CRF)
 data(Small)
 decode.exact(small.crf)
 infer.exact(small.crf)
-sample.exact(small.crf)
+sample.exact(small.crf, 100)
 }
 
 \keyword{ package }
