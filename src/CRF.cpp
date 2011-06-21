@@ -1,6 +1,43 @@
 #include "CRF.h"
 
+CRF::CRF()
+{
+	nNodes = 0;
+	nEdges = 0;
+	edges = NULL;
+	nStates = NULL;
+	maxState = 0;
+
+	nAdj = NULL;
+	adjNodes = NULL;
+	adjEdges = NULL;
+
+	nodePot = NULL;
+	edgePot = NULL;
+
+	labels = NULL;
+
+	nodeBel = NULL;
+	edgeBel = NULL;
+	logZ = NULL;
+
+	samples = NULL;
+	nSamples = 0;
+
+	numProtect = 0;
+}
+
 CRF::CRF(SEXP _crf)
+{
+	Set_Data(_crf);
+}
+
+CRF::~CRF()
+{
+	UNPROTECT(numProtect);
+}
+
+void CRF::Set_Data(SEXP _crf)
 {
 	PROTECT(_nNodes = AS_INTEGER(getListElement(_crf, "n.nodes")));
 	PROTECT(_nEdges = AS_INTEGER(getListElement(_crf, "n.edges")));
@@ -34,11 +71,6 @@ CRF::CRF(SEXP _crf)
 	edgePot = NUMERIC_POINTER(_edgePot);
 
 	numProtect = 10 + nNodes * 2;
-}
-
-CRF::~CRF()
-{
-	UNPROTECT(numProtect);
 }
 
 void CRF::Init_Labels()

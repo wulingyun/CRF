@@ -1,53 +1,88 @@
 #include "CRF.h"
 
-void CRF::Clamp_Reset(int *clamped, int *nodeMap, int nNodesNew, double *nodePotNew)
+CRFclamped::CRFclamped(SEXP _crf)
+: CRF(_crf)
+{
+	PROTECT(_original = AS_LIST(getListElement(_crf, "original")));
+	original.Set_Data(_original);
+
+	PROTECT(_nodeId = AS_INTEGER(getListElement(_crf, "node.id")));
+	PROTECT(_nodeMap = AS_INTEGER(getListElement(_crf, "node.map")));
+	PROTECT(_edgeId = AS_INTEGER(getListElement(_crf, "edge.id")));
+	PROTECT(_edgeMap = AS_INTEGER(getListElement(_crf, "edge.map")));
+	nodeId = INTEGER_POINTER(_nodeId);
+	nodeMap = INTEGER_POINTER(_nodeMap);
+	edgeId = INTEGER_POINTER(_edgeId);
+	edgeMap = INTEGER_POINTER(_edgeMap);
+
+	SEXP _clamped0;
+	int *clamped0;
+	PROTECT(_clamped0 = AS_INTEGER(getListElement(_crf, "clamped")));
+	clamped0 = INTEGER_POINTER(_clamped0);
+
+	PROTECT(_clamped = NEW_INTEGER(nNodes));
+	clamped = INTEGER_POINTER(_clamped);
+	for (int i = 0; i < nNodes; i++)
+		clamped[i] = clamped0[i];
+
+	PROTECT(_nodePot = NEW_NUMERIC(nNodes * maxState));
+	setDim2(_nodePot, nNodes, maxState);
+	nodePot = NUMERIC_POINTER(_nodePot);
+	setValues(_nodePot, nodePot, 0);
+
+	Reset();
+
+	numProtect += 8;
+}
+
+void CRFclamped::Reset()
 {
 	int e, n1, n2;
 	double *p_nodePot, *p_edgePot, *p_nodePotNew;
 
-	for (int i = 0; i < nNodes; i++)
+	for (int i = 0; i < original.nNodes; i++)
 	{
 		if (nodeMap[i] > 0)
 		{
-			p_nodePot = nodePot + i;
-			p_nodePotNew = nodePotNew + nodeMap[i] - 1;
-			for (int j = 0; j < nStates[i]; j++)
+			p_nodePot = original.nodePot + i;
+			p_nodePotNew = nodePot + nodeMap[i] - 1;
+			for (int j = 0; j < original.nStates[i]; j++)
 			{
 				p_nodePotNew[0] = p_nodePot[0];
-				p_nodePot += nNodes;
-				p_nodePotNew += nNodesNew;
+				p_nodePot += original.nNodes;
+				p_nodePotNew += nNodes;
 			}
 		}
 	}
 
-	for (int i = 0; i < nNodes; i++)
+	for (int i = 0; i < original.nNodes; i++)
 	{
 		if (clamped[i])
 		{
-			for (int j = 0; j < nAdj[i]; j++)
+			for (int j = 0; j < original.nAdj[i]; j++)
 			{
-				e = adjEdges[i][j] - 1;
-				n1 = edges[e] - 1;
-				n2 = edges[e + nEdges] - 1;
+				e = original.adjEdges[i][j] - 1;
+				n1 = original.edges[e] - 1;
+				n2 = original.edges[e + original.nEdges] - 1;
 				if (n1 == i && clamped[n2] == 0)
 				{
-					p_edgePot = edgePot + clamped[i] - 1 + maxState * maxState * e;
-					p_nodePotNew = nodePotNew + nodeMap[n2] - 1;
-					for (int k = 0; k < nStates[n2]; k++)
+					p_edgePot = original.edgePot + clamped[i] - 1 + original.maxState * original.maxState * e;
+					p_nodePotNew = nodePot + nodeMap[n2] - 1;
+					for (int k = 0; k < original.nStates[n2]; k++)
 					{
 						p_nodePotNew[0] *= p_edgePot[0];
-						p_edgePot += maxState;
-						p_nodePotNew += nNodesNew;
+						p_edgePot += original.maxState;
+						p_nodePotNew += nNodes;
 					}
 				}
 				else if (n2 == i && clamped[n1] == 0)
 				{
-					p_edgePot = edgePot + maxState * (clamped[i] - 1 + maxState * e);
-					p_nodePotNew = nodePotNew + nodeMap[n1] - 1;
-					for (int k = 0; k < nStates[n1]; k++)
+					p_edgePot = original.edgePot + original.maxState * (clamped[i] - 1 + original.maxState * e);
+					p_nodePotNew = nodePot + nodeMap[n1] - 1;
+					for (int k = 0; k < original.nStates[n1]; k++)
 					{
 						p_nodePotNew[0] *= p_edgePot[k];
-						p_nodePotNew += nNodesNew;
+						p_nodePotNew += nNodes;
 					}
 				}
 			}
@@ -55,31 +90,8 @@ void CRF::Clamp_Reset(int *clamped, int *nodeMap, int nNodesNew, double *nodePot
 	}
 }
 
-SEXP Clamp_NodePot(SEXP _crfClamped)
+SEXP Clamp_NodePot(SEXP _crf)
 {
-	SEXP _crf;
-	PROTECT(_crf = AS_LIST(getListElement(_crfClamped, "original")));
-	CRF crf(_crf);
-
-	SEXP _clamped, _nodeMap, _nNodes, _maxState;
-	PROTECT(_clamped = AS_INTEGER(getListElement(_crfClamped, "clamped")));
-	PROTECT(_nodeMap = AS_INTEGER(getListElement(_crfClamped, "node.map")));
-	PROTECT(_nNodes = AS_INTEGER(getListElement(_crfClamped, "n.nodes")));
-	PROTECT(_maxState = AS_INTEGER(getListElement(_crfClamped, "max.state")));
-	int *clamped = INTEGER_POINTER(_clamped);
-	int *nodeMap = INTEGER_POINTER(_nodeMap);
-	int nNodes = INTEGER_POINTER(_nNodes)[0];
-	int maxState = INTEGER_POINTER(_maxState)[0];
-
-	SEXP _nodePot;
-	PROTECT(_nodePot = NEW_NUMERIC(nNodes * maxState));
-	setDim2(_nodePot, nNodes, maxState);
-	double *nodePot = NUMERIC_POINTER(_nodePot);
-	setValues(_nodePot, nodePot, 0);
-
-	crf.Clamp_Reset(clamped, nodeMap, nNodes, nodePot);
-
-	UNPROTECT(6);
-
-	return(_nodePot);
+	CRFclamped crf(_crf);
+	return(crf._nodePot);
 }
