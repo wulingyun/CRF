@@ -52,10 +52,11 @@ public:
 
 	int numProtect;
 
+	CRF();
 	CRF(SEXP _crf);
 	~CRF();
 
-	void Clamp_Reset(int *clamped, int *nodeMap, int nNodesNew, double *nodePotNew);
+	void Set_Data(SEXP _crf);
 
 	/* Initialize results */
 	void Init_Labels();
@@ -81,6 +82,7 @@ public:
 	void Decode_Exact();
 	void Decode_Chain();
 	void Decode_Tree();
+	void Decode_Cutset();
 	void Decode_LBP(int maxIter, double cutoff, int verbose);
 	void Decode_Sample();
 	/* Inference methods */
@@ -95,6 +97,19 @@ public:
 	void Sample_Tree();
 	void Sample_LBP(int maxIter, double cutoff, int verbose);
 	void Sample_Gibbs(int burnIn, int *start);
+};
+
+class CRFclamped: public CRF {
+public:
+	SEXP _original;
+	CRF original;
+
+	SEXP _clamped, _nodeId, _nodeMap, _edgeId, _edgeMap;
+	int *clamped, *nodeId, *nodeMap, *edgeId, *edgeMap;
+
+	CRFclamped(SEXP _crf);
+
+	void Reset();
 };
 
 /* initialize the list */
