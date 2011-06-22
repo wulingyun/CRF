@@ -78,6 +78,7 @@ public:
 	double &EdgePot(int s1, int s2, int e);
 	double &NodeBel(int n, int s);
 	double &EdgeBel(int s1, int s2, int e);
+	int &Samples(int i, int n);
 
 	/* Utils */
 	double Get_Potential(int *configuration);
@@ -151,6 +152,11 @@ inline double &CRF::NodeBel(int n, int s)
 inline double &CRF::EdgeBel(int s1, int s2, int e)
 {
 	return edgeBel[s1 + maxState * (s2 + maxState * e)];
+}
+
+inline int &CRF::Samples(int i, int n)
+{
+	return samples[i + nSamples * n];
 }
 
 
