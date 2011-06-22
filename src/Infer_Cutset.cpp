@@ -40,24 +40,24 @@ void CRFclamped::Infer_Cutset()
 		pot = exp(*logZ);
 		for (int i = 0; i < original.nNodes; i++)
 			if (clamped[i] > 0)
-				pot *= original.nodePot[i + original.nNodes * y[i]];
+				pot *= original.NodePot(i, y[i]);
 		for (int i = 0; i < original.nEdges; i++)
 		{
 			n1 = original.edges[i] - 1;
 			n2 = original.edges[i + original.nEdges] - 1;
 			if (clamped[n1] > 0 && clamped[n2] > 0)
-				pot *= original.edgePot[y[n1] + original.maxState * (y[n2] + original.maxState * i)];
+				pot *= original.EdgePot(y[n1], y[n2], i);
 		}
 
 		/* Update node belief */
 		for (int i = 0; i < original.nNodes; i++)
 		{
 			if (clamped[i] > 0)
-				original.nodeBel[i + original.nNodes * y[i]] += pot;
+				original.NodeBel(i, y[i]) += pot;
 			else
 				for (int j = 0; j < original.maxState; j++)
 				{
-					original.nodeBel[i + original.nNodes * j] += nodeBel[nodeMap[i] - 1 + nNodes * j] * pot;
+					original.NodeBel(i, j) += NodeBel(nodeMap[i] - 1, j) * pot;
 				}
 		}
 
@@ -69,11 +69,11 @@ void CRFclamped::Infer_Cutset()
 			if (clamped[n1] > 0)
 			{
 				if (clamped[n2] > 0)
-					original.edgeBel[y[n1] + original.maxState * (y[n2] + original.maxState * i)] += pot;
+					original.EdgeBel(y[n1], y[n2], i) += pot;
 				else
 					for (int j = 0; j < original.maxState; j++)
 					{
-						original.edgeBel[y[n1] + original.maxState * (j + original.maxState * i)] += nodeBel[nodeMap[n2] - 1 + nNodes * j] * pot;
+						original.EdgeBel(y[n1], j, i) += NodeBel(nodeMap[n2] - 1, j) * pot;
 					}
 			}
 			else
@@ -82,7 +82,7 @@ void CRFclamped::Infer_Cutset()
 				{
 					for (int j = 0; j < original.maxState; j++)
 					{
-						original.edgeBel[j + original.maxState * (y[n2] + original.maxState * i)] += nodeBel[nodeMap[n1] - 1 + nNodes * j] * pot;
+						original.EdgeBel(j, y[n2], i) += NodeBel(nodeMap[n1] - 1, j) * pot;
 					}
 				}
 				else
@@ -90,7 +90,7 @@ void CRFclamped::Infer_Cutset()
 					for (int j1 = 0; j1 < original.maxState; j1++)
 						for (int j2 = 0; j2 < original.maxState; j2++)
 						{
-							original.edgeBel[j1 + original.maxState * (j2 + original.maxState * i)] += edgeBel[j1 + maxState * (j2 + maxState * (edgeMap[i] - 1))] * pot;
+							original.EdgeBel(j1, j2, i) += EdgeBel(j1, j2, edgeMap[i] - 1) * pot;
 						}
 				}
 			}

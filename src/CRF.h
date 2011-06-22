@@ -74,6 +74,11 @@ public:
 	void Set_Data(SEXP _crf);
 	void Set_Samples(SEXP _otherSamples);
 
+	double &NodePot(int n, int s);
+	double &EdgePot(int s1, int s2, int e);
+	double &NodeBel(int n, int s);
+	double &EdgeBel(int s1, int s2, int e);
+
 	/* Utils */
 	double Get_Potential(int *configuration);
 	double Get_LogPotential(int *configuration);
@@ -125,6 +130,29 @@ public:
 	/* Sampling methods */
 	void Sample_Cutset();
 };
+
+/* inline functions */
+
+inline double &CRF::NodePot(int n, int s)
+{
+	return nodePot[n + nNodes * s];
+}
+
+inline double &CRF::EdgePot(int s1, int s2, int e)
+{
+	return edgePot[s1 + maxState * (s2 + maxState * e)];
+}
+
+inline double &CRF::NodeBel(int n, int s)
+{
+	return nodeBel[n + nNodes * s];
+}
+
+inline double &CRF::EdgeBel(int s1, int s2, int e)
+{
+	return edgeBel[s1 + maxState * (s2 + maxState * e)];
+}
+
 
 /* initialize the list */
 #define setValues(r, c, v) for (int i = 0; i < length(r); i++) c[i] = v
