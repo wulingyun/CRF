@@ -18,6 +18,7 @@ void CRF::Decode_Exact()
 	int index;
 	while(1)
 	{
+		/* Calculate potential */
 		pot = Get_Potential(y);
 
 		/* Record the best potentials */
