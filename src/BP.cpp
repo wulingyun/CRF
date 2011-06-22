@@ -389,7 +389,7 @@ void CRF::Message2EdgeBelief(double *messages_1, double *messages_2)
 				bel = p_nodeBel[0] / p2_messages[j];
 			else
 				bel = 0;
-			for (int k = 0; k < nStates[n2]; k++)
+			for (int k = 0; k < nStates[n1]; k++)
 				p_edgeBel[k] *= bel;
 			p_nodeBel += nNodes;
 			p_edgeBel += maxState;
