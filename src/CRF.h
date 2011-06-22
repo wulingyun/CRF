@@ -114,7 +114,7 @@ public:
 
 	CRFclamped(SEXP _crf);
 
-	void Reset();
+	void Reset_NodePot();
 
 	/* Decoding methods */
 	void Decode_Cutset();
