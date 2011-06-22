@@ -32,7 +32,7 @@ void CRFclamped::Decode_Cutset()
 	while(1)
 	{
 		/* Reset node potentials */
-		Reset();
+		Reset_NodePot();
 
 		/* Decode clamped CRF */
 		Decode_Tree();

@@ -36,12 +36,12 @@ CRFclamped::CRFclamped(SEXP _crf)
 	nodePot = NUMERIC_POINTER(_nodePot);
 	setValues(_nodePot, nodePot, 0);
 
-	Reset();
+	Reset_NodePot();
 
 	numProtect += 8;
 }
 
-void CRFclamped::Clamp_Reset()
+void CRFclamped::Reset_NodePot()
 {
 	int e, n1, n2;
 	double *p_nodePot, *p_edgePot, *p_nodePotNew;
