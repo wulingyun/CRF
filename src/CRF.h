@@ -16,6 +16,7 @@ extern "C" {
 	SEXP Infer_Exact(SEXP _crf);
 	SEXP Infer_Chain(SEXP _crf);
 	SEXP Infer_Tree(SEXP _crf);
+	SEXP Infer_Cutset(SEXP _crf);
 	SEXP Infer_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Infer_Sample(SEXP _crf, SEXP _samples);
 
@@ -23,6 +24,7 @@ extern "C" {
 	SEXP Sample_Exact(SEXP _crf, SEXP _size);
 	SEXP Sample_Chain(SEXP _crf, SEXP _size);
 	SEXP Sample_Tree(SEXP _crf, SEXP _size);
+	SEXP Sample_Cutset(SEXP _crf, SEXP _size);
 	SEXP Sample_Gibbs(SEXP _crf, SEXP _size, SEXP _burnIn, SEXP _start);
 
 	/* Utils */
@@ -118,6 +120,10 @@ public:
 
 	/* Decoding methods */
 	void Decode_Cutset();
+	/* Inference methods */
+	void Infer_Cutset();
+	/* Sampling methods */
+	void Sample_Cutset();
 };
 
 /* initialize the list */

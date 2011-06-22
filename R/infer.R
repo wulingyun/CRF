@@ -28,6 +28,14 @@ infer.conditional <- function(crf, clamped, infer.method, ...)
 	belief
 }
 
+infer.cutset <- function(crf, cutset)
+{
+	clamped <- rep(0, crf$n.nodes)
+	clamped[cutset] <- 1
+	crf <- clamp.crf(crf, clamped)
+	.Call("Infer_Cutset", crf)
+}
+
 infer.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 	.Call("Infer_LBP", crf, max.iter, cutoff, verbose)
 
