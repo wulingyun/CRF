@@ -18,15 +18,7 @@ void CRF::Decode_Exact()
 	int index;
 	while(1)
 	{
-		pot = 1;
-
-		/* Node potentials */
-		for (int i = 0; i < nNodes; i++)
-			pot *= nodePot[i + nNodes * y[i]];
-
-		/* Edge potentials */
-		for (int i = 0; i < nEdges; i++)
-			pot *= edgePot[y[edges[i]-1] + maxState * (y[edges[i+nEdges]-1] + maxState * i)];
+		pot = Get_Potential(y);
 
 		/* Record the best potentials */
 		if (pot > maxPot)
