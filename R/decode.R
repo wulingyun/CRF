@@ -15,6 +15,14 @@ decode.conditional <- function(crf, clamped, decode.method, ...)
 	decode
 }
 
+decode.cutset <- function(crf, cutset)
+{
+	clamped <- rep(0, crf$n.nodes)
+	clamped[cutset] <- 1
+	crf <- clamp.crf(crf, clamped)
+	.Call("Decode_Cutset", crf)
+}
+
 decode.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 	.Call("Decode_LBP", crf, max.iter, cutoff, verbose)
 

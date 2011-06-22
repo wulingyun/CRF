@@ -1,35 +1,5 @@
 #include "CRF.h"
 
-double CRF::Get_Potential(int *configuration)
-{
-	double potential = 1;
-
-	/* Node potentials */
-	for (int i = 0; i < nNodes; i++)
-		potential *= nodePot[i + nNodes * configuration[i]];
-
-	/* Edge potentials */
-	for (int i = 0; i < nEdges; i++)
-		potential *= edgePot[configuration[edges[i]-1] + maxState * (configuration[edges[i+nEdges]-1] + maxState * i)];
-
-	return(potential);
-}
-
-double CRF::Get_LogPotential(int *configuration)
-{
-	double potential = 0;
-
-	/* Node potentials */
-	for (int i = 0; i < nNodes; i++)
-		potential += log(nodePot[i + nNodes * configuration[i]]);
-
-	/* Edge potentials */
-	for (int i = 0; i < nEdges; i++)
-		potential += log(edgePot[configuration[edges[i]-1] + maxState * (configuration[edges[i+nEdges]-1] + maxState * i)]);
-
-	return(potential);
-}
-
 SEXP Get_Potential(SEXP _crf, SEXP _configuration)
 {
 	CRF crf(_crf);
@@ -70,4 +40,34 @@ SEXP Get_LogPotential(SEXP _crf, SEXP _configuration)
 
 	UNPROTECT(2);
 	return(_potential);
+}
+
+double CRF::Get_Potential(int *configuration)
+{
+	double potential = 1;
+
+	/* Node potentials */
+	for (int i = 0; i < nNodes; i++)
+		potential *= nodePot[i + nNodes * configuration[i]];
+
+	/* Edge potentials */
+	for (int i = 0; i < nEdges; i++)
+		potential *= edgePot[configuration[edges[i]-1] + maxState * (configuration[edges[i+nEdges]-1] + maxState * i)];
+
+	return(potential);
+}
+
+double CRF::Get_LogPotential(int *configuration)
+{
+	double potential = 0;
+
+	/* Node potentials */
+	for (int i = 0; i < nNodes; i++)
+		potential += log(nodePot[i + nNodes * configuration[i]]);
+
+	/* Edge potentials */
+	for (int i = 0; i < nEdges; i++)
+		potential += log(edgePot[configuration[edges[i]-1] + maxState * (configuration[edges[i+nEdges]-1] + maxState * i)]);
+
+	return(potential);
 }
