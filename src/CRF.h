@@ -8,6 +8,7 @@ extern "C" {
 	SEXP Decode_Exact(SEXP _crf);
 	SEXP Decode_Chain(SEXP _crf);
 	SEXP Decode_Tree(SEXP _crf);
+	SEXP Decode_Cutset(SEXP _crf);
 	SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Decode_Sample(SEXP _crf, SEXP _samples);
 
@@ -26,6 +27,8 @@ extern "C" {
 
 	/* Utils */
 	SEXP Clamp_NodePot(SEXP _crfClamped);
+	SEXP Get_Potential(SEXP _crf, SEXP _configuration);
+	SEXP Get_LogPotential(SEXP _crf, SEXP _configuration);
 }
 
 /* CRF class */
@@ -56,8 +59,6 @@ public:
 	CRF(SEXP _crf);
 	~CRF();
 
-	void Set_Data(SEXP _crf);
-
 	/* Initialize results */
 	void Init_Labels();
 	void Init_NodeBel();
@@ -68,7 +69,12 @@ public:
 	void Init_Samples(SEXP _size);
 
 	/* Set members */
+	void Set_Data(SEXP _crf);
 	void Set_Samples(SEXP _otherSamples);
+
+	/* Utils */
+	double Get_Potential(int *configuration);
+	double Get_LogPotential(int *configuration);
 
 	/* BP functions */
 	void TreeBP(double *messages_1, double *messages_2, bool maximize = false);
@@ -82,7 +88,6 @@ public:
 	void Decode_Exact();
 	void Decode_Chain();
 	void Decode_Tree();
-	void Decode_Cutset();
 	void Decode_LBP(int maxIter, double cutoff, int verbose);
 	void Decode_Sample();
 	/* Inference methods */
@@ -110,6 +115,9 @@ public:
 	CRFclamped(SEXP _crf);
 
 	void Reset();
+
+	/* Decoding methods */
+	void Decode_Cutset();
 };
 
 /* initialize the list */

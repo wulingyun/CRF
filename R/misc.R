@@ -54,7 +54,7 @@ make.adj.info <- function(data)
 }
 
 get.potential <- function(crf, configuration)
-	.Call("Potential", crf, configuration)
+	.Call("Get_Potential", crf, configuration)
 
 get.logPotential <- function(crf, configuration)
-	.Call("Log_Potential", crf, configuration)
+	.Call("Get_LogPotential", crf, configuration)

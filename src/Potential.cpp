@@ -1,22 +1,38 @@
 #include "CRF.h"
 
-SEXP Potential(SEXP _crf, SEXP _configuration)
+double CRF::Get_Potential(int *configuration)
 {
-	SEXP _nNodes, _nEdges, _edges, _maxState;
-	PROTECT(_nNodes = AS_INTEGER(getListElement(_crf, "n.nodes")));
-	PROTECT(_nEdges = AS_INTEGER(getListElement(_crf, "n.edges")));
-	PROTECT(_edges = AS_INTEGER(getListElement(_crf, "edges")));
-	PROTECT(_maxState = AS_INTEGER(getListElement(_crf, "max.state")));
-	int nNodes = INTEGER_POINTER(_nNodes)[0];
-	int nEdges = INTEGER_POINTER(_nEdges)[0];
-	int *edges = INTEGER_POINTER(_edges);
-	int maxState = INTEGER_POINTER(_maxState)[0];
+	double potential = 1;
 
-	SEXP _nodePot, _edgePot;
-	PROTECT(_nodePot = AS_NUMERIC(getListElement(_crf, "node.pot")));
-	PROTECT(_edgePot = AS_NUMERIC(getListElement(_crf, "edge.pot")));
-	double *nodePot = NUMERIC_POINTER(_nodePot);
-	double *edgePot = NUMERIC_POINTER(_edgePot);
+	/* Node potentials */
+	for (int i = 0; i < nNodes; i++)
+		potential *= nodePot[i + nNodes * configuration[i]];
+
+	/* Edge potentials */
+	for (int i = 0; i < nEdges; i++)
+		potential *= edgePot[configuration[edges[i]-1] + maxState * (configuration[edges[i+nEdges]-1] + maxState * i)];
+
+	return(potential);
+}
+
+double CRF::Get_LogPotential(int *configuration)
+{
+	double potential = 0;
+
+	/* Node potentials */
+	for (int i = 0; i < nNodes; i++)
+		potential += log(nodePot[i + nNodes * configuration[i]]);
+
+	/* Edge potentials */
+	for (int i = 0; i < nEdges; i++)
+		potential += log(edgePot[configuration[edges[i]-1] + maxState * (configuration[edges[i+nEdges]-1] + maxState * i)]);
+
+	return(potential);
+}
+
+SEXP Get_Potential(SEXP _crf, SEXP _configuration)
+{
+	CRF crf(_crf);
 
 	PROTECT(_configuration = AS_INTEGER(_configuration));
 	int *configuration = INTEGER_POINTER(_configuration);
@@ -25,41 +41,19 @@ SEXP Potential(SEXP _crf, SEXP _configuration)
 	PROTECT(_potential = NEW_NUMERIC(1));
 	double *potential = NUMERIC_POINTER(_potential);
 
-	int *y = (int *) R_alloc(nNodes, sizeof(int));
-	for (int i = 0; i < nNodes; i++)
+	int *y = (int *) R_alloc(crf.nNodes, sizeof(int));
+	for (int i = 0; i < crf.nNodes; i++)
 		y[i] = configuration[i] - 1;
 
-	*potential = 1;
+	*potential = crf.Get_Potential(y);
 
-	/* Node potentials */
-	for (int i = 0; i < nNodes; i++)
-		*potential *= nodePot[i + nNodes * y[i]];
-
-	/* Edge potentials */
-	for (int i = 0; i < nEdges; i++)
-		*potential *= edgePot[y[edges[i]-1] + maxState * (y[edges[i+nEdges]-1] + maxState * i)];
-
-	UNPROTECT(8);
+	UNPROTECT(2);
 	return(_potential);
 }
 
-SEXP Log_Potential(SEXP _crf, SEXP _configuration)
+SEXP Get_LogPotential(SEXP _crf, SEXP _configuration)
 {
-	SEXP _nNodes, _nEdges, _edges, _maxState;
-	PROTECT(_nNodes = AS_INTEGER(getListElement(_crf, "n.nodes")));
-	PROTECT(_nEdges = AS_INTEGER(getListElement(_crf, "n.edges")));
-	PROTECT(_edges = AS_INTEGER(getListElement(_crf, "edges")));
-	PROTECT(_maxState = AS_INTEGER(getListElement(_crf, "max.state")));
-	int nNodes = INTEGER_POINTER(_nNodes)[0];
-	int nEdges = INTEGER_POINTER(_nEdges)[0];
-	int *edges = INTEGER_POINTER(_edges);
-	int maxState = INTEGER_POINTER(_maxState)[0];
-
-	SEXP _nodePot, _edgePot;
-	PROTECT(_nodePot = AS_NUMERIC(getListElement(_crf, "node.pot")));
-	PROTECT(_edgePot = AS_NUMERIC(getListElement(_crf, "edge.pot")));
-	double *nodePot = NUMERIC_POINTER(_nodePot);
-	double *edgePot = NUMERIC_POINTER(_edgePot);
+	CRF crf(_crf);
 
 	PROTECT(_configuration = AS_INTEGER(_configuration));
 	int *configuration = INTEGER_POINTER(_configuration);
@@ -68,20 +62,12 @@ SEXP Log_Potential(SEXP _crf, SEXP _configuration)
 	PROTECT(_potential = NEW_NUMERIC(1));
 	double *potential = NUMERIC_POINTER(_potential);
 
-	int *y = (int *) R_alloc(nNodes, sizeof(int));
-	for (int i = 0; i < nNodes; i++)
+	int *y = (int *) R_alloc(crf.nNodes, sizeof(int));
+	for (int i = 0; i < crf.nNodes; i++)
 		y[i] = configuration[i] - 1;
 
-	*potential = 0;
+	*potential = crf.Get_LogPotential(y);
 
-	/* Node potentials */
-	for (int i = 0; i < nNodes; i++)
-		*potential += log(nodePot[i + nNodes * y[i]]);
-
-	/* Edge potentials */
-	for (int i = 0; i < nEdges; i++)
-		*potential += log(edgePot[y[edges[i]-1] + maxState * (y[edges[i+nEdges]-1] + maxState * i)]);
-
-	UNPROTECT(8);
+	UNPROTECT(2);
 	return(_potential);
 }
