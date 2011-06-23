@@ -107,7 +107,7 @@ public:
 	/* Sampling methods */
 	void Sample_Exact();
 	void Sample_Chain();
-	void Sample_Tree();
+	void Sample_Tree(int size = 0);
 	void Sample_LBP(int maxIter, double cutoff, int verbose);
 	void Sample_Gibbs(int burnIn, int *start);
 };
