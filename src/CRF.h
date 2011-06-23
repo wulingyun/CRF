@@ -74,6 +74,7 @@ public:
 	void Set_Data(SEXP _crf);
 	void Set_Samples(SEXP _otherSamples);
 
+	int Edges(int i, int j);
 	double &NodePot(int n, int s);
 	double &EdgePot(int s1, int s2, int e);
 	double &NodeBel(int n, int s);
@@ -133,6 +134,11 @@ public:
 };
 
 /* inline functions */
+
+inline int CRF::Edges(int i, int j)
+{
+	return edges[i + nEdges * j];
+}
 
 inline double &CRF::NodePot(int n, int s)
 {

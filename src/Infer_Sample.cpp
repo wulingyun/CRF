@@ -18,13 +18,13 @@ void CRF::Infer_Sample()
 		pot = 1;
 		for (int j = 0; j < nNodes; j++)
 		{
-			k = j + nNodes * (samples[i + nSamples * j] - 1);
+			k = j + nNodes * (Samples(i, j) - 1);
 			nodeBel[k]++;
 			pot *= nodePot[k];
 		}
 		for (int j = 0; j < nEdges; j++)
 		{
-			k = samples[i + nSamples * (edges[j] - 1)] - 1 + maxState * (samples[i + nSamples * (edges[j + nEdges] - 1)] - 1 + maxState * j);
+			k = Samples(i, Edges(j,0)-1) - 1 + maxState * (Samples(i, Edges(j,1)-1) - 1 + maxState * j);
 			edgeBel[k]++;
 			pot *= edgePot[k];
 		}
@@ -41,7 +41,7 @@ void CRF::Infer_Sample()
 		same = 1;
 		for (int j = 0; j < nNodes; j++)
 		{
-			if (samples[i + nSamples * j] != samples[maxSample + nSamples * j])
+			if (Samples(i, j) != Samples(maxSample, j))
 			{
 				same = 0;
 				break;
