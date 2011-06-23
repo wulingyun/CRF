@@ -104,11 +104,10 @@ void CRFclamped::Sample_Cutset(int size)
 		}
 	}
 
-	int remain = size;
+	int m, remain = size;
 	double done = Z * 10;
 	double cumulativePot = 0;
 	n = 0;
-	int m;
 	while(1)
 	{
 		/* Reset node potentials */
