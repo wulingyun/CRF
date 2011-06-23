@@ -105,11 +105,11 @@ public:
 	void Infer_LBP(int maxIter, double cutoff, int verbose);
 	void Infer_Sample();
 	/* Sampling methods */
-	void Sample_Exact();
-	void Sample_Chain();
+	void Sample_Exact(int size = 0);
+	void Sample_Chain(int size = 0);
 	void Sample_Tree(int size = 0);
-	void Sample_LBP(int maxIter, double cutoff, int verbose);
-	void Sample_Gibbs(int burnIn, int *start);
+	void Sample_LBP(int maxIter, double cutoff, int verbose, int size = 0);
+	void Sample_Gibbs(int burnIn, int *start, int size = 0);
 };
 
 class CRFclamped: public CRF {

@@ -15,8 +15,13 @@ SEXP Sample_Gibbs(SEXP _crf, SEXP _size, SEXP _burnIn, SEXP _start)
 	return(crf._samples);
 }
 
-void CRF::Sample_Gibbs(int burnIn, int *start)
+void CRF::Sample_Gibbs(int burnIn, int *start, int size)
 {
+	if (size <= 0)
+		size = nSamples;
+	else if (size > nSamples)
+		Init_Samples(size);
+
 	int *y = (int *) R_alloc(nNodes, sizeof(int));
 	for (int i = 0; i < nNodes; i++)
 		y[i] = start[i] - 1;
@@ -24,11 +29,10 @@ void CRF::Sample_Gibbs(int burnIn, int *start)
 	double sumProb, *prob = (double *) R_alloc(maxState, sizeof(double));
 
 	int e, n, n1, n2;
-	int *p_samples;
 	double *p_nodePot, *p_edgePot;
 
 	GetRNGstate();
-	for (int iter = 0; iter < burnIn+nSamples; iter++)
+	for (int iter = 0; iter < burnIn+size; iter++)
 	{
 		for (int i = 0; i < nNodes; i++)
 		{
@@ -70,14 +74,8 @@ void CRF::Sample_Gibbs(int burnIn, int *start)
 		}
 
 		if (iter >= burnIn)
-		{
-			p_samples = samples + iter - burnIn;
 			for (int i = 0; i < nNodes; i++)
-			{
-				p_samples[0] = y[i] + 1;
-				p_samples += nSamples;
-			}
-		}
+				Samples(iter - burnIn, i) = y[i] + 1;
 	}
 	PutRNGstate();
 }

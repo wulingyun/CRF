@@ -8,8 +8,13 @@ SEXP Sample_Chain(SEXP _crf, SEXP _size)
 	return(crf._samples);
 }
 
-void CRF::Sample_Chain()
+void CRF::Sample_Chain(int size)
 {
+	if (size <= 0)
+		size = nSamples;
+	else if (size > nSamples)
+		Init_Samples(size);
+
 	int *y = (int *) R_alloc(nNodes, sizeof(int));
 	for (int i = 0; i < nNodes; i++)
 		y[i] = 0;
@@ -66,7 +71,7 @@ void CRF::Sample_Chain()
 	double sumProb, *prob = (double *) R_alloc(maxState, sizeof(double));
 
 	GetRNGstate();
-	for (int i = 0; i < nSamples; i++)
+	for (int i = 0; i < size; i++)
 	{
 		p_alpha = alpha + nNodes - 1;
 		for (int j = 0; j < nStates[nNodes-1]; j++)
@@ -92,7 +97,7 @@ void CRF::Sample_Chain()
 		}
 
 		for (int j = 0; j < nNodes; j++)
-			samples[i + nSamples * j] = y[j] + 1;
+			Samples(i, j) = y[j] + 1;
 	}
 	PutRNGstate();
 }
