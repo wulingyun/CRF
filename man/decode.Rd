@@ -4,6 +4,7 @@
 \alias{decode.chain}
 \alias{decode.tree}
 \alias{decode.conditional}
+\alias{decode.cutset}
 \alias{decode.sample}
 \alias{decode.marginal}
 \alias{decode.lbp}
@@ -21,6 +22,7 @@ decode.exact(crf)
 decode.chain(crf)
 decode.tree(crf)
 decode.conditional(crf, clamped, decode.method, ...)
+decode.cutset(crf, cutset)
 decode.sample(crf, sample.method, ...)
 decode.marginal(crf, infer.method, ...)
 decode.lbp(crf, max.iter=10000, cutoff=1e-4, verbose=0)
@@ -38,6 +40,7 @@ decode.lbp(crf, max.iter=10000, cutoff=1e-4, verbose=0)
   \item \code{\link{decode.chain}}          Exact decoding for chain-structured graphs with the Viterbi algorithm
   \item \code{\link{decode.tree}}           Exact decoding for tree- and forest-structured graphs with max-product belief propagation
   \item \code{\link{decode.conditional}}    Conditional decoding (takes another decoding method as input)
+  \item \code{\link{decode.cutset}}         Exact decoding for graphs with a small cutset using cutset conditioning
   \item \code{\link{decode.sample}}         Approximate decoding using sampling (takes a sampling method as input)
   \item \code{\link{decode.marginal}}       Approximate decoding using inference (takes an inference method as input)
   \item \code{\link{decode.lbp}}            Approximate decoding using max-product loopy belief propagation
@@ -71,6 +74,7 @@ decode.exact(small.crf)
 decode.chain(small.crf)
 decode.tree(small.crf)
 decode.conditional(small.crf, c(0,1,0,0), decode.exact)
+decode.cutset(small.crf, c(2))
 decode.sample(small.crf, sample.exact, 10000)
 decode.marginal(small.crf, infer.exact)
 decode.lbp(small.crf)
