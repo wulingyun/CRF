@@ -10,8 +10,13 @@ SEXP Sample_Tree(SEXP _crf, SEXP _size)
 	return(crf._samples);
 }
 
-void CRF::Sample_Tree()
+void CRF::Sample_Tree(int size)
 {
+	if (size <= 0)
+		size = nSamples;
+	else if (size > nSamples)
+		Init_Samples(size);
+
 	int *y = (int *) R_alloc(nNodes, sizeof(int));
 	for (int i = 0; i < nNodes; i++)
 		y[i] = 0;
@@ -87,7 +92,7 @@ void CRF::Sample_Tree()
 	double *p_nodeBel, *p_edgeBel;
 
 	GetRNGstate();
-	for (int i = 0; i < nSamples; i++)
+	for (int i = 0; i < size; i++)
 	{
 		for (int j = 0; j < nNodes; j++)
 		{
@@ -133,7 +138,7 @@ void CRF::Sample_Tree()
 		}
 
 		for (int j = 0; j < nNodes; j++)
-			samples[i + nSamples * j] = y[j] + 1;
+			Samples(i, j) = y[j] + 1;
 	}
 	PutRNGstate();
 }

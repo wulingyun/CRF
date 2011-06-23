@@ -121,10 +121,7 @@ void CRFclamped::Sample_Cutset()
 		/* Generate samples */
 		if (m > 0)
 		{
-			if (m > nSamples)
-				Init_Samples(m);
-
-			Sample_Tree();
+			Sample_Tree(m);
 			m = 0;
 			for (int k = 0; k < original.nSamples; k++)
 				if (cumulativePot > cutoff[k])
