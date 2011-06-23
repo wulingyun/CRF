@@ -16,5 +16,13 @@ sample.conditional <- function(crf, clamped, sample.method, ...)
 	samples
 }
 
+sample.cutset <- function(crf, cutset, size)
+{
+	clamped <- rep(0, crf$n.nodes)
+	clamped[cutset] <- 1
+	crf <- clamp.crf(crf, clamped)
+	.Call("Sample_Cutset", crf, size)
+}
+
 sample.gibbs <- function(crf, size, burn.in = 1000, start = apply(crf$node.pot, 1, which.max))
 	.Call("Sample_Gibbs", crf, size, burn.in, start)

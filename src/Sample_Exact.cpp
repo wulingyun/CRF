@@ -37,7 +37,7 @@ void CRF::Sample_Exact()
 
 	/* Sampling */
 
-	double *cutoff = Calloc(nSamples, double);
+	double *cutoff = (double *) R_alloc(nSamples, sizeof(double));
 	GetRNGstate();
 	for (int k = 0; k < nSamples; k++)
 		cutoff[k] = unif_rand() * Z;
@@ -76,6 +76,4 @@ void CRF::Sample_Exact()
 		if (index == nNodes || remain <= 0)
 			break;
 	}
-
-	Free(cutoff);
 }
