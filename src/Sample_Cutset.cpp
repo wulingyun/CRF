@@ -103,6 +103,7 @@ void CRFclamped::Sample_Cutset()
 	double done = Z * 10;
 	double cumulativePot = 0;
 	n = 0;
+	int m;
 	while(1)
 	{
 		/* Reset node potentials */
@@ -111,20 +112,35 @@ void CRFclamped::Sample_Cutset()
 		/* Update cumulative potential */
 		cumulativePot += pot[n++];
 
+		/* Count samples */
+		m = 0;
 		for (int k = 0; k < original.nSamples; k++)
 			if (cumulativePot > cutoff[k])
-			{
-				Sample_Tree();
-				for (int i = 0; i < original.nNodes; i++)
+				m++;
+
+		/* Generate samples */
+		if (m > 0)
+		{
+			if (m > nSamples)
+				Init_Samples(m);
+
+			Sample_Tree();
+			m = 0;
+			for (int k = 0; k < original.nSamples; k++)
+				if (cumulativePot > cutoff[k])
 				{
-					if (clamped[i] > 0)
-						original.Samples(k, i) = clamped[i];
-					else
-						original.Samples(k, i) = Samples(0, nodeMap[i] - 1);
+					for (int i = 0; i < original.nNodes; i++)
+					{
+						if (clamped[i] > 0)
+							original.Samples(k, i) = clamped[i];
+						else
+							original.Samples(k, i) = Samples(m, nodeMap[i] - 1);
+					}
+					cutoff[k] = done;
+					remain--;
+					m++;
 				}
-				cutoff[k] = done;
-				remain--;
-			}
+		}
 
 		/* Next configuration */
 		for (index = 0; index < original.nNodes; index++)
