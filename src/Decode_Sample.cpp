@@ -12,20 +12,14 @@ SEXP Decode_Sample(SEXP _crf, SEXP _samples)
 void CRF::Decode_Sample()
 {
 	double pot, maxPot = -1;
-	int k, maxSample = -1;
+	int maxSample = -1;
 	for (int i = 0; i < nSamples; i++)
 	{
 		pot = 1;
 		for (int j = 0; j < nNodes; j++)
-		{
-			k = j + nNodes * (samples[i + nSamples * j] - 1);
-			pot *= nodePot[k];
-		}
+			pot *= NodePot(j, Samples(i, j) - 1);
 		for (int j = 0; j < nEdges; j++)
-		{
-			k = samples[i + nSamples * (edges[j] - 1)] - 1 + maxState * (samples[i + nSamples * (edges[j + nEdges] - 1)] - 1 + maxState * j);
-			pot *= edgePot[k];
-		}
+			pot *= EdgePot(Samples(i, Edges(j,0)-1) - 1, Samples(i, Edges(j,1)-1) - 1, j);
 
 		if (pot > maxPot)
 		{
@@ -35,5 +29,5 @@ void CRF::Decode_Sample()
 	}
 
 	for (int i = 0; i < nNodes; i++)
-		labels[i] = samples[maxSample + nSamples * i];
+		labels[i] = Samples(maxSample, i);
 }
