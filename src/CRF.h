@@ -129,7 +129,7 @@ public:
 	/* Inference methods */
 	void Infer_Cutset();
 	/* Sampling methods */
-	void Sample_Cutset();
+	void Sample_Cutset(int size = 0);
 };
 
 /* inline functions */

@@ -10,8 +10,13 @@ SEXP Sample_Cutset(SEXP _crf, SEXP _size)
 	return(crf.original._samples);
 }
 
-void CRFclamped::Sample_Cutset()
+void CRFclamped::Sample_Cutset(int size)
 {
+	if (size <= 0)
+		size = original.nSamples;
+	else if (size > original.nSamples)
+		original.Init_Samples(size);
+
 	int *y = (int *) R_alloc(original.nNodes, sizeof(int));
 	int nPot = 1;
 	for (int i = 0; i < original.nNodes; i++)
@@ -79,9 +84,9 @@ void CRFclamped::Sample_Cutset()
 
 	/* Sampling */
 
-	double *cutoff = (double *) R_alloc(original.nSamples, sizeof(double));
+	double *cutoff = (double *) R_alloc(size, sizeof(double));
 	GetRNGstate();
-	for (int k = 0; k < original.nSamples; k++)
+	for (int k = 0; k < size; k++)
 		cutoff[k] = unif_rand() * Z;
 	PutRNGstate();
 
@@ -99,7 +104,7 @@ void CRFclamped::Sample_Cutset()
 		}
 	}
 
-	int remain = original.nSamples;
+	int remain = size;
 	double done = Z * 10;
 	double cumulativePot = 0;
 	n = 0;
@@ -114,7 +119,7 @@ void CRFclamped::Sample_Cutset()
 
 		/* Count samples */
 		m = 0;
-		for (int k = 0; k < original.nSamples; k++)
+		for (int k = 0; k < size; k++)
 			if (cumulativePot > cutoff[k])
 				m++;
 
@@ -123,7 +128,7 @@ void CRFclamped::Sample_Cutset()
 		{
 			Sample_Tree(m);
 			m = 0;
-			for (int k = 0; k < original.nSamples; k++)
+			for (int k = 0; k < size; k++)
 				if (cumulativePot > cutoff[k])
 				{
 					for (int i = 0; i < original.nNodes; i++)
