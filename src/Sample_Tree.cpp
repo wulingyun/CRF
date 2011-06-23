@@ -12,6 +12,8 @@ SEXP Sample_Tree(SEXP _crf, SEXP _size)
 
 void CRF::Sample_Tree(int size)
 {
+	void *vmax = vmaxget(); 
+
 	if (size <= 0)
 		size = nSamples;
 	else if (size > nSamples)
@@ -141,4 +143,6 @@ void CRF::Sample_Tree(int size)
 			Samples(i, j) = y[j] + 1;
 	}
 	PutRNGstate();
+
+	vmaxset(vmax); 
 }
