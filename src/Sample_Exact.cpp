@@ -8,8 +8,13 @@ SEXP Sample_Exact(SEXP _crf, SEXP _size)
 	return(crf._samples);
 }
 
-void CRF::Sample_Exact()
+void CRF::Sample_Exact(int size)
 {
+	if (size <= 0)
+		size = nSamples;
+	else if (size > nSamples)
+		Init_Samples(size);
+
 	int *y = (int *) R_alloc(nNodes, sizeof(int));
 	for (int i = 0; i < nNodes; i++)
 		y[i] = 0;
@@ -37,16 +42,16 @@ void CRF::Sample_Exact()
 
 	/* Sampling */
 
-	double *cutoff = (double *) R_alloc(nSamples, sizeof(double));
+	double *cutoff = (double *) R_alloc(size, sizeof(double));
 	GetRNGstate();
-	for (int k = 0; k < nSamples; k++)
+	for (int k = 0; k < size; k++)
 		cutoff[k] = unif_rand() * Z;
 	PutRNGstate();
 
 	for (int i = 0; i < nNodes; i++)
 		y[i] = 0;
 
-	int remain = nSamples;
+	int remain = size;
 	double done = Z * 10;
 	double cumulativePot = 0;
 	while(1)
@@ -54,7 +59,7 @@ void CRF::Sample_Exact()
 		/* Update cumulative potential */
 		cumulativePot += Get_Potential(y);
 
-		for (int k = 0; k < nSamples; k++)
+		for (int k = 0; k < size; k++)
 			if (cumulativePot > cutoff[k])
 			{
 				for (int i = 0; i < nNodes; i++)
