@@ -27,6 +27,7 @@ Decoding: Computing the most likely configuration
   \item \code{\link{decode.sample}}         Approximate decoding using sampling (takes a sampling method as input)
   \item \code{\link{decode.marginal}}       Approximate decoding using inference (takes an inference method as input)
   \item \code{\link{decode.lbp}}            Approximate decoding using max-product loopy belief propagation
+  \item \code{\link{decode.trbp}}           Approximate decoding using max-product tree-reweighted belief propagtion
 }
 
 Inference: Computing the partition function and marginal probabilities
@@ -38,6 +39,7 @@ Inference: Computing the partition function and marginal probabilities
   \item \code{\link{infer.cutset}}          Exact inference for graphs with a small cutset using cutset conditioning
   \item \code{\link{infer.sample}}          Approximate inference using sampling (takes a sampling method as input)
   \item \code{\link{infer.lbp}}             Approximate inference using sum-product loopy belief propagation
+  \item \code{\link{infer.trbp}}            Approximate inference using sum-product tree-reweighted belief propagation
 }
 
 Sampling: Generating samples from the distribution

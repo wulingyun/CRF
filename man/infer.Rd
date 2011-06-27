@@ -7,6 +7,7 @@
 \alias{infer.cutset}
 \alias{infer.sample}
 \alias{infer.lbp}
+\alias{infer.trbp}
 
 \title{
 Inference methods
@@ -24,6 +25,7 @@ infer.conditional(crf, clamped, infer.method, ...)
 infer.cutset(crf, cutset)
 infer.sample(crf, sample.method, ...)
 infer.lbp(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
+infer.trbp(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 }
 
 \arguments{
@@ -41,6 +43,7 @@ infer.lbp(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
   \item \code{\link{infer.cutset}}          Exact inference for graphs with a small cutset using cutset conditioning
   \item \code{\link{infer.sample}}          Approximate inference using sampling (takes a sampling method as input)
   \item \code{\link{infer.lbp}}             Approximate inference using sum-product loopy belief propagation
+  \item \code{\link{infer.trbp}}            Approximate inference using sum-product tree-reweighted belief propagation
 }
 }
 
@@ -74,6 +77,7 @@ infer.conditional(small.crf, c(0,1,0,0), infer.exact)
 infer.cutset(small.crf, c(2))
 infer.sample(small.crf, sample.exact, 10000)
 infer.lbp(small.crf)
+infer.trbp(small.crf)
 }
 
 \keyword{ infer }
