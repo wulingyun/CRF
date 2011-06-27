@@ -23,11 +23,14 @@ decode.cutset <- function(crf, cutset)
 	.Call("Decode_Cutset", crf)
 }
 
-decode.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
-	.Call("Decode_LBP", crf, max.iter, cutoff, verbose)
+decode.sample <- function(crf, sample.method, ...)
+	.Call("Decode_Sample", crf, sample.method(crf, ...))
 
 decode.marginal <- function(crf, infer.method, ...)
 	apply(infer.method(crf, ...)$node.bel, 1, which.max)
 
-decode.sample <- function(crf, sample.method, ...)
-	.Call("Decode_Sample", crf, sample.method(crf, ...))
+decode.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
+	.Call("Decode_LBP", crf, max.iter, cutoff, verbose)
+
+decode.trbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
+	.Call("Decode_TRBP", crf, max.iter, cutoff, verbose)

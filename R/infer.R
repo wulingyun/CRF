@@ -36,8 +36,11 @@ infer.cutset <- function(crf, cutset)
 	.Call("Infer_Cutset", crf)
 }
 
+infer.sample <- function(crf, sample.method, ...)
+	.Call("Infer_Sample", crf, sample.method(crf, ...))
+
 infer.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 	.Call("Infer_LBP", crf, max.iter, cutoff, verbose)
 
-infer.sample <- function(crf, sample.method, ...)
-	.Call("Infer_Sample", crf, sample.method(crf, ...))
+infer.trbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
+	.Call("Infer_TRBP", crf, max.iter, cutoff, verbose)

@@ -7,16 +7,16 @@ sample.chain <- function(crf, size)
 sample.tree <- function(crf, size)
 	.Call("Sample_Tree", crf, size)
 
-sample.conditional <- function(crf, clamped, sample.method, ...)
+sample.conditional <- function(crf, size, clamped, sample.method, ...)
 {
 	crf <- clamp.crf(crf, clamped)
-	s <- sample.method(crf, ...)
+	s <- sample.method(crf, size, ...)
 	samples <- matrix(rep(clamped, nrow(s)), nrow=nrow(s), ncol=length(clamped), byrow=TRUE)
 	samples[,crf$node.id] <- s
 	samples
 }
 
-sample.cutset <- function(crf, cutset, size)
+sample.cutset <- function(crf, size, cutset)
 {
 	clamped <- rep(0, crf$n.nodes)
 	clamped[cutset] <- 1

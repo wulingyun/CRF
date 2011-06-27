@@ -10,6 +10,7 @@ extern "C" {
 	SEXP Decode_Tree(SEXP _crf);
 	SEXP Decode_Cutset(SEXP _crf);
 	SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
+	SEXP Decode_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Decode_Sample(SEXP _crf, SEXP _samples);
 
 	/* Inference */
@@ -18,6 +19,7 @@ extern "C" {
 	SEXP Infer_Tree(SEXP _crf);
 	SEXP Infer_Cutset(SEXP _crf);
 	SEXP Infer_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
+	SEXP Infer_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Infer_Sample(SEXP _crf, SEXP _samples);
 
 	/* Sampling */
@@ -88,22 +90,26 @@ public:
 	/* BP functions */
 	void TreeBP(double *messages_1, double *messages_2, bool maximize = false);
 	void LoopyBP(double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose, bool maximize = false);
+	void TRBP(double *messages_1, double *messages_2, double *mu, int maxIter, double cutoff, int verbose, bool maximize = false);
 	void Message2NodeBelief(double *messages_1, double *messages_2);
 	void Message2EdgeBelief(double *messages_1, double *messages_2);
 	void MaxOfMarginals();
 	void BetheFreeEnergy();
+	void TRBP_Weights(double *mu);
 
 	/* Decoding methods */
 	void Decode_Exact();
 	void Decode_Chain();
 	void Decode_Tree();
 	void Decode_LBP(int maxIter, double cutoff, int verbose);
+	void Decode_TRBP(int maxIter, double cutoff, int verbose);
 	void Decode_Sample();
 	/* Inference methods */
 	void Infer_Exact();
 	void Infer_Chain();
 	void Infer_Tree();
 	void Infer_LBP(int maxIter, double cutoff, int verbose);
+	void Infer_TRBP(int maxIter, double cutoff, int verbose);
 	void Infer_Sample();
 	/* Sampling methods */
 	void Sample_Exact(int size = 0);
