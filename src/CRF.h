@@ -96,6 +96,9 @@ public:
 	void MaxOfMarginals();
 	void BetheFreeEnergy();
 	void TRBP_Weights(double *mu);
+	void TRBP_Message2NodeBelief(double *messages_1, double *messages_2, double *mu);
+	void TRBP_Message2EdgeBelief(double *messages_1, double *messages_2, double *mu);
+	void TRBP_BetheFreeEnergy(double *mu);
 
 	/* Decoding methods */
 	void Decode_Exact();
