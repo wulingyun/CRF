@@ -8,6 +8,7 @@
 \alias{decode.sample}
 \alias{decode.marginal}
 \alias{decode.lbp}
+\alias{decode.trbp}
 
 \title{
 Decoding methods
@@ -26,6 +27,7 @@ decode.cutset(crf, cutset)
 decode.sample(crf, sample.method, ...)
 decode.marginal(crf, infer.method, ...)
 decode.lbp(crf, max.iter=10000, cutoff=1e-4, verbose=0)
+decode.trbp(crf, max.iter=10000, cutoff=1e-4, verbose=0)
 }
 
 \arguments{
@@ -44,6 +46,7 @@ decode.lbp(crf, max.iter=10000, cutoff=1e-4, verbose=0)
   \item \code{\link{decode.sample}}         Approximate decoding using sampling (takes a sampling method as input)
   \item \code{\link{decode.marginal}}       Approximate decoding using inference (takes an inference method as input)
   \item \code{\link{decode.lbp}}            Approximate decoding using max-product loopy belief propagation
+  \item \code{\link{decode.trbp}}           Approximate decoding using max-product tree-reweighted belief propagtion
 }
 }
 
@@ -78,6 +81,7 @@ decode.cutset(small.crf, c(2))
 decode.sample(small.crf, sample.exact, 10000)
 decode.marginal(small.crf, infer.exact)
 decode.lbp(small.crf)
+decode.trbp(small.crf)
 }
 
 \keyword{ decode }
