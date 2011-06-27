@@ -1,0 +1,23 @@
+library(CRF)
+data(TestFunc)
+
+cat("Testing dataset Small ...\n")
+data(Small)
+test.sample("Exact", sample.exact, small.crf, small.answer)
+test.sample("Chain", sample.chain, small.crf, small.answer)
+test.sample("Tree", sample.tree, small.crf, small.answer)
+test.sample("Cutset", sample.cutset, small.crf, small.answer, 0.01, 10000, c(3))
+test.sample("Gibbs", sample.gibbs, small.crf, small.answer, 0.01, 10000, 100000)
+
+cat("Testing dataset Chain ...\n")
+data(Chain)
+test.sample("Chain", sample.chain, chain.crf, chain.answer)
+test.sample("Tree", sample.tree, chain.crf, chain.answer)
+test.sample("Cutset", sample.cutset, chain.crf, chain.answer, 0.01, 10000, c(3))
+test.sample("Gibbs", sample.gibbs, chain.crf, chain.answer, 0.1, 10000, 100000)
+
+cat("Testing dataset Tree ...\n")
+data(Tree)
+test.sample("Tree", sample.tree, tree.crf, tree.answer)
+test.sample("Cutset", sample.cutset, tree.crf, tree.answer, 0.01, 10000, c(3))
+test.sample("Gibbs", sample.gibbs, tree.crf, tree.answer, 0.1, 10000, 100000)
