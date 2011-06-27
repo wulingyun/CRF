@@ -24,7 +24,7 @@ void CRF::Infer_TRBP(int maxIter, double cutoff, int verbose)
 	double *mu = (double *) R_alloc(nEdges, sizeof(double));
 	TRBP_Weights(mu);
 	TRBP(messages_1, messages_2, mu, maxIter, cutoff, verbose);
-	Message2NodeBelief(messages_1, messages_2);
-	Message2EdgeBelief(messages_1, messages_2);
-	BetheFreeEnergy();
+	TRBP_Message2NodeBelief(messages_1, messages_2, mu);
+	TRBP_Message2EdgeBelief(messages_1, messages_2, mu);
+	TRBP_BetheFreeEnergy(mu);
 }

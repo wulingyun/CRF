@@ -25,6 +25,6 @@ void CRF::Decode_TRBP(int maxIter, double cutoff, int verbose)
 	double *mu = (double *) R_alloc(nEdges, sizeof(double));
 	TRBP_Weights(mu);
 	TRBP(messages_1, messages_2, mu, maxIter, cutoff, verbose, true);
-	Message2NodeBelief(messages_1, messages_2);
+	TRBP_Message2NodeBelief(messages_1, messages_2, mu);
 	MaxOfMarginals();
 }
