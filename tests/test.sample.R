@@ -21,3 +21,13 @@ data(Tree)
 test.sample("Tree", sample.tree, tree.crf, tree.answer)
 test.sample("Cutset", sample.cutset, tree.crf, tree.answer, 0.01, 10000, c(3))
 test.sample("Gibbs", sample.gibbs, tree.crf, tree.answer, 0.1, 10000, 100000)
+
+cat("Testing dataset Loop ...\n")
+data(Loop)
+test.sample("Cutset", sample.cutset, loop.crf, loop.answer, 0.01, 10000, c(1,3))
+test.sample("Gibbs", sample.gibbs, loop.crf, loop.answer, 0.01, 10000, 100000)
+
+cat("Testing dataset Clique ...\n")
+data(Clique)
+test.sample("Cutset", sample.cutset, clique.crf, clique.answer, 0.01, 10000, c(1,3))
+test.sample("Gibbs", sample.gibbs, clique.crf, clique.answer, 0.01, 10000, 100000)
