@@ -131,9 +131,7 @@ void CRF::Init_Samples(int size)
 
 void CRF::Init_Samples(SEXP _size)
 {
-	PROTECT(_size = AS_INTEGER(_size));
-	Init_Samples(INTEGER_POINTER(_size)[0]);
-	numProtect++;
+	Init_Samples(INTEGER_POINTER(AS_INTEGER(_size))[0]);
 }
 
 void CRF::Set_Samples(SEXP _otherSamples)

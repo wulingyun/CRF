@@ -17,7 +17,8 @@ SEXP Get_Potential(SEXP _crf, SEXP _configuration)
 
 	*potential = crf.Get_Potential(y);
 
-	UNPROTECT(2);
+	UNPROTECT_PTR(_configuration);
+	UNPROTECT_PTR(_potential);
 	return(_potential);
 }
 
@@ -38,7 +39,8 @@ SEXP Get_LogPotential(SEXP _crf, SEXP _configuration)
 
 	*potential = crf.Get_LogPotential(y);
 
-	UNPROTECT(2);
+	UNPROTECT_PTR(_configuration);
+	UNPROTECT_PTR(_potential);
 	return(_potential);
 }
 

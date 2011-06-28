@@ -163,7 +163,7 @@ void MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs)
 	rsort_with_index(costs, index, nEdges);
 
 	int *label = (int *) R_alloc(nNodes, sizeof(int));
-	for (int i = 0; i < nEdges; i++)
+	for (int i = 0; i < nNodes; i++)
 		label[i] = i;
 
 	int n = 0, n1, n2;

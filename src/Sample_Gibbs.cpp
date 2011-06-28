@@ -2,8 +2,7 @@
 
 SEXP Sample_Gibbs(SEXP _crf, SEXP _size, SEXP _burnIn, SEXP _start)
 {
-	PROTECT(_burnIn = AS_INTEGER(_burnIn));
-	int burnIn = INTEGER_POINTER(_burnIn)[0];
+	int burnIn = INTEGER_POINTER(AS_INTEGER(_burnIn))[0];
 	PROTECT(_start = AS_INTEGER(_start));
 	int *start = INTEGER_POINTER(_start);
 
@@ -11,7 +10,7 @@ SEXP Sample_Gibbs(SEXP _crf, SEXP _size, SEXP _burnIn, SEXP _start)
 	crf.Init_Samples(_size);
 	crf.Sample_Gibbs(burnIn, start);
 
-	UNPROTECT(2);
+	UNPROTECT_PTR(_start);
 	return(crf._samples);
 }
 
