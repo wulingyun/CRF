@@ -8,7 +8,7 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double *scale
 	double *old_messages_1 = (double *) R_alloc(maxState * nEdges, sizeof(double));
 	double *old_messages_2 = (double *) R_alloc(maxState * nEdges, sizeof(double));
 	for (int i = 0; i < maxState * nEdges; i++)
-		messages_1[i] = messages_2[i] = old_messages_1[i] = old_messages_2[i] = 0;
+		old_messages_1[i] = old_messages_2[i] = 0;
 
 	double *incoming = (double *) R_alloc(maxState, sizeof(double));
 	double *outgoing = (double *) R_alloc(maxState, sizeof(double));
@@ -395,18 +395,15 @@ void CRF::TRBP_BetheFreeEnergy(double *mu)
 
 void CRF::TRBP_ScaleEdgePot(double *mu, double *scaleEdgePot)
 {
-	int n = maxState * maxState;
 	double inv_mu;
-	double *p_scaleEdgePot = scaleEdgePot;
-	double *p_edgePot = edgePot;
+	int ss = maxState * maxState, n = 0;
 	for (int i = 0; i < nEdges; i++)
 	{
 		inv_mu = 1/mu[i];
-		for (int j = 0; j < n; j++)
+		for (int j = 0; j < ss; j++)
 		{
-			p_scaleEdgePot[0] = R_pow(p_edgePot[0], inv_mu);
-			p_scaleEdgePot++;
-			p_edgePot++;
+			scaleEdgePot[n] = R_pow(edgePot[n], inv_mu);
+			n++;
 		}
 	}
 }
