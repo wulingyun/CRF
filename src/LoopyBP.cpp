@@ -10,6 +10,7 @@ void CRF::LoopyBP(double *messages_1, double *messages_2, int maxIter, double cu
 		messages_1[i] = messages_2[i] = old_messages_1[i] = old_messages_2[i] = 0;
 
 	double *incoming = (double *) R_alloc(maxState, sizeof(double));
+	double *outgoing = (double *) R_alloc(maxState, sizeof(double));
 
 	int s, r, e, n;
 	double mesg, sumMesg, *p_nodePot, *p_edgePot, *p0_edgePot, *p_messages;
@@ -38,36 +39,41 @@ void CRF::LoopyBP(double *messages_1, double *messages_2, int maxIter, double cu
 
 		for (s = 0; s < nNodes; s++)
 		{
+			/* gather incoming messages */
+
+			p_nodePot = nodePot + s;
+			for (int i = 0; i < nStates[s]; i++)
+			{
+				incoming[i] = p_nodePot[0];
+				p_nodePot += nNodes;
+			}
+			for (int i = 0; i < nAdj[s]; i++)
+			{
+				e = adjEdges[s][i] - 1;
+				if (edges[e] - 1 == s)
+					p_messages = old_messages_1;
+				else
+					p_messages = old_messages_2;
+				p_messages += maxState * e;
+				for (int k = 0; k < nStates[s]; k++)
+					incoming[k] *= p_messages[k];
+			}
+
+			/* send messages */
+
 			for (int i = 0; i < nAdj[s]; i++)
 			{
 				r = adjNodes[s][i] - 1;
-
-				/* gather incoming messages */
-
-				p_nodePot = nodePot + s;
-				for (int j = 0; j < nStates[s]; j++)
-				{
-					incoming[j] = p_nodePot[0];
-					p_nodePot += nNodes;
-				}
-				for (int j = 0; j < nAdj[s]; j++)
-				{
-					if (j != i)
-					{
-						e = adjEdges[s][j] - 1;
-						if (edges[e] - 1 == s)
-							p_messages = old_messages_1;
-						else
-							p_messages = old_messages_2;
-						p_messages += maxState * e;
-						for (int k = 0; k < nStates[s]; k++)
-							incoming[k] *= p_messages[k];
-					}
-				}
-
-				/* send messages */
-
 				e = adjEdges[s][i] - 1;
+
+				if (edges[e] - 1 == s)
+					p_messages = old_messages_1;
+				else
+					p_messages = old_messages_2;
+				p_messages += maxState * e;
+				for (int k = 0; k < nStates[s]; k++)
+					outgoing[k] = p_messages[k] == 0 ? 0 : incoming[k] / p_messages[k];
+
 				sumMesg = 0;
 				p0_edgePot = edgePot + maxState * maxState * e;
 				if (edges[e] - 1 == s)
@@ -82,7 +88,7 @@ void CRF::LoopyBP(double *messages_1, double *messages_2, int maxIter, double cu
 						{
 							for (int k = 0; k < nStates[s]; k++)
 							{
-								mesg = incoming[k] * p_edgePot[k];
+								mesg = outgoing[k] * p_edgePot[k];
 								if (mesg > p_messages[j])
 									p_messages[j] = mesg;
 							}
@@ -90,7 +96,7 @@ void CRF::LoopyBP(double *messages_1, double *messages_2, int maxIter, double cu
 						else
 						{
 							for (int k = 0; k < nStates[s]; k++)
-								p_messages[j] += incoming[k] * p_edgePot[k];
+								p_messages[j] += outgoing[k] * p_edgePot[k];
 						}
 						sumMesg += p_messages[j];
 					}
@@ -106,7 +112,7 @@ void CRF::LoopyBP(double *messages_1, double *messages_2, int maxIter, double cu
 						{
 							for (int k = 0; k < nStates[s]; k++)
 							{
-								mesg = incoming[k] * p_edgePot[0];
+								mesg = outgoing[k] * p_edgePot[0];
 								if (mesg > p_messages[j])
 									p_messages[j] = mesg;
 								p_edgePot += maxState;
@@ -116,7 +122,7 @@ void CRF::LoopyBP(double *messages_1, double *messages_2, int maxIter, double cu
 						{
 							for (int k = 0; k < nStates[s]; k++)
 							{
-								p_messages[j] += incoming[k] * p_edgePot[0];
+								p_messages[j] += outgoing[k] * p_edgePot[0];
 								p_edgePot += maxState;
 							}
 						}
