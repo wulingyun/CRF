@@ -90,15 +90,16 @@ public:
 	/* BP functions */
 	void TreeBP(double *messages_1, double *messages_2, bool maximize = false);
 	void LoopyBP(double *messages_1, double *messages_2, int maxIter, double cutoff, int verbose, bool maximize = false);
-	void TRBP(double *messages_1, double *messages_2, double *mu, int maxIter, double cutoff, int verbose, bool maximize = false);
 	void Message2NodeBelief(double *messages_1, double *messages_2);
 	void Message2EdgeBelief(double *messages_1, double *messages_2);
 	void MaxOfMarginals();
 	void BetheFreeEnergy();
-	void TRBP_Weights(double *mu);
+	void TRBP(double *messages_1, double *messages_2, double *mu, double *scaleEdgePot, int maxIter, double cutoff, int verbose, bool maximize = false);
 	void TRBP_Message2NodeBelief(double *messages_1, double *messages_2, double *mu);
-	void TRBP_Message2EdgeBelief(double *messages_1, double *messages_2, double *mu);
+	void TRBP_Message2EdgeBelief(double *messages_1, double *messages_2, double *mu, double *scaleEdgePot);
 	void TRBP_BetheFreeEnergy(double *mu);
+	void TRBP_Weights(double *mu);
+	void TRBP_ScaleEdgePot(double *mu, double *scaleEdgePot);
 
 	/* Decoding methods */
 	void Decode_Exact();
