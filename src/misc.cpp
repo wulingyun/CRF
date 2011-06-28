@@ -18,16 +18,16 @@ SEXP getListElement(SEXP list, const char *tag)
 
 void setListElement(SEXP list, int i, const char *tag, SEXP value)
 {
-	SEXP names = getAttrib(list, R_NamesSymbol);
-	if (names == R_NilValue)
+	SEXP _names = getAttrib(list, R_NamesSymbol);
+	if (_names == R_NilValue)
 	{
-		PROTECT(names = NEW_STRING(length(list)));
-		SET_STRING_ELT(names, i, mkChar(tag));
-		setAttrib(list, R_NamesSymbol, names);
-		UNPROTECT(1);
+		PROTECT(_names = NEW_STRING(length(list)));
+		SET_STRING_ELT(_names, i, mkChar(tag));
+		setAttrib(list, R_NamesSymbol, _names);
+		UNPROTECT_PTR(_names);
 	}
 	else
-		SET_STRING_ELT(names, i, mkChar(tag));
+		SET_STRING_ELT(_names, i, mkChar(tag));
 	SET_VECTOR_ELT(list, i, value);
 }
 
@@ -40,7 +40,7 @@ void setDim2(SEXP array, int x1, int x2)
 	INTEGER_POINTER(_dim)[0] = x1;
 	INTEGER_POINTER(_dim)[1] = x2;
 	SET_DIM(array, _dim);
-	UNPROTECT(1);
+	UNPROTECT_PTR(_dim);
 }
 
 void setDim3(SEXP array, int x1, int x2, int x3)
@@ -51,7 +51,7 @@ void setDim3(SEXP array, int x1, int x2, int x3)
 	INTEGER_POINTER(_dim)[1] = x2;
 	INTEGER_POINTER(_dim)[2] = x3;
 	SET_DIM(array, _dim);
-	UNPROTECT(1);
+	UNPROTECT_PTR(_dim);
 }
 
 /* sample from discret distribution */
