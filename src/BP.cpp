@@ -68,10 +68,7 @@ void CRF::Message2EdgeBelief(double *messages_1, double *messages_2)
 		p_nodeBel = nodeBel + n1;
 		for (int j = 0; j < nStates[n1]; j++)
 		{
-			if (p1_messages[j] != 0)
-				bel = p_nodeBel[0] / p1_messages[j];
-			else
-				bel = 0;
+			bel = p1_messages[j] == 0 ? 0 : p_nodeBel[0] / p1_messages[j];
 			p_edgeBel = p0_edgeBel + j;
 			for (int k = 0; k < nStates[n2]; k++)
 			{
@@ -84,10 +81,7 @@ void CRF::Message2EdgeBelief(double *messages_1, double *messages_2)
 		p_edgeBel = p0_edgeBel;
 		for (int j = 0; j < nStates[n2]; j++)
 		{
-			if (p2_messages[j] != 0)
-				bel = p_nodeBel[0] / p2_messages[j];
-			else
-				bel = 0;
+			bel = p2_messages[j] == 0 ? 0 : p_nodeBel[0] / p2_messages[j];
 			for (int k = 0; k < nStates[n1]; k++)
 				p_edgeBel[k] *= bel;
 			p_nodeBel += nNodes;
