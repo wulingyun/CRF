@@ -23,6 +23,14 @@ decode.cutset <- function(crf, cutset)
 	.Call("Decode_Cutset", crf)
 }
 
+decode.cutsetChain <- function(crf, cutset)
+{
+	clamped <- rep(0, crf$n.nodes)
+	clamped[cutset] <- 1
+	crf <- clamp.crf(crf, clamped)
+	.Call("Decode_CutsetChain", crf)
+}
+
 decode.sample <- function(crf, sample.method, ...)
 	.Call("Decode_Sample", crf, sample.method(crf, ...))
 
