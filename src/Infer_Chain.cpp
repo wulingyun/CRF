@@ -155,6 +155,8 @@ void CRF::Infer_Chain()
 		}
 	}
 
+	double Z = 1;
 	for (int i = 0; i < nNodes; i++)
-		*logZ += log(kappa[i]);
+		Z *= kappa[i];
+	*logZ = log(Z);
 }
