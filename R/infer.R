@@ -36,6 +36,14 @@ infer.cutset <- function(crf, cutset)
 	.Call("Infer_Cutset", crf)
 }
 
+infer.cutsetChain <- function(crf, cutset)
+{
+	clamped <- rep(0, crf$n.nodes)
+	clamped[cutset] <- 1
+	crf <- clamp.crf(crf, clamped)
+	.Call("Infer_CutsetChain", crf)
+}
+
 infer.sample <- function(crf, sample.method, ...)
 	.Call("Infer_Sample", crf, sample.method(crf, ...))
 
