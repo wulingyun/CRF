@@ -12,6 +12,8 @@ SEXP Decode_Cutset(SEXP _crf, SEXP _isChain)
 
 void CRFclamped::Decode_Cutset(bool isChain)
 {
+	original.Init_UpperBound();
+
 	int *y = (int *) R_alloc(original.nNodes, sizeof(int));
 	for (int i = 0; i < original.nNodes; i++)
 	{
@@ -31,28 +33,31 @@ void CRFclamped::Decode_Cutset(bool isChain)
 	int index;
 	while(1)
 	{
-		/* Reset node potentials */
-		Reset_NodePot();
-
-		/* Decode clamped CRF */
-		if (isChain)
-			Decode_Chain();
-		else
-			Decode_Tree();
-
-		/* Map results back */
-		for (int i = 0; i < nNodes; i++)
-			y[nodeId[i]-1] = labels[i] - 1;
-
-		/* Calculate potential */
-		pot = original.Get_Potential(y);
-
-		/* Record the best potentials */
-		if (pot > maxPot)
+		if (original.Get_UpperBound(clamped) > maxPot)
 		{
-			maxPot = pot;
-			for (int i = 0; i < original.nNodes; i++)
-				original.labels[i] = y[i] + 1;
+			/* Reset node potentials */
+			Reset_NodePot();
+
+			/* Decode clamped CRF */
+			if (isChain)
+				Decode_Chain();
+			else
+				Decode_Tree();
+
+			/* Map results back */
+			for (int i = 0; i < nNodes; i++)
+				y[nodeId[i]-1] = labels[i] - 1;
+
+			/* Calculate potential */
+			pot = original.Get_Potential(y);
+
+			/* Record the best potentials */
+			if (pot > maxPot)
+			{
+				maxPot = pot;
+				for (int i = 0; i < original.nNodes; i++)
+					original.labels[i] = y[i] + 1;
+			}
 		}
 
 		/* Next configuration */

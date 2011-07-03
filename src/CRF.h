@@ -60,6 +60,8 @@ public:
 	SEXP _samples;
 	int *samples, nSamples;
 
+	double *maxNodePot, *maxEdgePot;
+
 	int numProtect;
 
 	CRF();
@@ -89,6 +91,9 @@ public:
 	/* Utils */
 	double Get_Potential(int *configuration);
 	double Get_LogPotential(int *configuration);
+	void Init_UpperBound();
+	double Get_UpperBound();
+	double Get_UpperBound(int *clamped);
 
 	/* BP functions */
 	void TreeBP(double *messages_1, double *messages_2, bool maximize = false);
