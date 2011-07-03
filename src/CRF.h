@@ -10,9 +10,10 @@ extern "C" {
 	SEXP Decode_Tree(SEXP _crf);
 	SEXP Decode_Cutset(SEXP _crf, SEXP _isChain);
 	SEXP Decode_CutsetChain(SEXP _crf);
+	SEXP Decode_Sample(SEXP _crf, SEXP _samples);
 	SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Decode_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
-	SEXP Decode_Sample(SEXP _crf, SEXP _samples);
+	SEXP Decode_Greedy(SEXP _crf, SEXP _start);
 
 	/* Inference */
 	SEXP Infer_Exact(SEXP _crf);
@@ -20,9 +21,9 @@ extern "C" {
 	SEXP Infer_Tree(SEXP _crf);
 	SEXP Infer_Cutset(SEXP _crf, SEXP _isChain);
 	SEXP Infer_CutsetChain(SEXP _crf);
+	SEXP Infer_Sample(SEXP _crf, SEXP _samples);
 	SEXP Infer_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Infer_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
-	SEXP Infer_Sample(SEXP _crf, SEXP _samples);
 
 	/* Sampling */
 	SEXP Sample_Exact(SEXP _crf, SEXP _size);
@@ -113,21 +114,23 @@ public:
 	void Decode_Exact();
 	void Decode_Chain();
 	void Decode_Tree();
+	void Decode_Sample();
 	void Decode_LBP(int maxIter, double cutoff, int verbose);
 	void Decode_TRBP(int maxIter, double cutoff, int verbose);
-	void Decode_Sample();
+	void Decode_Greedy(int *start = 0);
+
 	/* Inference methods */
 	void Infer_Exact();
 	void Infer_Chain();
 	void Infer_Tree();
+	void Infer_Sample();
 	void Infer_LBP(int maxIter, double cutoff, int verbose);
 	void Infer_TRBP(int maxIter, double cutoff, int verbose);
-	void Infer_Sample();
+
 	/* Sampling methods */
 	void Sample_Exact(int size = 0);
 	void Sample_Chain(int size = 0);
 	void Sample_Tree(int size = 0);
-	void Sample_LBP(int maxIter, double cutoff, int verbose, int size = 0);
 	void Sample_Gibbs(int burnIn, int *start, int size = 0);
 };
 
@@ -146,9 +149,11 @@ public:
 	/* Decoding methods */
 	void Decode_Cutset(bool isChain = 0);
 	void Decode_CutsetChain();
+
 	/* Inference methods */
 	void Infer_Cutset(bool isChain = 0);
 	void Infer_CutsetChain();
+
 	/* Sampling methods */
 	void Sample_Cutset(int size = 0, bool isChain = 0);
 	void Sample_CutsetChain(int size = 0);
