@@ -1,15 +1,15 @@
 #include "CRF.h"
 
-SEXP Infer_Cutset(SEXP _crf)
+SEXP Infer_Cutset(SEXP _crf, SEXP _isChain)
 {
 	CRFclamped crf(_crf);
 	crf.Init_Belief();
 	crf.original.Init_Belief();
-	crf.Infer_Cutset();
+	crf.Infer_Cutset(INTEGER_POINTER(AS_INTEGER(_isChain))[0]);
 	return(crf.original._belief);
 }
 
-void CRFclamped::Infer_Cutset()
+void CRFclamped::Infer_Cutset(bool isChain)
 {
 	int *y = (int *) R_alloc(original.nNodes, sizeof(int));
 	for (int i = 0; i < original.nNodes; i++)
@@ -34,7 +34,10 @@ void CRFclamped::Infer_Cutset()
 		Reset_NodePot();
 
 		/* Infer clamped CRF */
-		Infer_Tree();
+		if (isChain)
+			Infer_Chain();
+		else
+			Infer_Tree();
 
 		/* Calculate potential */
 		pot = exp(*logZ);

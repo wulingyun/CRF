@@ -1,16 +1,16 @@
 #include "CRF.h"
 
-SEXP Decode_Cutset(SEXP _crf)
+SEXP Decode_Cutset(SEXP _crf, SEXP _isChain)
 {
 	CRFclamped crf(_crf);
 	crf.Init_Labels();
 	crf.Init_NodeBel();
 	crf.original.Init_Labels();
-	crf.Decode_Cutset();
+	crf.Decode_Cutset(INTEGER_POINTER(AS_INTEGER(_isChain))[0]);
 	return(crf.original._labels);
 }
 
-void CRFclamped::Decode_Cutset()
+void CRFclamped::Decode_Cutset(bool isChain)
 {
 	int *y = (int *) R_alloc(original.nNodes, sizeof(int));
 	for (int i = 0; i < original.nNodes; i++)
@@ -35,7 +35,10 @@ void CRFclamped::Decode_Cutset()
 		Reset_NodePot();
 
 		/* Decode clamped CRF */
-		Decode_Tree();
+		if (isChain)
+			Decode_Chain();
+		else
+			Decode_Tree();
 
 		/* Map results back */
 		for (int i = 0; i < nNodes; i++)

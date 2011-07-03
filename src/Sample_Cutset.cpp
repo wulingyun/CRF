@@ -1,16 +1,16 @@
 #include "CRF.h"
 
-SEXP Sample_Cutset(SEXP _crf, SEXP _size)
+SEXP Sample_Cutset(SEXP _crf, SEXP _size, SEXP _isChain)
 {
 	CRFclamped crf(_crf);
 	crf.Init_Belief();
 	crf.Init_Samples(1);
 	crf.original.Init_Samples(_size);
-	crf.Sample_Cutset();
+	crf.Sample_Cutset(INTEGER_POINTER(AS_INTEGER(_isChain))[0]);
 	return(crf.original._samples);
 }
 
-void CRFclamped::Sample_Cutset(int size)
+void CRFclamped::Sample_Cutset(int size, bool isChain)
 {
 	if (size <= 0)
 		size = original.nSamples;
@@ -44,7 +44,10 @@ void CRFclamped::Sample_Cutset(int size)
 		Reset_NodePot();
 
 		/* Infer clamped CRF */
-		Infer_Tree();
+		if (isChain)
+			Infer_Chain();
+		else
+			Infer_Tree();
 
 		/* Calculate potential */
 		pot[n] = exp(*logZ);
@@ -125,7 +128,10 @@ void CRFclamped::Sample_Cutset(int size)
 		/* Generate samples */
 		if (m > 0)
 		{
-			Sample_Tree(m);
+			if (isChain)
+				Sample_Chain(m);
+			else
+				Sample_Tree(m);
 			m = 0;
 			for (int k = 0; k < size; k++)
 				if (cumulativePot > cutoff[k])

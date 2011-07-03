@@ -16,12 +16,12 @@ sample.conditional <- function(crf, size, clamped, sample.method, ...)
 	samples
 }
 
-sample.cutset <- function(crf, size, cutset)
+sample.cutset <- function(crf, size, cutset, is.chain = FALSE)
 {
 	clamped <- rep(0, crf$n.nodes)
 	clamped[cutset] <- 1
 	crf <- clamp.crf(crf, clamped)
-	.Call("Sample_Cutset", crf, size)
+	.Call("Sample_Cutset", crf, size, is.chain)
 }
 
 sample.cutsetChain <- function(crf, size, cutset)
