@@ -9,26 +9,26 @@ decode.tree <- function(crf)
 
 decode.conditional <- function(crf, clamped, decode.method, ...)
 {
-	crf <- clamp.crf(crf, clamped)
+	newcrf <- clamp.crf(crf, clamped)
 	decode <- clamped
-	decode[crf$node.id] <- decode.method(crf, ...)
+	decode[crf$node.id] <- decode.method(newcrf, ...)
 	decode
 }
 
-decode.cutset <- function(crf, cutset, is.chain = FALSE)
+decode.cutset <- function(crf, cutset, is.chain = FALSE, start = apply(crf$node.pot, 1, which.max))
 {
 	clamped <- rep(0, crf$n.nodes)
 	clamped[cutset] <- 1
-	crf <- clamp.crf(crf, clamped)
-	.Call("Decode_Cutset", crf, is.chain)
+	newcrf <- clamp.crf(crf, clamped)
+	.Call("Decode_Cutset", newcrf, is.chain, start)
 }
 
 decode.cutsetChain <- function(crf, cutset)
 {
 	clamped <- rep(0, crf$n.nodes)
 	clamped[cutset] <- 1
-	crf <- clamp.crf(crf, clamped)
-	.Call("Decode_CutsetChain", crf)
+	newcrf <- clamp.crf(crf, clamped)
+	.Call("Decode_CutsetChain", newcrf)
 }
 
 decode.sample <- function(crf, sample.method, ...)

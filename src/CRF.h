@@ -8,7 +8,7 @@ extern "C" {
 	SEXP Decode_Exact(SEXP _crf);
 	SEXP Decode_Chain(SEXP _crf);
 	SEXP Decode_Tree(SEXP _crf);
-	SEXP Decode_Cutset(SEXP _crf, SEXP _isChain);
+	SEXP Decode_Cutset(SEXP _crf, SEXP _isChain, SEXP _start);
 	SEXP Decode_CutsetChain(SEXP _crf);
 	SEXP Decode_Sample(SEXP _crf, SEXP _samples);
 	SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
@@ -147,7 +147,7 @@ public:
 	void Reset_NodePot();
 
 	/* Decoding methods */
-	void Decode_Cutset(bool isChain = 0);
+	void Decode_Cutset(bool isChain = 0, int *start = 0);
 	void Decode_CutsetChain();
 
 	/* Inference methods */
