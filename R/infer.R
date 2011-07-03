@@ -28,12 +28,12 @@ infer.conditional <- function(crf, clamped, infer.method, ...)
 	belief
 }
 
-infer.cutset <- function(crf, cutset)
+infer.cutset <- function(crf, cutset, is.chain = FALSE)
 {
 	clamped <- rep(0, crf$n.nodes)
 	clamped[cutset] <- 1
 	crf <- clamp.crf(crf, clamped)
-	.Call("Infer_Cutset", crf)
+	.Call("Infer_Cutset", crf, is.chain)
 }
 
 infer.cutsetChain <- function(crf, cutset)
