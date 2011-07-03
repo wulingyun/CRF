@@ -22,8 +22,21 @@ void CRF::Sample_Gibbs(int burnIn, int *start, int size)
 		Init_Samples(size);
 
 	int *y = (int *) R_alloc(nNodes, sizeof(int));
-	for (int i = 0; i < nNodes; i++)
-		y[i] = start[i] - 1;
+	double max;
+	if (start)
+		for (int i = 0; i < nNodes; i++)
+			y[i] = start[i] - 1;
+	else
+		for (int i = 0; i < nNodes; i++)
+		{
+			max = -1;
+			for (int j = 0; j < nStates[i]; j++)
+				if (max < NodePot(i,j))
+				{
+					max = NodePot(i,j);
+					y[i] = j;
+				}
+		}
 
 	double sumProb, *prob = (double *) R_alloc(maxState, sizeof(double));
 
