@@ -73,3 +73,72 @@ double CRF::Get_LogPotential(int *configuration)
 
 	return(potential);
 }
+
+void CRF::Init_UpperBound()
+{
+	maxNodePot = (double *) R_alloc(nNodes, sizeof(double));
+	maxEdgePot = (double *) R_alloc(nEdges, sizeof(double));
+
+	/* Node potentials */
+	for (int i = 0; i < nNodes; i++)
+	{
+		maxNodePot[i] = 0;
+		for (int j = 0; j < nStates[i]; j++)
+			if (maxNodePot[i] < NodePot(i, j))
+				maxNodePot[i] = NodePot(i, j);
+	}
+
+	/* Edge potentials */
+	int n1, n2;
+	for (int i = 0; i < nEdges; i++)
+	{
+		maxEdgePot[i] = 0;
+		n1 = Edges(i,0) - 1;
+		n2 = Edges(i,1) - 1;
+		for (int j = 0; j < nStates[n1]; j++)
+			for (int k = 0; k < nStates[n2]; k++)
+				if (maxEdgePot[i] < EdgePot(j, k, i))
+					maxEdgePot[i] = EdgePot(j, k, i);
+	}
+}
+
+double CRF::Get_UpperBound()
+{
+	double potential = 1;
+
+	/* Node potentials */
+	for (int i = 0; i < nNodes; i++)
+		potential *= maxNodePot[i];
+
+	/* Edge potentials */
+	for (int i = 0; i < nEdges; i++)
+		potential *= maxEdgePot[i];
+
+	return(potential);
+}
+
+double CRF::Get_UpperBound(int *clamped)
+{
+	double potential = 1;
+	int s1, s2;
+
+	/* Node potentials */
+	for (int i = 0; i < nNodes; i++)
+		if (clamped[i] > 0)
+			potential *= NodePot(i, clamped[i]-1);
+		else
+			potential *= maxNodePot[i];
+
+	/* Edge potentials */
+	for (int i = 0; i < nEdges; i++)
+	{
+		s1 = clamped[Edges(i,0) - 1] - 1;
+		s2 = clamped[Edges(i,1) - 1] - 1;
+		if (s1 >= 0 && s2 >= 0)
+			potential *= EdgePot(s1, s2, i);
+		else
+			potential *= maxEdgePot[i];
+	}
+
+	return(potential);
+}

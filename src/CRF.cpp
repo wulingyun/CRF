@@ -24,6 +24,9 @@ CRF::CRF()
 	samples = NULL;
 	nSamples = 0;
 
+	maxNodePot = NULL;
+	maxEdgePot = NULL;
+
 	numProtect = 0;
 }
 
