@@ -15,6 +15,8 @@ void CRF::Decode_Sample()
 	int maxSample = -1;
 	for (int i = 0; i < nSamples; i++)
 	{
+		R_CheckUserInterrupt();
+
 		pot = 1;
 		for (int j = 0; j < nNodes; j++)
 			pot *= NodePot(j, Samples(i, j) - 1);

@@ -46,6 +46,8 @@ void CRF::Sample_Gibbs(int burnIn, int *start, int size)
 	GetRNGstate();
 	for (int iter = 0; iter < burnIn+size; iter++)
 	{
+		R_CheckUserInterrupt();
+
 		for (int i = 0; i < nNodes; i++)
 		{
 			n = nStates[i];

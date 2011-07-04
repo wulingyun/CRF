@@ -18,6 +18,8 @@ void CRF::Infer_Exact()
 	int index;
 	while(1)
 	{
+		R_CheckUserInterrupt();
+
 		/* Calculate potential */
 		pot = Get_Potential(y);
 

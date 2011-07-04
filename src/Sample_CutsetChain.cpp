@@ -40,6 +40,8 @@ void CRFclamped::Sample_CutsetChain(int size)
 	int index, n1, n2;
 	while(1)
 	{
+		R_CheckUserInterrupt();
+
 		/* Reset node potentials */
 		Reset_NodePot();
 
@@ -110,6 +112,8 @@ void CRFclamped::Sample_CutsetChain(int size)
 	n = 0;
 	while(1)
 	{
+		R_CheckUserInterrupt();
+
 		/* Reset node potentials */
 		Reset_NodePot();
 

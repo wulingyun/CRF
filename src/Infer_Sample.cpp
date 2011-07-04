@@ -15,6 +15,8 @@ void CRF::Infer_Sample()
 	int k, maxSample = -1;
 	for (int i = 0; i < nSamples; i++)
 	{
+		R_CheckUserInterrupt();
+
 		pot = 1;
 		for (int j = 0; j < nNodes; j++)
 		{
@@ -38,6 +40,8 @@ void CRF::Infer_Sample()
 	int same, freq = 0;
 	for (int i = 0; i < nSamples; i++)
 	{
+		R_CheckUserInterrupt();
+
 		same = 1;
 		for (int j = 0; j < nNodes; j++)
 		{
