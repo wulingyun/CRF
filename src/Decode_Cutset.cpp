@@ -72,12 +72,16 @@ void CRFclamped::Decode_Cutset(int engine, int *start)
 				break;
 			case 1:
 				Decode_Exact();
+				break;
 			case 2:
 				Decode_Chain();
+				break;
 			case 3:
 				Decode_Tree();
+				break;
 			default:
 				Decode_Tree();
+				break;
 			}
 
 			/* Map results back */

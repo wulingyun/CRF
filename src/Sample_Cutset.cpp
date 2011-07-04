@@ -52,12 +52,16 @@ void CRFclamped::Sample_Cutset(int size, int engine)
 			break;
 		case 1:
 			Infer_Exact();
+			break;
 		case 2:
 			Infer_Chain();
+			break;
 		case 3:
 			Infer_Tree();
+			break;
 		default:
 			Infer_Tree();
+			break;
 		}
 
 		/* Calculate potential */
@@ -147,12 +151,16 @@ void CRFclamped::Sample_Cutset(int size, int engine)
 				break;
 			case 1:
 				Sample_Exact(m);
+				break;
 			case 2:
 				Sample_Chain(m);
+				break;
 			case 3:
 				Sample_Tree(m);
+				break;
 			default:
 				Sample_Tree(m);
+				break;
 			}
 			m = 0;
 			for (int k = 0; k < size; k++)
