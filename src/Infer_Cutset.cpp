@@ -42,12 +42,16 @@ void CRFclamped::Infer_Cutset(int engine)
 			break;
 		case 1:
 			Infer_Exact();
+			break;
 		case 2:
 			Infer_Chain();
+			break;
 		case 3:
 			Infer_Tree();
+			break;
 		default:
 			Infer_Tree();
+			break;
 		}
 
 		/* Calculate potential */
