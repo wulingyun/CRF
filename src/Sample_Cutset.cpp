@@ -40,6 +40,8 @@ void CRFclamped::Sample_Cutset(int size, int engine)
 	int index, n1, n2;
 	while(1)
 	{
+		R_CheckUserInterrupt();
+
 		/* Reset node potentials */
 		Reset_NodePot();
 
@@ -122,6 +124,8 @@ void CRFclamped::Sample_Cutset(int size, int engine)
 	n = 0;
 	while(1)
 	{
+		R_CheckUserInterrupt();
+
 		/* Reset node potentials */
 		Reset_NodePot();
 

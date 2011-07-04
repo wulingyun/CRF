@@ -23,6 +23,8 @@ void CRF::Sample_Exact(int size)
 	int index;
 	while(1)
 	{
+		R_CheckUserInterrupt();
+
 		/* Calculate potential and update Z */
 		Z += Get_Potential(y);
 
@@ -56,6 +58,8 @@ void CRF::Sample_Exact(int size)
 	double cumulativePot = 0;
 	while(1)
 	{
+		R_CheckUserInterrupt();
+
 		/* Update cumulative potential */
 		cumulativePot += Get_Potential(y);
 

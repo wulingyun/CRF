@@ -31,6 +31,8 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double *scale
 	double difference = 0;
 	for (int iter = 1; iter <= maxIter; iter++)
 	{
+		R_CheckUserInterrupt();
+
 		p_messages = old_messages_1;
 		old_messages_1 = messages_1;
 		messages_1 = p_messages;

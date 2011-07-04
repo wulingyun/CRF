@@ -27,8 +27,10 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 	double mesg, sumMesg, *p_nodePot, *p_edgePot, *p0_edgePot, *p_messages;
 
 	int done = 0;
-	while (!done)
+	while(!done)
 	{
+		R_CheckUserInterrupt();
+
 		done = 1;
 		for (s = 0; s < nNodes; s++)
 		{

@@ -30,6 +30,8 @@ void CRFclamped::Infer_CutsetChain()
 	int index, n1, n2;
 	while(1)
 	{
+		R_CheckUserInterrupt();
+
 		/* Reset node potentials */
 		Reset_NodePot();
 

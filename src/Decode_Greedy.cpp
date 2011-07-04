@@ -40,6 +40,8 @@ void CRF::Decode_Greedy(int *start)
 	int e, n1, n2, index;
 	while(1)
 	{
+		R_CheckUserInterrupt();
+
 		for (int i = 0; i < nNodes; i++)
 		{
 			for (int j = 0; j < nStates[i]; j++)
