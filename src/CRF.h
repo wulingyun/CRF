@@ -8,7 +8,7 @@ extern "C" {
 	SEXP Decode_Exact(SEXP _crf);
 	SEXP Decode_Chain(SEXP _crf);
 	SEXP Decode_Tree(SEXP _crf);
-	SEXP Decode_Cutset(SEXP _crf, SEXP _isChain, SEXP _start);
+	SEXP Decode_Cutset(SEXP _crf, SEXP _engine, SEXP _start);
 	SEXP Decode_CutsetChain(SEXP _crf);
 	SEXP Decode_Sample(SEXP _crf, SEXP _samples);
 	SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
@@ -19,7 +19,7 @@ extern "C" {
 	SEXP Infer_Exact(SEXP _crf);
 	SEXP Infer_Chain(SEXP _crf);
 	SEXP Infer_Tree(SEXP _crf);
-	SEXP Infer_Cutset(SEXP _crf, SEXP _isChain);
+	SEXP Infer_Cutset(SEXP _crf, SEXP _engine);
 	SEXP Infer_CutsetChain(SEXP _crf);
 	SEXP Infer_Sample(SEXP _crf, SEXP _samples);
 	SEXP Infer_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
@@ -29,7 +29,7 @@ extern "C" {
 	SEXP Sample_Exact(SEXP _crf, SEXP _size);
 	SEXP Sample_Chain(SEXP _crf, SEXP _size);
 	SEXP Sample_Tree(SEXP _crf, SEXP _size);
-	SEXP Sample_Cutset(SEXP _crf, SEXP _size, SEXP _isChain);
+	SEXP Sample_Cutset(SEXP _crf, SEXP _size, SEXP _engine);
 	SEXP Sample_CutsetChain(SEXP _crf, SEXP _size);
 	SEXP Sample_Gibbs(SEXP _crf, SEXP _size, SEXP _burnIn, SEXP _start);
 
@@ -61,7 +61,7 @@ public:
 	SEXP _samples;
 	int *samples, nSamples;
 
-	double *maxNodePot, *maxEdgePot;
+	double *maxNodePot, *maxEdgePot, unclampedUB;
 
 	int numProtect;
 
@@ -92,9 +92,10 @@ public:
 	/* Utils */
 	double Get_Potential(int *configuration);
 	double Get_LogPotential(int *configuration);
-	void Init_UpperBound();
-	double Get_UpperBound();
-	double Get_UpperBound(int *clamped);
+	void UB_Init();
+	void UB_Clamp(int *clamped);
+	double UB_Estimate();
+	double UB_Estimate(int *clamped);
 
 	/* BP functions */
 	void TreeBP(double *messages_1, double *messages_2, bool maximize = false);
@@ -147,15 +148,15 @@ public:
 	void Reset_NodePot();
 
 	/* Decoding methods */
-	void Decode_Cutset(bool isChain = 0, int *start = 0);
+	void Decode_Cutset(int engine = -1, int *start = 0);
 	void Decode_CutsetChain();
 
 	/* Inference methods */
-	void Infer_Cutset(bool isChain = 0);
+	void Infer_Cutset(int engine = -1);
 	void Infer_CutsetChain();
 
 	/* Sampling methods */
-	void Sample_Cutset(int size = 0, bool isChain = 0);
+	void Sample_Cutset(int size = 0, int engine = -1);
 	void Sample_CutsetChain(int size = 0);
 };
 

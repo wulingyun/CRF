@@ -15,12 +15,13 @@ decode.conditional <- function(crf, clamped, decode.method, ...)
 	decode
 }
 
-decode.cutset <- function(crf, cutset, is.chain = FALSE, start = apply(crf$node.pot, 1, which.max))
+decode.cutset <- function(crf, cutset, engine = "default", start = apply(crf$node.pot, 1, which.max))
 {
+	engine.id <- c("default"=-1, "none"=0, "exact"=1, "chain"=2, "tree"=3);
 	clamped <- rep(0, crf$n.nodes)
 	clamped[cutset] <- 1
 	newcrf <- clamp.crf(crf, clamped)
-	.Call("Decode_Cutset", newcrf, is.chain, start)
+	.Call("Decode_Cutset", newcrf, engine.id[engine], start)
 }
 
 decode.cutsetChain <- function(crf, cutset)
