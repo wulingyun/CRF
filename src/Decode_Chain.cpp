@@ -10,6 +10,8 @@ SEXP Decode_Chain(SEXP _crf)
 
 void CRF::Decode_Chain()
 {
+	void *vmax = vmaxget(); 
+
 	/* forward pass */
 
 	double *alpha = (double *) R_alloc(nNodes * maxState, sizeof(double));
@@ -93,4 +95,6 @@ void CRF::Decode_Chain()
 
 	for (int i = 0; i < nNodes; i++)
 		labels[i]++;
+
+	vmaxset(vmax); 
 }
