@@ -11,7 +11,7 @@ decode.conditional <- function(crf, clamped, decode.method, ...)
 {
 	newcrf <- clamp.crf(crf, clamped)
 	decode <- clamped
-	decode[crf$node.id] <- decode.method(newcrf, ...)
+	decode[newcrf$node.id] <- decode.method(newcrf, ...)
 	decode
 }
 
