@@ -1,6 +1,6 @@
 #include "CRF.h"
 
-SEXP Decode_Cutset(SEXP _crf, SEXP _isChain, SEXP _start)
+SEXP Decode_Cutset(SEXP _crf, SEXP _engine, SEXP _start)
 {
 	PROTECT(_start = AS_INTEGER(_start));
 	int *start = INTEGER_POINTER(_start);
@@ -9,15 +9,16 @@ SEXP Decode_Cutset(SEXP _crf, SEXP _isChain, SEXP _start)
 	crf.Init_Labels();
 	crf.Init_NodeBel();
 	crf.original.Init_Labels();
-	crf.Decode_Cutset(INTEGER_POINTER(AS_INTEGER(_isChain))[0], start);
+	crf.Decode_Cutset(INTEGER_POINTER(AS_INTEGER(_engine))[0], start);
 
 	UNPROTECT_PTR(_start);
 	return(crf.original._labels);
 }
 
-void CRFclamped::Decode_Cutset(bool isChain, int *start)
+void CRFclamped::Decode_Cutset(int engine, int *start)
 {
-	original.Init_UpperBound();
+	original.UB_Init();
+	original.UB_Clamp(clamped);
 
 	int *y = (int *) R_alloc(original.nNodes, sizeof(int));
 	double max;
@@ -57,16 +58,27 @@ void CRFclamped::Decode_Cutset(bool isChain, int *start)
 	int index;
 	while(1)
 	{
-		if (original.Get_UpperBound(clamped) > maxPot)
+		R_CheckUserInterrupt();
+
+		if (original.UB_Estimate(clamped) > maxPot)
 		{
 			/* Reset node potentials */
 			Reset_NodePot();
 
 			/* Decode clamped CRF */
-			if (isChain)
+			switch (engine)
+			{
+			case 0:
+				break;
+			case 1:
+				Decode_Exact();
+			case 2:
 				Decode_Chain();
-			else
+			case 3:
 				Decode_Tree();
+			default:
+				Decode_Tree();
+			}
 
 			/* Map results back */
 			for (int i = 0; i < nNodes; i++)

@@ -80,7 +80,7 @@ void CRF::Init_Labels()
 {
 	PROTECT(_labels = NEW_INTEGER(nNodes));
 	labels = INTEGER_POINTER(_labels);
-	setValues(_labels, labels, -1);
+	setValues(_labels, labels, 0);
 	numProtect++;
 }
 

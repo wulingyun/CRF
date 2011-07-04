@@ -28,12 +28,13 @@ infer.conditional <- function(crf, clamped, infer.method, ...)
 	belief
 }
 
-infer.cutset <- function(crf, cutset, is.chain = FALSE)
+infer.cutset <- function(crf, cutset, engine = "default")
 {
+	engine.id <- c("default"=-1, "none"=0, "exact"=1, "chain"=2, "tree"=3);
 	clamped <- rep(0, crf$n.nodes)
 	clamped[cutset] <- 1
 	newcrf <- clamp.crf(crf, clamped)
-	.Call("Infer_Cutset", newcrf, is.chain)
+	.Call("Infer_Cutset", newcrf, engine.id[engine])
 }
 
 infer.cutsetChain <- function(crf, cutset)

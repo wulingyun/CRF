@@ -16,12 +16,13 @@ sample.conditional <- function(crf, size, clamped, sample.method, ...)
 	samples
 }
 
-sample.cutset <- function(crf, size, cutset, is.chain = FALSE)
+sample.cutset <- function(crf, size, cutset, engine = "default")
 {
+	engine.id <- c("default"=-1, "none"=0, "exact"=1, "chain"=2, "tree"=3);
 	clamped <- rep(0, crf$n.nodes)
 	clamped[cutset] <- 1
 	newcrf <- clamp.crf(crf, clamped)
-	.Call("Sample_Cutset", newcrf, size, is.chain)
+	.Call("Sample_Cutset", newcrf, size, engine.id[engine])
 }
 
 sample.cutsetChain <- function(crf, size, cutset)
