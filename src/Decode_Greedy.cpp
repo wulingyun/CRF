@@ -38,7 +38,7 @@ void CRF::Decode_Greedy(int *start)
 
 	double ref;
 	int e, n1, n2, index;
-	while(1)
+	while (1)
 	{
 		R_CheckUserInterrupt();
 

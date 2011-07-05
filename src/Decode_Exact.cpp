@@ -16,7 +16,7 @@ void CRF::Decode_Exact()
 
 	double pot, maxPot = -1;
 	int index;
-	while(1)
+	while (1)
 	{
 		R_CheckUserInterrupt();
 

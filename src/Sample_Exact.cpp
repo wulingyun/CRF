@@ -21,7 +21,7 @@ void CRF::Sample_Exact(int size)
 
 	double Z = 0;
 	int index;
-	while(1)
+	while (1)
 	{
 		R_CheckUserInterrupt();
 
@@ -56,7 +56,7 @@ void CRF::Sample_Exact(int size)
 	int remain = size;
 	double done = Z * 10;
 	double cumulativePot = 0;
-	while(1)
+	while (1)
 	{
 		R_CheckUserInterrupt();
 

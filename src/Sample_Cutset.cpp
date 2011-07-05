@@ -38,7 +38,7 @@ void CRFclamped::Sample_Cutset(int size, int engine)
 	double Z = 0;
 	int n = 0;
 	int index, n1, n2;
-	while(1)
+	while (1)
 	{
 		R_CheckUserInterrupt();
 
@@ -126,7 +126,7 @@ void CRFclamped::Sample_Cutset(int size, int engine)
 	double done = Z * 10;
 	double cumulativePot = 0;
 	n = 0;
-	while(1)
+	while (1)
 	{
 		R_CheckUserInterrupt();
 
