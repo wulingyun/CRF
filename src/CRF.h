@@ -9,7 +9,6 @@ extern "C" {
 	SEXP Decode_Chain(SEXP _crf);
 	SEXP Decode_Tree(SEXP _crf);
 	SEXP Decode_Cutset(SEXP _crf, SEXP _engine, SEXP _start);
-	SEXP Decode_CutsetChain(SEXP _crf);
 	SEXP Decode_Sample(SEXP _crf, SEXP _samples);
 	SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Decode_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
@@ -20,7 +19,6 @@ extern "C" {
 	SEXP Infer_Chain(SEXP _crf);
 	SEXP Infer_Tree(SEXP _crf);
 	SEXP Infer_Cutset(SEXP _crf, SEXP _engine);
-	SEXP Infer_CutsetChain(SEXP _crf);
 	SEXP Infer_Sample(SEXP _crf, SEXP _samples);
 	SEXP Infer_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Infer_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
@@ -30,7 +28,6 @@ extern "C" {
 	SEXP Sample_Chain(SEXP _crf, SEXP _size);
 	SEXP Sample_Tree(SEXP _crf, SEXP _size);
 	SEXP Sample_Cutset(SEXP _crf, SEXP _size, SEXP _engine);
-	SEXP Sample_CutsetChain(SEXP _crf, SEXP _size);
 	SEXP Sample_Gibbs(SEXP _crf, SEXP _size, SEXP _burnIn, SEXP _start);
 
 	/* Utils */
@@ -149,15 +146,12 @@ public:
 
 	/* Decoding methods */
 	void Decode_Cutset(int engine = -1, int *start = 0);
-	void Decode_CutsetChain();
 
 	/* Inference methods */
 	void Infer_Cutset(int engine = -1);
-	void Infer_CutsetChain();
 
 	/* Sampling methods */
 	void Sample_Cutset(int size = 0, int engine = -1);
-	void Sample_CutsetChain(int size = 0);
 };
 
 /* inline functions */

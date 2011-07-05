@@ -37,14 +37,6 @@ infer.cutset <- function(crf, cutset, engine = "default")
 	.Call("Infer_Cutset", newcrf, engine.id[engine])
 }
 
-infer.cutsetChain <- function(crf, cutset)
-{
-	clamped <- rep(0, crf$n.nodes)
-	clamped[cutset] <- 1
-	newcrf <- clamp.crf(crf, clamped)
-	.Call("Infer_CutsetChain", newcrf)
-}
-
 infer.sample <- function(crf, sample.method, ...)
 	.Call("Infer_Sample", crf, sample.method(crf, ...))
 
