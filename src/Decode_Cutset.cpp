@@ -56,7 +56,7 @@ void CRFclamped::Decode_Cutset(int engine, int *start)
 
 	double pot;
 	int index;
-	while(1)
+	while (1)
 	{
 		R_CheckUserInterrupt();
 

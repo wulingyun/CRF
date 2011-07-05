@@ -16,7 +16,7 @@ void CRF::Infer_Exact()
 
 	double pot, Z = 0;
 	int index;
-	while(1)
+	while (1)
 	{
 		R_CheckUserInterrupt();
 

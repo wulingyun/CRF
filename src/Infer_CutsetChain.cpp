@@ -28,7 +28,7 @@ void CRFclamped::Infer_CutsetChain()
 
 	double pot, Z = 0;
 	int index, n1, n2;
-	while(1)
+	while (1)
 	{
 		R_CheckUserInterrupt();
 
