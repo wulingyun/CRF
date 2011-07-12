@@ -24,8 +24,11 @@ void CRF::Infer_Chain()
 		alpha[nNodes * i] = nodePot[nNodes * i];
 		kappa[0] += alpha[nNodes * i];
 	}
-	for (int i = 0; i < nStates[0]; i++)
-		alpha[nNodes * i] /= kappa[0];
+	if (kappa[0] != 0)
+	{
+		for (int i = 0; i < nStates[0]; i++)
+			alpha[nNodes * i] /= kappa[0];
+	}
 
 	double *p_alpha, *p0_alpha, *p_nodePot, *p_edgePot;
 	double sumPot;
@@ -49,11 +52,14 @@ void CRF::Infer_Chain()
 			p_nodePot += nNodes;
 			p_edgePot += maxState;
 		}
-		p_alpha = alpha + i;
-		for (int j = 0; j < nStates[i]; j++)
+		if (kappa[i] != 0)
 		{
-			p_alpha[0] /= kappa[i];
-			p_alpha += nNodes;
+			p_alpha = alpha + i;
+			for (int j = 0; j < nStates[i]; j++)
+			{
+				p_alpha[0] /= kappa[i];
+				p_alpha += nNodes;
+			}
 		}
 	}
 
@@ -87,11 +93,14 @@ void CRF::Infer_Chain()
 			sumPot += p0_beta[0];
 			p0_beta += nNodes;
 		}
-		p_beta = beta + i;
-		for (int j = 0; j < nStates[i]; j++)
+		if (sumPot != 0)
 		{
-			p_beta[0] /= sumPot;
-			p_beta += nNodes;
+			p_beta = beta + i;
+			for (int j = 0; j < nStates[i]; j++)
+			{
+				p_beta[0] /= sumPot;
+				p_beta += nNodes;
+			}
 		}
 	}
 
@@ -111,11 +120,14 @@ void CRF::Infer_Chain()
 			p_beta += nNodes;
 			p_nodeBel += nNodes;
 		}
-		p_nodeBel = nodeBel + i;
-		for (int j = 0; j < nStates[i]; j++)
+		if (sumBel != 0)
 		{
-			p_nodeBel[0] /= sumBel;
-			p_nodeBel += nNodes;
+			p_nodeBel = nodeBel + i;
+			for (int j = 0; j < nStates[i]; j++)
+			{
+				p_nodeBel[0] /= sumBel;
+				p_nodeBel += nNodes;
+			}
 		}
 	}
 
@@ -144,13 +156,16 @@ void CRF::Infer_Chain()
 			}
 			p_alpha += nNodes;
 		}
-		for (int j = 0; j < nStates[i]; j++)
+		if (sumBel != 0)
 		{
-			p_edgeBel = p0_edgeBel + j;
-			for (int k = 0; k < nStates[i+1]; k++)
+			for (int j = 0; j < nStates[i]; j++)
 			{
-				p_edgeBel[0] /= sumBel;
-				p_edgeBel += maxState;
+				p_edgeBel = p0_edgeBel + j;
+				for (int k = 0; k < nStates[i+1]; k++)
+				{
+					p_edgeBel[0] /= sumBel;
+					p_edgeBel += maxState;
+				}
 			}
 		}
 	}
