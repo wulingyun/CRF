@@ -28,6 +28,8 @@ Decoding: Computing the most likely configuration
   \item \code{\link{decode.marginal}}       Approximate decoding using inference (takes an inference method as input)
   \item \code{\link{decode.lbp}}            Approximate decoding using max-product loopy belief propagation
   \item \code{\link{decode.trbp}}           Approximate decoding using max-product tree-reweighted belief propagtion
+  \item \code{\link{decode.greedy}}         Approximate decoding with greedy algorithm
+  \item \code{\link{decode.icm}}            Approximate decoding with the iterated conditional modes algorithm
 }
 
 Inference: Computing the partition function and marginal probabilities

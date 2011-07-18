@@ -28,6 +28,9 @@ decode.sample(crf, sample.method, ...)
 decode.marginal(crf, infer.method, ...)
 decode.lbp(crf, max.iter=10000, cutoff=1e-4, verbose=0)
 decode.trbp(crf, max.iter=10000, cutoff=1e-4, verbose=0)
+decode.greedy(crf, start = apply(crf$node.pot, 1, which.max))
+decode.icm(crf, start = apply(crf$node.pot, 1, which.max),
+           restart = F, max.iter = 10000)
 }
 
 \arguments{
@@ -47,6 +50,8 @@ decode.trbp(crf, max.iter=10000, cutoff=1e-4, verbose=0)
   \item \code{\link{decode.marginal}}       Approximate decoding using inference (takes an inference method as input)
   \item \code{\link{decode.lbp}}            Approximate decoding using max-product loopy belief propagation
   \item \code{\link{decode.trbp}}           Approximate decoding using max-product tree-reweighted belief propagtion
+  \item \code{\link{decode.greedy}}         Approximate decoding with greedy algorithm
+  \item \code{\link{decode.icm}}            Approximate decoding with the iterated conditional modes algorithm
 }
 }
 
@@ -82,6 +87,8 @@ decode.sample(small.crf, sample.exact, 10000)
 decode.marginal(small.crf, infer.exact)
 decode.lbp(small.crf)
 decode.trbp(small.crf)
+decode.greedy(small.crf)
+decode.icm(small.crf)
 }
 
 \keyword{ decode }
