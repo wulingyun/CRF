@@ -39,5 +39,5 @@ decode.trbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 decode.greedy <- function(crf, start = apply(crf$node.pot, 1, which.max))
 	.Call("Decode_Greedy", crf, start)
 
-decode.icm <- function(crf, start = apply(crf$node.pot, 1, which.max), restart = F, max.iter = 10000)
-	.Call("Decode_ICM", crf, start, restart, max.iter)
+decode.icm <- function(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
+	.Call("Decode_ICM", crf, restart, start)

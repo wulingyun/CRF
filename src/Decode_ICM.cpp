@@ -1,22 +1,24 @@
 #include "CRF.h"
 
-SEXP Decode_ICM(SEXP _crf, SEXP _start, SEXP _restart, SEXP _maxIter)
+SEXP Decode_ICM(SEXP _crf, SEXP _restart, SEXP _start)
 {
+	int restart = INTEGER_POINTER(AS_INTEGER(_restart))[0];
 	PROTECT(_start = AS_INTEGER(_start));
 	int *start = INTEGER_POINTER(_start);
-	bool restart = LOGICAL_POINTER(AS_LOGICAL(_restart))[0];
-	int maxIter = INTEGER_POINTER(AS_INTEGER(_maxIter))[0];
 
 	CRF crf(_crf);
 	crf.Init_Labels();
-	crf.Decode_ICM(start, restart, maxIter);
+	crf.Decode_ICM(restart, start);
 
 	UNPROTECT_PTR(_start);
 	return(crf._labels);
 }
 
-void CRF::Decode_ICM(int *start, bool restart, int maxIter)
+void CRF::Decode_ICM(int restart, int *start)
 {
+	if (restart < 0)
+		restart = 0;
+
 	int *y = (int *) R_alloc(nNodes, sizeof(int));
 	double max;
 	if (start)
@@ -34,17 +36,17 @@ void CRF::Decode_ICM(int *start, bool restart, int maxIter)
 				}
 		}
 
+	double Z, maxZ = Get_Potential(y);
+	for (int i = 0; i < nNodes; i++)
+		labels[i] = y[i] + 1;
+
 	double *pot = (double *) R_alloc(maxState, sizeof(double));
 
 	int e, n1, n2;
 	bool done;
 
-	double Z, maxZ = Get_Potential(y);
-	for (int i = 0; i < nNodes; i++)
-		labels[i] = y[i] + 1;
-
 	GetRNGstate();
-	for (int iter = 0; iter < maxIter; iter++)
+	for (int iter = 0; iter <= restart; iter++)
 	{
 		done = false;
 		while (!done)
@@ -91,11 +93,9 @@ void CRF::Decode_ICM(int *start, bool restart, int maxIter)
 				labels[i] = y[i] + 1;
 		}
 
-		if (restart)
+		if (iter < restart)
 			for (int i = 0; i < nNodes; i++)
 				y[i] = ceil(unif_rand() * nStates[i]) - 1;
-		else
-			break;
 	}
 	PutRNGstate();
 }
