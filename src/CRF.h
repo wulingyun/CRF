@@ -13,7 +13,7 @@ extern "C" {
 	SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Decode_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Decode_Greedy(SEXP _crf, SEXP _start);
-	SEXP Decode_ICM(SEXP _crf, SEXP _start, SEXP _restart, SEXP _maxIter);
+	SEXP Decode_ICM(SEXP _crf, SEXP _restart, SEXP _start);
 
 	/* Inference */
 	SEXP Infer_Exact(SEXP _crf);
@@ -117,7 +117,7 @@ public:
 	void Decode_LBP(int maxIter, double cutoff, int verbose);
 	void Decode_TRBP(int maxIter, double cutoff, int verbose);
 	void Decode_Greedy(int *start = 0);
-	void Decode_ICM(int *start = 0, bool restart = false, int maxIter = 10000);
+	void Decode_ICM(int restart = 0, int *start = 0);
 
 	/* Inference methods */
 	void Infer_Exact();

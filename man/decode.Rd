@@ -29,8 +29,7 @@ decode.marginal(crf, infer.method, ...)
 decode.lbp(crf, max.iter=10000, cutoff=1e-4, verbose=0)
 decode.trbp(crf, max.iter=10000, cutoff=1e-4, verbose=0)
 decode.greedy(crf, start = apply(crf$node.pot, 1, which.max))
-decode.icm(crf, start = apply(crf$node.pot, 1, which.max),
-           restart = F, max.iter = 10000)
+decode.icm(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
 }
 
 \arguments{
