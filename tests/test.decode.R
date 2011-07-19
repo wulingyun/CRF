@@ -12,6 +12,7 @@ test.decode("Sample", decode.sample, small.crf, small.answer, sample.exact, 1000
 test.decode("LBP", decode.lbp, small.crf, small.answer)
 test.decode("TRBP", decode.trbp, small.crf, small.answer)
 test.decode("Greedy", decode.greedy, small.crf, small.answer)
+test.decode("Greedy (Restart)", decode.greedy, small.crf, small.answer, restart = 100)
 test.decode("ICM", decode.icm, small.crf, small.answer)
 test.decode("ICM (Restart)", decode.icm, small.crf, small.answer, restart = 100)
 
@@ -25,6 +26,7 @@ test.decode("Sample", decode.sample, chain.crf, chain.answer, sample.chain, 1000
 test.decode("LBP", decode.lbp, chain.crf, chain.answer)
 test.decode("TRBP", decode.trbp, chain.crf, chain.answer)
 test.decode("Greedy", decode.greedy, chain.crf, chain.answer)
+test.decode("Greedy (Restart)", decode.greedy, chain.crf, chain.answer, restart = 100)
 test.decode("ICM", decode.icm, chain.crf, chain.answer)
 test.decode("ICM (Restart)", decode.icm, chain.crf, chain.answer, restart = 100)
 
@@ -36,6 +38,7 @@ test.decode("Sample", decode.sample, tree.crf, tree.answer, sample.tree, 10000)
 test.decode("LBP", decode.lbp, tree.crf, tree.answer)
 test.decode("TRBP", decode.trbp, tree.crf, tree.answer)
 test.decode("Greedy", decode.greedy, tree.crf, tree.answer)
+test.decode("Greedy (Restart)", decode.greedy, tree.crf, tree.answer, restart = 100)
 test.decode("ICM", decode.icm, tree.crf, tree.answer)
 test.decode("ICM (Restart)", decode.icm, tree.crf, tree.answer, restart = 100)
 
@@ -47,6 +50,7 @@ test.decode("Sample", decode.sample, loop.crf, loop.answer, sample.exact, 10000)
 test.decode("LBP", decode.lbp, loop.crf, loop.answer)
 test.decode("TRBP", decode.trbp, loop.crf, loop.answer)
 test.decode("Greedy", decode.greedy, loop.crf, loop.answer)
+test.decode("Greedy (Restart)", decode.greedy, loop.crf, loop.answer, restart = 100)
 test.decode("ICM", decode.icm, loop.crf, loop.answer)
 test.decode("ICM (Restart)", decode.icm, loop.crf, loop.answer, restart = 100)
 
@@ -57,5 +61,6 @@ test.decode("Sample", decode.sample, clique.crf, clique.answer, sample.exact, 10
 test.decode("LBP", decode.lbp, clique.crf, clique.answer)
 test.decode("TRBP", decode.trbp, clique.crf, clique.answer)
 test.decode("Greedy", decode.greedy, clique.crf, clique.answer, c(1,1,1,2))
+test.decode("Greedy (Restart)", decode.greedy, clique.crf, clique.answer, restart = 100)
 test.decode("ICM", decode.icm, clique.crf, clique.answer, start = c(2,1,1,1))
 test.decode("ICM (Restart)", decode.icm, clique.crf, clique.answer, restart = 100)
