@@ -41,3 +41,52 @@ decode.greedy <- function(crf, restart = 0, start = apply(crf$node.pot, 1, which
 
 decode.icm <- function(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
 	.Call("Decode_ICM", crf, restart, start)
+
+decode.block <- function(crf, blocks, decode.method = decode.tree, restart = 0, start = apply(crf$node.pot, 1, which.max), ...)
+{
+	newcrf <- list()
+	for (i in 1:length(blocks))
+	{
+		blocks[[i]] <- sort(blocks[[i]])
+		clamped <- start
+		clamped[blocks[[i]]] <- 0
+		newcrf[[i]] <- clamp.crf(crf, clamped)
+	}
+
+	maxPot <- -1
+	decode <- start
+	restart <- max(0, restart)
+	for (iter in 0:restart)
+	{
+		done = F
+		while(!done)
+		{
+			done = T
+			for (i in 1:length(blocks))
+			{
+				clamped <- start
+				clamped[blocks[[i]]] <- 0
+				clamp.reset(newcrf[[i]], clamped)
+				temp <- decode.method(newcrf[[i]], ...)
+				if (any(temp != start[blocks[[i]]]))
+				{
+					start[blocks[[i]]] <- temp
+					done = F
+				}
+			}
+		}
+
+		pot <- get.potential(crf, start)
+		if (pot > maxPot)
+		{
+			maxPot <- pot
+			decode <- start
+		}
+
+		if (iter < restart)
+		{
+			start <- ceiling(runif(crf$n.nodes) * crf$n.states)
+		}
+	}
+	decode
+}
