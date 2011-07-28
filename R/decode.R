@@ -44,17 +44,20 @@ decode.icm <- function(crf, restart = 0, start = apply(crf$node.pot, 1, which.ma
 
 decode.block <- function(crf, blocks, decode.method = decode.tree, restart = 0, start = apply(crf$node.pot, 1, which.max), ...)
 {
+	y <- integer(crf$n.nodes)
+	y[] <- start
+
 	newcrf <- list()
 	for (i in 1:length(blocks))
 	{
 		blocks[[i]] <- sort(blocks[[i]])
-		clamped <- start
+		clamped <- y
 		clamped[blocks[[i]]] <- 0
 		newcrf[[i]] <- clamp.crf(crf, clamped)
 	}
 
 	maxPot <- -1
-	decode <- start
+	decode <- y
 	restart <- max(0, restart)
 	for (iter in 0:restart)
 	{
@@ -64,28 +67,28 @@ decode.block <- function(crf, blocks, decode.method = decode.tree, restart = 0, 
 			done = T
 			for (i in 1:length(blocks))
 			{
-				clamped <- start
+				clamped <- y
 				clamped[blocks[[i]]] <- 0
-				clamp.reset(newcrf[[i]], clamped)
+				newcrf[[i]] <- clamp.reset(newcrf[[i]], clamped)
 				temp <- decode.method(newcrf[[i]], ...)
-				if (any(temp != start[blocks[[i]]]))
+				if (any(temp != y[blocks[[i]]]))
 				{
-					start[blocks[[i]]] <- temp
+					y[blocks[[i]]] <- temp
 					done = F
 				}
 			}
 		}
 
-		pot <- get.potential(crf, start)
+		pot <- get.potential(crf, y)
 		if (pot > maxPot)
 		{
 			maxPot <- pot
-			decode <- start
+			decode <- y
 		}
 
 		if (iter < restart)
 		{
-			start <- ceiling(runif(crf$n.nodes) * crf$n.states)
+			y <- ceiling(runif(crf$n.nodes) * crf$n.states)
 		}
 	}
 	decode
