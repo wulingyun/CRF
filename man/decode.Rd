@@ -9,6 +9,9 @@
 \alias{decode.marginal}
 \alias{decode.lbp}
 \alias{decode.trbp}
+\alias{decode.greedy}
+\alias{decode.icm}
+\alias{decode.block}
 
 \title{
 Decoding methods
@@ -30,6 +33,8 @@ decode.lbp(crf, max.iter=10000, cutoff=1e-4, verbose=0)
 decode.trbp(crf, max.iter=10000, cutoff=1e-4, verbose=0)
 decode.greedy(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
 decode.icm(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
+decode.block(crf, blocks, decode.method = decode.tree, restart = 0,
+             start = apply(crf$node.pot, 1, which.max), ...)
 }
 
 \arguments{
@@ -51,6 +56,7 @@ decode.icm(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
   \item \code{\link{decode.trbp}}           Approximate decoding using max-product tree-reweighted belief propagtion
   \item \code{\link{decode.greedy}}         Approximate decoding with greedy algorithm
   \item \code{\link{decode.icm}}            Approximate decoding with the iterated conditional modes algorithm
+  \item \code{\link{decode.block}}          Approximate decoding with the block iterated conditional modes algorithm
 }
 }
 
@@ -88,6 +94,7 @@ decode.lbp(small.crf)
 decode.trbp(small.crf)
 decode.greedy(small.crf)
 decode.icm(small.crf)
+decode.block(small.crf, list(c(1,3), c(2,4)))
 }
 
 \keyword{ decode }
