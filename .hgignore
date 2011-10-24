@@ -1,3 +1,4 @@
 glob:src-i386/*
 glob:src-x64/*
 glob:*.bak
+glob:.svn/*
