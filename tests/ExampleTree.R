@@ -502,9 +502,9 @@ while (length(queue) > 0)
 	e <- crf$adj.edges[[n]]
 	e <- e[!e %in% done.edges]
 	e1 <- e[crf$edges[e,1] == n]
-	crf$edge.pot[,,e1] <- trans
+	crf$edge.pot[[e1]][,] <- trans
 	e2 <- e[crf$edges[e,2] == n]
-	crf$edge.pot[,,e2] <- t(trans)
+	crf$edge.pot[[e2]][,] <- t(trans)
 	done.nodes <- c(done.nodes, n)
 	done.edges <- c(done.edges, e1, e2)
 	queue <- c(queue[-1], crf$adj.nodes[[n]])
