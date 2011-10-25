@@ -16,7 +16,7 @@ make.crf <- function(adj.matrix, nstates)
 	data$max.state <- max(nstates)
 
 	data$node.pot <- array(1, dim=c(data$n.nodes, data$max.state))
-	data$edge.pot <- array(1, dim=c(data$max.state, data$max.state, data$n.edges))
+	data$edge.pot <- lapply(1:data$n.edges, function(i) array(1, dim=c(data$n.states[data$edges[i,1]], data$n.states[data$edges[i,2]])))
 
 	class(data) <- "CRF"
 	data

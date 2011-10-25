@@ -19,8 +19,8 @@ crf$node.pot[4,] <- c(9, 1)
 
 for (i in 1:crf$n.edges)
 {
-   crf$edge.pot[1,,i] <- c(2, 1)
-   crf$edge.pot[2,,i] <- c(1, 2)
+   crf$edge.pot[[i]][1,] <- c(2, 1)
+   crf$edge.pot[[i]][2,] <- c(1, 2)
 }
 
 answer <-
