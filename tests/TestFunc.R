@@ -16,7 +16,9 @@ test.infer <- function(name, infer.method, crf, answer, cutoff=1e-8, ...)
 	cat("  ", name, ": Inferring ... ", sep="")
 	belief <- infer.method(crf, ...)
 
-	if (max(abs(c(belief$node.bel - answer$node.bel, belief$edge.bel - answer$edge.bel, belief$logZ - answer$logZ))) < cutoff) {
+	node.error <- sapply(1:crf$n.nodes, function(i) max(abs(belief$node.bel[i,] - answer$node.bel[i,])))
+	edge.error <- sapply(1:crf$n.edges, function(i) max(abs(belief$edge.bel[[i]] - answer$edge.bel[[i]])))
+	if (max(abs(c(node.error, edge.error, belief$logZ - answer$logZ))) < cutoff) {
 		cat("Passed.\n")
 	} else {
 		cat("\n")
