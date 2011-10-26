@@ -26,7 +26,7 @@ clamp.crf <- function(crf, clamped)
 	data$max.state <- max(data$n.states)
 
 	data$node.pot <- .Call("Clamp_NodePot", data)
-	data$edge.pot <- array(crf$edge.pot[1:data$max.state, 1:data$max.state, data$edge.id], dim=c(data$max.state, data$max.state, data$n.edges))
+	data$edge.pot <- crf$edge.pot[data$edge.id]
 
 	class(data) <- c("CRF.clamped", "CRF")
 	data
@@ -67,7 +67,7 @@ sub.crf <- function(crf, subset)
 	data$max.state <- max(data$n.states)
 
 	data$node.pot <- array(crf$node.pot[data$node.id, 1:data$max.state], dim=c(data$n.nodes, data$max.state))
-	data$edge.pot <- array(crf$edge.pot[1:data$max.state, 1:data$max.state, data$edge.id], dim=c(data$max.state, data$max.state, data$n.edges))
+	data$edge.pot <- crf$edge.pot[data$edge.id]
 
 	class(data) <- c("CRF.sub", "CRF")
 	data
