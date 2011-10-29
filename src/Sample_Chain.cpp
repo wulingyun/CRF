@@ -39,27 +39,25 @@ void CRF::Sample_Chain(int size)
 			alpha[nNodes * i] /= kappa[0];
 	}
 
-	double *p_alpha, *p0_alpha, *p_nodePot, *p_edgePot;
+	double *p_alpha, *p0_alpha, *p_nodePot;
 	double sumPot;
 	for (int i = 1; i < nNodes; i++)
 	{
 		p0_alpha = alpha + i;
 		p_nodePot = nodePot + i;
-		p_edgePot = edgePot + maxState * maxState * (i-1);
 		for (int j = 0; j < nStates[i]; j++)
 		{
 			p_alpha = alpha + i - 1;
 			sumPot = 0;
 			for (int k=0; k < nStates[i-1]; k++)
 			{
-				sumPot += p_alpha[0] * p_edgePot[k];
+				sumPot += p_alpha[0] * EdgePot(i-1, k, j);
 				p_alpha += nNodes;
 			}
 			p0_alpha[0] = sumPot * p_nodePot[0];
 			kappa[i] += p0_alpha[0];
 			p0_alpha += nNodes;
 			p_nodePot += nNodes;
-			p_edgePot += maxState;
 		}
 		if (kappa[i] != 0)
 		{
@@ -89,11 +87,10 @@ void CRF::Sample_Chain(int size)
 		for (int j = nNodes-2; j >= 0; j--)
 		{
 			p_alpha = alpha + j;
-			p_edgePot = edgePot + maxState * (y[j+1] + maxState * j);
 			sumProb = 0;
 			for (int k = 0; k < nStates[j]; k++)
 			{
-				prob[k] = p_alpha[0] * p_edgePot[k];
+				prob[k] = p_alpha[0] * EdgePot(j, k, y[j+1]);
 				sumProb += prob[k];
 				p_alpha += nNodes;
 			}

@@ -25,8 +25,8 @@ clamp.crf <- function(crf, clamped)
 	data$n.states <- crf$n.states[data$node.id]
 	data$max.state <- max(data$n.states)
 
-	data$node.pot <- .Call("Clamp_NodePot", data)
 	data$edge.pot <- crf$edge.pot[data$edge.id]
+	data$node.pot <- .Call("Clamp_NodePot", data)
 
 	class(data) <- c("CRF.clamped", "CRF")
 	data

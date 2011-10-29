@@ -3,8 +3,11 @@
 
 /* Tree-Reweighted BP */
 
-void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double *scaleEdgePot, int maxIter, double cutoff, int verbose, bool maximize)
+void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double **scaleEdgePot, int maxIter, double cutoff, int verbose, bool maximize)
 {
+	double **originalEdgePot = edgePot;
+	edgePot = scaleEdgePot;
+
 	double *old_messages_1 = (double *) R_alloc(maxState * nEdges, sizeof(double));
 	double *old_messages_2 = (double *) R_alloc(maxState * nEdges, sizeof(double));
 	for (int i = 0; i < maxState * nEdges; i++)
@@ -14,16 +17,16 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double *scale
 	double *outgoing = (double *) R_alloc(maxState, sizeof(double));
 
 	int s, r, e, n;
-	double mesg, sumMesg, *p_nodePot, *p_edgePot, *p0_edgePot, *p_messages;
+	double mesg, sumMesg, *p_nodePot, *p_messages;
 
 	for (int i = 0; i < nEdges; i++)
 	{
 		p_messages = messages_1 + maxState * i;
-		n = edges[i] - 1;
+		n = EdgesBegin(i);
 		for (int j = 0; j < nStates[n]; j++)
 			p_messages[j] = 1.0 / nStates[n];
 		p_messages = messages_2 + maxState * i;
-		n = edges[i + nEdges] - 1;
+		n = EdgesEnd(i);
 		for (int j = 0; j < nStates[n]; j++)
 			p_messages[j] = 1.0 / nStates[n];
 	}
@@ -53,7 +56,7 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double *scale
 			for (int i = 0; i < nAdj[s]; i++)
 			{
 				e = adjEdges[s][i] - 1;
-				if (edges[e] - 1 == s)
+				if (EdgesBegin(e) == s)
 					p_messages = old_messages_1;
 				else
 					p_messages = old_messages_2;
@@ -69,7 +72,7 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double *scale
 				r = adjNodes[s][i] - 1;
 				e = adjEdges[s][i] - 1;
 
-				if (edges[e] - 1 == s)
+				if (EdgesBegin(e) == s)
 					p_messages = old_messages_1;
 				else
 					p_messages = old_messages_2;
@@ -78,20 +81,17 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double *scale
 					outgoing[k] = p_messages[k] == 0 ? 0 : incoming[k] / p_messages[k];
 
 				sumMesg = 0;
-				p0_edgePot = scaleEdgePot + maxState * maxState * e;
-				if (edges[e] - 1 == s)
+				if (EdgesBegin(e) == s)
 				{
 					p_messages = messages_2 + maxState * e;
 					for (int j = 0; j < nStates[r]; j++)
 					{
-						p_edgePot = p0_edgePot;
-						p0_edgePot += maxState;
 						p_messages[j] = 0;
 						if (maximize)
 						{
 							for (int k = 0; k < nStates[s]; k++)
 							{
-								mesg = outgoing[k] * p_edgePot[k];
+								mesg = outgoing[k] * EdgePot(e, k, j);
 								if (mesg > p_messages[j])
 									p_messages[j] = mesg;
 							}
@@ -99,7 +99,7 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double *scale
 						else
 						{
 							for (int k = 0; k < nStates[s]; k++)
-								p_messages[j] += outgoing[k] * p_edgePot[k];
+								p_messages[j] += outgoing[k] * EdgePot(e, k, j);
 						}
 						sumMesg += p_messages[j];
 					}
@@ -109,24 +109,21 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double *scale
 					p_messages = messages_1 + maxState * e;
 					for (int j = 0; j < nStates[r]; j++)
 					{
-						p_edgePot = p0_edgePot++;
 						p_messages[j] = 0;
 						if (maximize)
 						{
 							for (int k = 0; k < nStates[s]; k++)
 							{
-								mesg = outgoing[k] * p_edgePot[0];
+								mesg = outgoing[k] * EdgePot(e, j, k);
 								if (mesg > p_messages[j])
 									p_messages[j] = mesg;
-								p_edgePot += maxState;
 							}
 						}
 						else
 						{
 							for (int k = 0; k < nStates[s]; k++)
 							{
-								p_messages[j] += outgoing[k] * p_edgePot[0];
-								p_edgePot += maxState;
+								p_messages[j] += outgoing[k] * EdgePot(e, j, k);
 							}
 						}
 						sumMesg += p_messages[j];
@@ -151,6 +148,8 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double *scale
 
 	if (difference > cutoff)
 		warning("Tree-Reweighted BP did not converge in %d iterations! (diff = %f)", maxIter, difference);
+
+	edgePot = originalEdgePot;
 }
 
 /* Minimum Weight Spanning Tree using Kruskal algorithm */
@@ -237,8 +236,8 @@ void CRF::TRBP_Message2NodeBelief(double *messages_1, double *messages_2, double
 	double *p2_messages = messages_2;
 	for (int i = 0; i < nEdges; i++)
 	{
-		n1 = edges[i] - 1;
-		n2 = edges[i + nEdges] - 1;
+		n1 = EdgesBegin(i);
+		n2 = EdgesEnd(i);
 		p_nodeBel = nodeBel + n1;
 		for (int j = 0; j < nStates[n1]; j++)
 		{
@@ -275,60 +274,52 @@ void CRF::TRBP_Message2NodeBelief(double *messages_1, double *messages_2, double
 
 /* Edge beliefs */
 
-void CRF::TRBP_Message2EdgeBelief(double *messages_1, double *messages_2, double *mu, double *scaleEdgePot)
+void CRF::TRBP_Message2EdgeBelief(double *messages_1, double *messages_2, double *mu, double **scaleEdgePot)
 {
-	for (int i = 0; i < length(_edgePot); i++)
-		edgeBel[i] = scaleEdgePot[i];
+	for (int i=0; i < nEdges; i++)
+	{
+		int n = nStates[EdgesBegin(i)] * nStates[EdgesEnd(i)];
+		for (int j = 0; j < n; j++)
+			edgeBel[i][j] = scaleEdgePot[i][j];
+	}
 
 	int n1, n2;
-	double bel, sumBel, *p_nodeBel, *p_edgeBel;
-	double *p0_edgeBel = edgeBel;
+	double bel, sumBel, *p_nodeBel;
 	double *p1_messages = messages_1;
 	double *p2_messages = messages_2;
 	for (int i = 0; i < nEdges; i++)
 	{
-		n1 = edges[i] - 1;
-		n2 = edges[i + nEdges] - 1;
+		n1 = EdgesBegin(i);
+		n2 = EdgesEnd(i);
 		p_nodeBel = nodeBel + n1;
 		for (int j = 0; j < nStates[n1]; j++)
 		{
 			bel = p1_messages[j] == 0 ? 0 : p_nodeBel[0] / p1_messages[j];
-			p_edgeBel = p0_edgeBel + j;
 			for (int k = 0; k < nStates[n2]; k++)
-			{
-				p_edgeBel[0] *= bel;
-				p_edgeBel += maxState;
-			}
+				EdgeBel(i, j, k) *= bel;
 			p_nodeBel += nNodes;
 		}
 		p_nodeBel = nodeBel + n2;
-		p_edgeBel = p0_edgeBel;
 		for (int j = 0; j < nStates[n2]; j++)
 		{
 			bel = p2_messages[j] == 0 ? 0 : p_nodeBel[0] / p2_messages[j];
 			for (int k = 0; k < nStates[n1]; k++)
-				p_edgeBel[k] *= bel;
+				EdgeBel(i, k, j) *= bel;
 			p_nodeBel += nNodes;
-			p_edgeBel += maxState;
 		}
 
 		sumBel = 0;
-		p_edgeBel = p0_edgeBel;
 		for (int j = 0; j < nStates[n2]; j++)
 		{
 			for (int k = 0; k < nStates[n1]; k++)
-				sumBel += p_edgeBel[k];
-			p_edgeBel += maxState;
+				sumBel += EdgeBel(i, k, j);
 		}
-		p_edgeBel = p0_edgeBel;
 		for (int j = 0; j < nStates[n2]; j++)
 		{
 			for (int k = 0; k < nStates[n1]; k++)
-				p_edgeBel[k] /= sumBel;
-			p_edgeBel += maxState;
+				EdgeBel(i, k, j) /= sumBel;
 		}
 
-		p0_edgeBel += maxState * maxState;
 		p1_messages += maxState;
 		p2_messages += maxState;
 	}
@@ -365,47 +356,39 @@ void CRF::TRBP_BetheFreeEnergy(double *mu)
 	}
 
 	int n1, n2;
-	double *p_edgeBel, *p0_edgeBel = edgeBel;
-	double *p_edgePot, *p0_edgePot = edgePot;
+	double bel;
 	for (int i = 0; i < nEdges; i++)
 	{
 		entropy = 0;
-		n1 = edges[i] - 1;
-		n2 = edges[i + nEdges] - 1;
-		p_edgeBel = p0_edgeBel;
-		p_edgePot = p0_edgePot;
+		n1 = EdgesBegin(i);
+		n2 = EdgesEnd(i);
 		for (int j = 0; j < nStates[n2]; j++)
 		{
 			for (int k = 0; k < nStates[n1]; k++)
 			{
-				if (p_edgeBel[k] > 0)
+				bel = EdgeBel(i, k, j);
+				if (bel > 0)
 				{
-					edgeEnergy -= p_edgeBel[k] * log(p_edgePot[k]);
-					entropy -= p_edgeBel[k] * log(p_edgeBel[k]);
+					edgeEnergy -= bel * log(EdgePot(i, k, j));
+					entropy -= bel * log(bel);
 				}
 			}
-			p_edgeBel += maxState;
-			p_edgePot += maxState;
 		}
-		p0_edgeBel += maxState * maxState;
-		p0_edgePot += maxState * maxState;
 		edgeEntropy += mu[i] * entropy;
 	}
 
 	*logZ = - nodeEnergy + nodeEntropy - edgeEnergy + edgeEntropy;
 }
 
-void CRF::TRBP_ScaleEdgePot(double *mu, double *scaleEdgePot)
+void CRF::TRBP_ScaleEdgePot(double *mu, double **scaleEdgePot)
 {
+	int n;
 	double inv_mu;
-	int ss = maxState * maxState, n = 0;
 	for (int i = 0; i < nEdges; i++)
 	{
 		inv_mu = 1/mu[i];
-		for (int j = 0; j < ss; j++)
-		{
-			scaleEdgePot[n] = R_pow(edgePot[n], inv_mu);
-			n++;
-		}
+		n = nStates[EdgesBegin(i)] * nStates[EdgesEnd(i)];
+		for (int j = 0; j < n; j++)
+			scaleEdgePot[i][j] = R_pow(edgePot[i][j], inv_mu);
 	}
 }

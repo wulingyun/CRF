@@ -12,7 +12,7 @@ SEXP Infer_Sample(SEXP _crf, SEXP _samples)
 void CRF::Infer_Sample()
 {
 	double pot, maxPot = -1;
-	int k, maxSample = -1;
+	int k, s1, s2, maxSample = -1;
 	for (int i = 0; i < nSamples; i++)
 	{
 		R_CheckUserInterrupt();
@@ -26,9 +26,10 @@ void CRF::Infer_Sample()
 		}
 		for (int j = 0; j < nEdges; j++)
 		{
-			k = Samples(i, Edges(j,0)-1) - 1 + maxState * (Samples(i, Edges(j,1)-1) - 1 + maxState * j);
-			edgeBel[k]++;
-			pot *= edgePot[k];
+			s1 = Samples(i, EdgesBegin(j)) - 1;
+			s2 = Samples(i, EdgesEnd(j)) - 1;
+			EdgeBel(j, s1, s2)++;
+			pot *= EdgePot(j, s1, s2);
 		}
 
 		if (pot > maxPot)
@@ -56,7 +57,12 @@ void CRF::Infer_Sample()
 	}
 	for (int i = 0; i < length(_nodeBel); i++)
 		nodeBel[i] /= nSamples;
-	for (int i = 0; i < length(_edgeBel); i++)
-		edgeBel[i] /= nSamples;
+	int n;
+	for (int i = 0; i < nEdges; i++)
+	{
+		n = nStates[EdgesBegin(i)] * nStates[EdgesEnd(i)];
+		for (int j = 0; j < n; j++)
+			edgeBel[i][j] /= nSamples;
+	}
 	*logZ = log(maxPot * nSamples / freq);
 }

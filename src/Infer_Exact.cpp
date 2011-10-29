@@ -29,7 +29,7 @@ void CRF::Infer_Exact()
 
 		/* Edge belief */
 		for (int i = 0; i < nEdges; i++)
-			edgeBel[y[edges[i]-1] + maxState * (y[edges[i+nEdges]-1] + maxState * i)] += pot;
+			EdgeBel(i, y[EdgesBegin(i)], y[EdgesEnd(i)]) += pot;
 
 		/* Update Z */
 		Z += pot;
@@ -51,7 +51,12 @@ void CRF::Infer_Exact()
 	/* Normalization */
 	for (int i = 0; i < length(_nodeBel); i++)
 		nodeBel[i] /= Z;
-	for (int i = 0; i < length(_edgeBel); i++)
-		edgeBel[i] /= Z;
+	int n;
+	for (int i = 0; i < nEdges; i++)
+	{
+		n = nStates[EdgesBegin(i)] * nStates[EdgesEnd(i)];
+		for (int j = 0; j < n; j++)
+			edgeBel[i][j] /= Z;
+	}
 	*logZ = log(Z);
 }

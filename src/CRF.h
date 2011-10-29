@@ -48,13 +48,13 @@ public:
 	int *nAdj, **adjNodes, **adjEdges;
 
 	SEXP _nodePot, _edgePot;
-	double *nodePot, *edgePot;
+	double *nodePot, **edgePot;
 
 	SEXP _labels;
 	int *labels;
 
 	SEXP _nodeBel, _edgeBel, _logZ, _belief;
-	double *nodeBel, *edgeBel, *logZ;
+	double *nodeBel, **edgeBel, *logZ;
 
 	SEXP _samples;
 	int *samples, nSamples;
@@ -80,11 +80,12 @@ public:
 	void Set_Data(SEXP _crf);
 	void Set_Samples(SEXP _otherSamples);
 
-	int Edges(int i, int j);
+	int EdgesBegin(int e);
+	int EdgesEnd(int e);
 	double &NodePot(int n, int s);
-	double &EdgePot(int s1, int s2, int e);
+	double &EdgePot(int e, int s1, int s2);
 	double &NodeBel(int n, int s);
-	double &EdgeBel(int s1, int s2, int e);
+	double &EdgeBel(int e, int s1, int s2);
 	int &Samples(int i, int n);
 
 	/* Utils */
@@ -102,12 +103,12 @@ public:
 	void Message2EdgeBelief(double *messages_1, double *messages_2);
 	void MaxOfMarginals();
 	void BetheFreeEnergy();
-	void TRBP(double *messages_1, double *messages_2, double *mu, double *scaleEdgePot, int maxIter, double cutoff, int verbose, bool maximize = false);
+	void TRBP(double *messages_1, double *messages_2, double *mu, double **scaleEdgePot, int maxIter, double cutoff, int verbose, bool maximize = false);
 	void TRBP_Message2NodeBelief(double *messages_1, double *messages_2, double *mu);
-	void TRBP_Message2EdgeBelief(double *messages_1, double *messages_2, double *mu, double *scaleEdgePot);
+	void TRBP_Message2EdgeBelief(double *messages_1, double *messages_2, double *mu, double **scaleEdgePot);
 	void TRBP_BetheFreeEnergy(double *mu);
 	void TRBP_Weights(double *mu);
-	void TRBP_ScaleEdgePot(double *mu, double *scaleEdgePot);
+	void TRBP_ScaleEdgePot(double *mu, double **scaleEdgePot);
 
 	/* Decoding methods */
 	void Decode_Exact();
@@ -158,9 +159,14 @@ public:
 
 /* inline functions */
 
-inline int CRF::Edges(int i, int j)
+inline int CRF::EdgesBegin(int e)
 {
-	return edges[i + nEdges * j];
+	return edges[e] - 1;
+}
+
+inline int CRF::EdgesEnd(int e)
+{
+	return edges[e + nEdges] - 1;
 }
 
 inline double &CRF::NodePot(int n, int s)
@@ -168,9 +174,9 @@ inline double &CRF::NodePot(int n, int s)
 	return nodePot[n + nNodes * s];
 }
 
-inline double &CRF::EdgePot(int s1, int s2, int e)
+inline double &CRF::EdgePot(int e, int s1, int s2)
 {
-	return edgePot[s1 + maxState * (s2 + maxState * e)];
+	return edgePot[e][s1 + nStates[EdgesBegin(e)] * s2];
 }
 
 inline double &CRF::NodeBel(int n, int s)
@@ -178,9 +184,9 @@ inline double &CRF::NodeBel(int n, int s)
 	return nodeBel[n + nNodes * s];
 }
 
-inline double &CRF::EdgeBel(int s1, int s2, int e)
+inline double &CRF::EdgeBel(int e, int s1, int s2)
 {
-	return edgeBel[s1 + maxState * (s2 + maxState * e)];
+	return edgeBel[e][s1 + nStates[EdgesBegin(e)] * s2];
 }
 
 inline int &CRF::Samples(int i, int n)
@@ -190,7 +196,12 @@ inline int &CRF::Samples(int i, int n)
 
 
 /* initialize the list */
-#define setValues(r, c, v) for (int i = 0; i < length(r); i++) c[i] = v
+template <class T>
+void setValues(SEXP r, T *c, T v)
+{
+	for (int i = 0; i < length(r); i++)
+		c[i] = v;
+};
 
 /* get/set the list element */
 SEXP getListElement(SEXP list, const char *tag);

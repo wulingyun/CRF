@@ -62,14 +62,14 @@ void CRF::Decode_Greedy(int restart, int *start)
 				for (int j = 0; j < nAdj[i]; j++)
 				{
 					e = adjEdges[i][j] - 1;
-					n1 = Edges(e,0) - 1;
-					n2 = Edges(e,1) - 1;
+					n1 = EdgesBegin(e);
+					n2 = EdgesEnd(e);
 					if (i == n1)
 						for (int k = 0; k < nStates[i]; k++)
-							pot[k] *= EdgePot(k, y[n2], e);
+							pot[k] *= EdgePot(e, k, y[n2]);
 					else
 						for (int k = 0; k < nStates[i]; k++)
-							pot[k] *= EdgePot(y[n1], k, e);
+							pot[k] *= EdgePot(e, y[n1], k);
 				}
 
 				ref = pot[y[i]];

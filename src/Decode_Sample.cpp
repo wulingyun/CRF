@@ -21,7 +21,7 @@ void CRF::Decode_Sample()
 		for (int j = 0; j < nNodes; j++)
 			pot *= NodePot(j, Samples(i, j) - 1);
 		for (int j = 0; j < nEdges; j++)
-			pot *= EdgePot(Samples(i, Edges(j,0)-1) - 1, Samples(i, Edges(j,1)-1) - 1, j);
+			pot *= EdgePot(j, Samples(i, EdgesBegin(j))-1, Samples(i, EdgesEnd(j))-1);
 
 		if (pot > maxPot)
 		{

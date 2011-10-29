@@ -71,10 +71,10 @@ void CRFclamped::Sample_Cutset(int size, int engine)
 				pot[n] *= original.NodePot(i, y[i]);
 		for (int i = 0; i < original.nEdges; i++)
 		{
-			n1 = original.edges[i] - 1;
-			n2 = original.edges[i + original.nEdges] - 1;
+			n1 = original.EdgesBegin(i);
+			n2 = original.EdgesEnd(i);
 			if (clamped[n1] > 0 && clamped[n2] > 0)
-				pot[n] *= original.EdgePot(y[n1], y[n2], i);
+				pot[n] *= original.EdgePot(i, y[n1], y[n2]);
 		}
 
 		/* Update Z */

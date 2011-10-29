@@ -6,8 +6,8 @@ test.decode <- function(name, decode.method, crf, answer, ...)
 	if (all(decode == answer$decode)) {
 		cat("Passed.\n")
 	} else {
-		cat("\n")
-		stop("Decoding is incorrect!")
+		cat("Failed ***\n")
+		warning(name, ": Decoding is incorrect!")
 	}
 }
 
@@ -21,8 +21,8 @@ test.infer <- function(name, infer.method, crf, answer, cutoff=1e-8, ...)
 	if (max(abs(c(node.error, edge.error, belief$logZ - answer$logZ))) < cutoff) {
 		cat("Passed.\n")
 	} else {
-		cat("\n")
-		stop("Inference is incorrect!")
+		cat("Failed ***\n")
+		warning(name, ": Inference is incorrect!")
 	}
 }
 
@@ -39,8 +39,8 @@ test.sample <- function(name, sample.method, crf, answer, cutoff=0.01, size=1000
 	if (mean(abs(samples.node.bel - answer$node.bel)) < cutoff) {
 		cat("Passed.\n")
 	} else {
-		cat("\n")
-		stop("Sampling may be incorrect!")
+		cat("Failed ***\n")
+		warning(name, ": Sampling may be incorrect!")
 	}
 }
 
