@@ -34,7 +34,7 @@ CRFclamped::CRFclamped(SEXP _crf)
 	PROTECT(_nodePot = NEW_NUMERIC(nNodes * maxState));
 	setDim2(_nodePot, nNodes, maxState);
 	nodePot = NUMERIC_POINTER(_nodePot);
-	setValues(_nodePot, nodePot, 0);
+	setValues(_nodePot, nodePot, 0.0);
 
 	Reset_NodePot();
 
@@ -44,7 +44,7 @@ CRFclamped::CRFclamped(SEXP _crf)
 void CRFclamped::Reset_NodePot()
 {
 	int e, n1, n2;
-	double *p_nodePot, *p_edgePot, *p_nodePotNew;
+	double *p_nodePot, *p_nodePotNew;
 
 	for (int i = 0; i < original.nNodes; i++)
 	{
@@ -68,26 +68,23 @@ void CRFclamped::Reset_NodePot()
 			for (int j = 0; j < original.nAdj[i]; j++)
 			{
 				e = original.adjEdges[i][j] - 1;
-				n1 = original.edges[e] - 1;
-				n2 = original.edges[e + original.nEdges] - 1;
+				n1 = original.EdgesBegin(e);
+				n2 = original.EdgesEnd(e);
 				if (n1 == i && clamped[n2] == 0)
 				{
-					p_edgePot = original.edgePot + clamped[i] - 1 + original.maxState * original.maxState * e;
 					p_nodePotNew = nodePot + nodeMap[n2] - 1;
 					for (int k = 0; k < original.nStates[n2]; k++)
 					{
-						p_nodePotNew[0] *= p_edgePot[0];
-						p_edgePot += original.maxState;
+						p_nodePotNew[0] *= original.EdgePot(e, clamped[i]-1, k);
 						p_nodePotNew += nNodes;
 					}
 				}
 				else if (n2 == i && clamped[n1] == 0)
 				{
-					p_edgePot = original.edgePot + original.maxState * (clamped[i] - 1 + original.maxState * e);
 					p_nodePotNew = nodePot + nodeMap[n1] - 1;
 					for (int k = 0; k < original.nStates[n1]; k++)
 					{
-						p_nodePotNew[0] *= p_edgePot[k];
+						p_nodePotNew[0] *= original.EdgePot(e, k, clamped[i]-1);
 						p_nodePotNew += nNodes;
 					}
 				}

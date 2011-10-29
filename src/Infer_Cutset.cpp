@@ -61,10 +61,10 @@ void CRFclamped::Infer_Cutset(int engine)
 				pot *= original.NodePot(i, y[i]);
 		for (int i = 0; i < original.nEdges; i++)
 		{
-			n1 = original.edges[i] - 1;
-			n2 = original.edges[i + original.nEdges] - 1;
+			n1 = original.EdgesBegin(i);
+			n2 = original.EdgesEnd(i);
 			if (clamped[n1] > 0 && clamped[n2] > 0)
-				pot *= original.EdgePot(y[n1], y[n2], i);
+				pot *= original.EdgePot(i, y[n1], y[n2]);
 		}
 
 		/* Update node belief */
@@ -73,7 +73,7 @@ void CRFclamped::Infer_Cutset(int engine)
 			if (clamped[i] > 0)
 				original.NodeBel(i, y[i]) += pot;
 			else
-				for (int j = 0; j < original.maxState; j++)
+				for (int j = 0; j < original.nStates[i]; j++)
 				{
 					original.NodeBel(i, j) += NodeBel(nodeMap[i] - 1, j) * pot;
 				}
@@ -82,34 +82,28 @@ void CRFclamped::Infer_Cutset(int engine)
 		/* Update edge belief */
 		for (int i = 0; i < original.nEdges; i++)
 		{
-			n1 = original.edges[i] - 1;
-			n2 = original.edges[i + original.nEdges] - 1;
+			n1 = original.EdgesBegin(i);
+			n2 = original.EdgesEnd(i);
 			if (clamped[n1] > 0)
 			{
 				if (clamped[n2] > 0)
-					original.EdgeBel(y[n1], y[n2], i) += pot;
+					original.EdgeBel(i, y[n1], y[n2]) += pot;
 				else
-					for (int j = 0; j < original.maxState; j++)
-					{
-						original.EdgeBel(y[n1], j, i) += NodeBel(nodeMap[n2] - 1, j) * pot;
-					}
+					for (int j = 0; j < original.nStates[n2]; j++)
+						original.EdgeBel(i, y[n1], j) += NodeBel(nodeMap[n2] - 1, j) * pot;
 			}
 			else
 			{
 				if (clamped[n2] > 0)
 				{
-					for (int j = 0; j < original.maxState; j++)
-					{
-						original.EdgeBel(j, y[n2], i) += NodeBel(nodeMap[n1] - 1, j) * pot;
-					}
+					for (int j = 0; j < original.nStates[n1]; j++)
+						original.EdgeBel(i, j, y[n2]) += NodeBel(nodeMap[n1] - 1, j) * pot;
 				}
 				else
 				{
-					for (int j1 = 0; j1 < original.maxState; j1++)
-						for (int j2 = 0; j2 < original.maxState; j2++)
-						{
-							original.EdgeBel(j1, j2, i) += EdgeBel(j1, j2, edgeMap[i] - 1) * pot;
-						}
+					for (int j1 = 0; j1 < original.nStates[n1]; j1++)
+						for (int j2 = 0; j2 < original.nStates[n2]; j2++)
+							original.EdgeBel(i, j1, j2) += EdgeBel(edgeMap[i] - 1, j1, j2) * pot;
 				}
 			}
 		}
@@ -140,7 +134,11 @@ void CRFclamped::Infer_Cutset(int engine)
 	/* Normalization */
 	for (int i = 0; i < length(original._nodeBel); i++)
 		original.nodeBel[i] /= Z;
-	for (int i = 0; i < length(original._edgeBel); i++)
-		original.edgeBel[i] /= Z;
+	for (int i = 0; i < original.nEdges; i++)
+	{
+		int n = original.nStates[original.EdgesBegin(i)] * original.nStates[original.EdgesEnd(i)];
+		for (int j = 0; j < n; j++)
+			original.edgeBel[i][j] /= Z;
+	}
 	*(original.logZ) = log(Z);
 }

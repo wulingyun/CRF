@@ -91,7 +91,7 @@ void CRF::Sample_Tree(int size)
 	}
 
 	double sumProb, *prob = (double *) R_alloc(maxState, sizeof(double));
-	double *p_nodeBel, *p_edgeBel;
+	double *p_nodeBel;
 
 	GetRNGstate();
 	for (int i = 0; i < size; i++)
@@ -112,25 +112,22 @@ void CRF::Sample_Tree(int size)
 			else
 			{
 				sumProb = 0;
-				if (edges[e] - 1 == n)
+				if (EdgesBegin(e) == n)
 				{
-					s = edges[e + nEdges] - 1;
-					p_edgeBel = edgeBel + maxState * (y[s] + maxState * e);
+					s = EdgesEnd(e);
 					for (int k = 0; k < nStates[n]; k++)
 					{
-						prob[k] = p_edgeBel[k];
+						prob[k] = EdgeBel(e, k, y[s]);
 						sumProb += prob[k];
 					}
 				}
 				else
 				{
-					s = edges[e] - 1;
-					p_edgeBel = edgeBel + y[s] + maxState * maxState * e;
+					s = EdgesBegin(e);
 					for (int k = 0; k < nStates[n]; k++)
 					{
-						prob[k] = p_edgeBel[0];
+						prob[k] = EdgeBel(e, y[s], k);
 						sumProb += prob[k];
-						p_edgeBel += maxState;
 					}
 				}
 				for (int k = 0; k < nStates[n]; k++)

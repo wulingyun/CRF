@@ -54,7 +54,7 @@ double CRF::Get_Potential(int *configuration)
 
 	/* Edge potentials */
 	for (int i = 0; i < nEdges; i++)
-		potential *= edgePot[configuration[edges[i]-1] + maxState * (configuration[edges[i+nEdges]-1] + maxState * i)];
+		potential *= EdgePot(i, configuration[EdgesBegin(i)], configuration[EdgesEnd(i)]);
 
 	return(potential);
 }
@@ -69,7 +69,7 @@ double CRF::Get_LogPotential(int *configuration)
 
 	/* Edge potentials */
 	for (int i = 0; i < nEdges; i++)
-		potential += log(edgePot[configuration[edges[i]-1] + maxState * (configuration[edges[i+nEdges]-1] + maxState * i)]);
+		potential += log(EdgePot(i, configuration[EdgesBegin(i)], configuration[EdgesEnd(i)]));
 
 	return(potential);
 }
@@ -93,12 +93,12 @@ void CRF::UB_Init()
 	for (int i = 0; i < nEdges; i++)
 	{
 		maxEdgePot[i] = 0;
-		n1 = Edges(i,0) - 1;
-		n2 = Edges(i,1) - 1;
+		n1 = EdgesBegin(i);
+		n2 = EdgesEnd(i);
 		for (int j = 0; j < nStates[n1]; j++)
 			for (int k = 0; k < nStates[n2]; k++)
-				if (maxEdgePot[i] < EdgePot(j, k, i))
-					maxEdgePot[i] = EdgePot(j, k, i);
+				if (maxEdgePot[i] < EdgePot(i, j, k))
+					maxEdgePot[i] = EdgePot(i, j, k);
 	}
 }
 
@@ -115,8 +115,8 @@ void CRF::UB_Clamp(int *clamped)
 	/* Edge potentials */
 	for (int i = 0; i < nEdges; i++)
 	{
-		s1 = clamped[Edges(i,0) - 1] - 1;
-		s2 = clamped[Edges(i,1) - 1] - 1;
+		s1 = clamped[EdgesBegin(i)] - 1;
+		s2 = clamped[EdgesEnd(i)] - 1;
 		if (s1 < 0 || s2 < 0)
 			unclampedUB *= maxEdgePot[i];
 	}
@@ -150,10 +150,10 @@ double CRF::UB_Estimate(int *clamped)
 	/* Edge potentials */
 	for (int i = 0; i < nEdges; i++)
 	{
-		s1 = clamped[Edges(i,0) - 1] - 1;
-		s2 = clamped[Edges(i,1) - 1] - 1;
+		s1 = clamped[EdgesBegin(i)] - 1;
+		s2 = clamped[EdgesEnd(i)] - 1;
 		if (s1 >= 0 && s2 >= 0)
-			potential *= EdgePot(s1, s2, i);
+			potential *= EdgePot(i, s1, s2);
 	}
 
 	return(potential);

@@ -18,7 +18,11 @@ void CRF::Infer_TRBP(int maxIter, double cutoff, int verbose)
 	double *messages_1 = (double *) R_alloc(maxState * nEdges, sizeof(double)); // Messages from n2 to n1 at edge (n1, n2)
 	double *messages_2 = (double *) R_alloc(maxState * nEdges, sizeof(double)); // Messages from n1 to n2 at edge (n1, n2)
 	double *mu = (double *) R_alloc(nEdges, sizeof(double));
-	double *scaleEdgePot = (double *) R_alloc(maxState * maxState * nEdges, sizeof(double));
+	double **scaleEdgePot = (double **) R_alloc(nEdges, sizeof(double *));
+	for (int i = 0; i < nEdges; i++)
+	{
+		scaleEdgePot[i] = (double *) R_alloc(nStates[EdgesBegin(i)] * nStates[EdgesEnd(i)], sizeof(double));
+	}
 	TRBP_Weights(mu);
 	TRBP_ScaleEdgePot(mu, scaleEdgePot);
 	TRBP(messages_1, messages_2, mu, scaleEdgePot, maxIter, cutoff, verbose);
