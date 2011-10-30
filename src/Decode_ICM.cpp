@@ -61,7 +61,7 @@ void CRF::Decode_ICM(int restart, int *start)
 
 				for (int j = 0; j < nAdj[i]; j++)
 				{
-					e = adjEdges[i][j] - 1;
+					e = AdjEdges(i, j);
 					n1 = EdgesBegin(e);
 					n2 = EdgesEnd(e);
 					if (i == n1)

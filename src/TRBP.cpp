@@ -55,7 +55,7 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double **scal
 			}
 			for (int i = 0; i < nAdj[s]; i++)
 			{
-				e = adjEdges[s][i] - 1;
+				e = AdjEdges(s, i);
 				if (EdgesBegin(e) == s)
 					p_messages = old_messages_1;
 				else
@@ -69,8 +69,8 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double **scal
 
 			for (int i = 0; i < nAdj[s]; i++)
 			{
-				r = adjNodes[s][i] - 1;
-				e = adjEdges[s][i] - 1;
+				r = AdjNodes(s, i);
+				e = AdjEdges(s, i);
 
 				if (EdgesBegin(e) == s)
 					p_messages = old_messages_1;
@@ -350,7 +350,7 @@ void CRF::TRBP_BetheFreeEnergy(double *mu)
 		}
 		sum_mu = 0;
 		for (int j = 0; j < nAdj[i]; j++)
-			sum_mu += mu[adjEdges[i][j] - 1];
+			sum_mu += mu[AdjEdges(i, j)];
 		nodeEntropy += (sum_mu - 1) * entropy;
 	}
 

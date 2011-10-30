@@ -56,13 +56,13 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 				for (int i = 0; i < nQueue; i++)
 				{
 					n = queue[i];
-					r = adjNodes[s][n] - 1;
+					r = AdjNodes(s, n);
 
 					unsent[s][n] = 0;
 					nUnsent[s]--;
 
 					for (int j = 0; j < nAdj[r]; j++)
-						if (adjNodes[r][j] - 1 == s)
+						if (AdjNodes(r, j) == s)
 						{
 							waiting[r][j] = 0;
 							nWaiting[r]--;
@@ -81,7 +81,7 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 					{
 						if (j != n)
 						{
-							e = adjEdges[s][j] - 1;
+							e = AdjEdges(s, j);
 							if (EdgesBegin(e) == s)
 								p_messages = messages_1;
 							else
@@ -94,7 +94,7 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 
 					/* send messages */
 
-					e = adjEdges[s][n] - 1;
+					e = AdjEdges(s, n);
 					sumMesg = 0;
 					if (EdgesBegin(e) == s)
 					{
