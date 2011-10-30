@@ -75,13 +75,13 @@ void CRF::Sample_Tree(int size)
 
 			for (int j = 0; j < nAdj[n1]; j++)
 			{
-				n2 = adjNodes[n1][j] - 1;
+				n2 = AdjNodes(n1, j);
 				if (ordered[n2])
 					continue;
 
 				ordered[n2] = 1;
 				order[nOrdered] = n2;
-				parentEdge[nOrdered] = adjEdges[n1][j] - 1;
+				parentEdge[nOrdered] = AdjEdges(n1, j);
 				nOrdered++;
 
 				queue[n2] = 1;

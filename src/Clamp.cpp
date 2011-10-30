@@ -67,7 +67,7 @@ void CRFclamped::Reset_NodePot()
 		{
 			for (int j = 0; j < original.nAdj[i]; j++)
 			{
-				e = original.adjEdges[i][j] - 1;
+				e = original.AdjEdges(i, j);
 				n1 = original.EdgesBegin(e);
 				n2 = original.EdgesEnd(e);
 				if (n1 == i && clamped[n2] == 0)

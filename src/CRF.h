@@ -80,6 +80,8 @@ public:
 	void Set_Data(SEXP _crf);
 	void Set_Samples(SEXP _otherSamples);
 
+	int AdjNodes(int n, int i);
+	int AdjEdges(int n, int i);
 	int EdgesBegin(int e);
 	int EdgesEnd(int e);
 	double &NodePot(int n, int s);
@@ -158,6 +160,16 @@ public:
 };
 
 /* inline functions */
+
+inline int CRF::AdjNodes(int n, int i)
+{
+	return adjNodes[n][i] - 1;
+}
+
+inline int CRF::AdjEdges(int n, int i)
+{
+	return adjEdges[n][i] - 1;
+}
 
 inline int CRF::EdgesBegin(int e)
 {

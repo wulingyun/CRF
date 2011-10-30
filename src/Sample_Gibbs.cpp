@@ -59,7 +59,7 @@ void CRF::Sample_Gibbs(int burnIn, int *start, int size)
 			}
 			for (int j = 0; j < nAdj[i]; j++)
 			{
-				e = adjEdges[i][j] - 1;
+				e = AdjEdges(i, j);
 				n1 = EdgesBegin(e);
 				n2 = EdgesEnd(e);
 				if (n1 == i)

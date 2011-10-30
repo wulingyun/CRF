@@ -51,7 +51,7 @@ void CRF::LoopyBP(double *messages_1, double *messages_2, int maxIter, double cu
 			}
 			for (int i = 0; i < nAdj[s]; i++)
 			{
-				e = adjEdges[s][i] - 1;
+				e = AdjEdges(s, i);
 				if (EdgesBegin(e) == s)
 					p_messages = old_messages_1;
 				else
@@ -65,8 +65,8 @@ void CRF::LoopyBP(double *messages_1, double *messages_2, int maxIter, double cu
 
 			for (int i = 0; i < nAdj[s]; i++)
 			{
-				r = adjNodes[s][i] - 1;
-				e = adjEdges[s][i] - 1;
+				r = AdjNodes(s, i);
+				e = AdjEdges(s, i);
 
 				if (EdgesBegin(e) == s)
 					p_messages = old_messages_1;
