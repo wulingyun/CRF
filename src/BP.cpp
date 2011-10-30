@@ -8,25 +8,17 @@ void CRF::Message2NodeBelief(double *messages_1, double *messages_2)
 		nodeBel[i] = nodePot[i];
 
 	int n1, n2;
-	double sumBel, *p_nodeBel;
+	double sumBel;
 	double *p1_messages = messages_1;
 	double *p2_messages = messages_2;
 	for (int i = 0; i < nEdges; i++)
 	{
 		n1 = EdgesBegin(i);
 		n2 = EdgesEnd(i);
-		p_nodeBel = nodeBel + n1;
 		for (int j = 0; j < nStates[n1]; j++)
-		{
-			p_nodeBel[0] *= p1_messages[j];
-			p_nodeBel += nNodes;
-		}
-		p_nodeBel = nodeBel + n2;
+			NodeBel(n1, j) *= p1_messages[j];
 		for (int j = 0; j < nStates[n2]; j++)
-		{
-			p_nodeBel[0] *= p2_messages[j];
-			p_nodeBel += nNodes;
-		}
+			NodeBel(n2, j) *= p2_messages[j];
 		p1_messages += maxState;
 		p2_messages += maxState;
 	}
@@ -34,18 +26,10 @@ void CRF::Message2NodeBelief(double *messages_1, double *messages_2)
 	for (int i = 0; i < nNodes; i++)
 	{
 		sumBel = 0;
-		p_nodeBel = nodeBel + i;
 		for (int j = 0; j < nStates[i]; j++)
-		{
-			sumBel += p_nodeBel[0];
-			p_nodeBel += nNodes;
-		}
-		p_nodeBel = nodeBel + i;
+			sumBel += NodeBel(i, j);
 		for (int j = 0; j < nStates[i]; j++)
-		{
-			p_nodeBel[0] /= sumBel;
-			p_nodeBel += nNodes;
-		}
+			NodeBel(i, j) /= sumBel;
 	}
 }
 
@@ -60,28 +44,24 @@ void CRF::Message2EdgeBelief(double *messages_1, double *messages_2)
 	}
 
 	int n1, n2;
-	double bel, sumBel, *p_nodeBel;
+	double bel, sumBel;
 	double *p1_messages = messages_1;
 	double *p2_messages = messages_2;
 	for (int i = 0; i < nEdges; i++)
 	{
 		n1 = EdgesBegin(i);
 		n2 = EdgesEnd(i);
-		p_nodeBel = nodeBel + n1;
 		for (int j = 0; j < nStates[n1]; j++)
 		{
-			bel = p1_messages[j] == 0 ? 0 : p_nodeBel[0] / p1_messages[j];
+			bel = p1_messages[j] == 0 ? 0 : NodeBel(n1, j) / p1_messages[j];
 			for (int k = 0; k < nStates[n2]; k++)
 				EdgeBel(i, j, k) *= bel;
-			p_nodeBel += nNodes;
 		}
-		p_nodeBel = nodeBel + n2;
 		for (int j = 0; j < nStates[n2]; j++)
 		{
-			bel = p2_messages[j] == 0 ? 0 : p_nodeBel[0] / p2_messages[j];
+			bel = p2_messages[j] == 0 ? 0 : NodeBel(n2, j) / p2_messages[j];
 			for (int k = 0; k < nStates[n1]; k++)
 				EdgeBel(i, k, j) *= bel;
-			p_nodeBel += nNodes;
 		}
 
 		sumBel = 0;
@@ -105,19 +85,17 @@ void CRF::Message2EdgeBelief(double *messages_1, double *messages_2)
 
 void CRF::MaxOfMarginals()
 {
-	double maxBel, *p_nodeBel;
+	double maxBel;
 	for (int i = 0; i < nNodes; i++)
 	{
 		maxBel = -1;
-		p_nodeBel = nodeBel + i;
 		for (int j = 0; j < nStates[i]; j++)
 		{
-			if (p_nodeBel[0] > maxBel)
+			if (NodeBel(i, j) > maxBel)
 			{
-				maxBel = p_nodeBel[0];
+				maxBel = NodeBel(i, j);
 				labels[i] = j;
 			}
-			p_nodeBel += nNodes;
 		}
 	}
 
@@ -132,28 +110,23 @@ void CRF::BetheFreeEnergy()
 	double nodeEnergy, nodeEntropy, edgeEnergy, edgeEntropy;
 	nodeEnergy = nodeEntropy = edgeEnergy = edgeEntropy = 0;
 
-	double entropy;
-	double *p_nodeBel, *p_nodePot;
+	double entropy, bel;
 	for (int i = 0; i < nNodes; i++)
 	{
 		entropy = 0;
-		p_nodeBel = nodeBel + i;
-		p_nodePot = nodePot + i;
 		for (int j = 0; j < nStates[i]; j++)
 		{
-			if (p_nodeBel[0] > 0)
+			bel = NodeBel(i, j);
+			if (bel > 0)
 			{
-				nodeEnergy -= p_nodeBel[0] * log(p_nodePot[0]);
-				entropy += p_nodeBel[0] * log(p_nodeBel[0]);
+				nodeEnergy -= bel * log(NodePot(i, j));
+				entropy += bel * log(bel);
 			}
-			p_nodeBel += nNodes;
-			p_nodePot += nNodes;
 		}
 		nodeEntropy += (nAdj[i] - 1) * entropy;
 	}
 
 	int n1, n2;
-	double bel;
 	for (int i = 0; i < nEdges; i++)
 	{
 		n1 = EdgesBegin(i);

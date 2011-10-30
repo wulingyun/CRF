@@ -44,22 +44,11 @@ CRFclamped::CRFclamped(SEXP _crf)
 void CRFclamped::Reset_NodePot()
 {
 	int e, n1, n2;
-	double *p_nodePot, *p_nodePotNew;
 
 	for (int i = 0; i < original.nNodes; i++)
-	{
 		if (nodeMap[i] > 0)
-		{
-			p_nodePot = original.nodePot + i;
-			p_nodePotNew = nodePot + nodeMap[i] - 1;
 			for (int j = 0; j < original.nStates[i]; j++)
-			{
-				p_nodePotNew[0] = p_nodePot[0];
-				p_nodePot += original.nNodes;
-				p_nodePotNew += nNodes;
-			}
-		}
-	}
+				NodePot(nodeMap[i]-1, j) = original.NodePot(i, j);
 
 	for (int i = 0; i < original.nNodes; i++)
 	{
@@ -72,21 +61,13 @@ void CRFclamped::Reset_NodePot()
 				n2 = original.EdgesEnd(e);
 				if (n1 == i && clamped[n2] == 0)
 				{
-					p_nodePotNew = nodePot + nodeMap[n2] - 1;
 					for (int k = 0; k < original.nStates[n2]; k++)
-					{
-						p_nodePotNew[0] *= original.EdgePot(e, clamped[i]-1, k);
-						p_nodePotNew += nNodes;
-					}
+						NodePot(nodeMap[n2]-1, k) *= original.EdgePot(e, clamped[i]-1, k);
 				}
 				else if (n2 == i && clamped[n1] == 0)
 				{
-					p_nodePotNew = nodePot + nodeMap[n1] - 1;
 					for (int k = 0; k < original.nStates[n1]; k++)
-					{
-						p_nodePotNew[0] *= original.EdgePot(e, k, clamped[i]-1);
-						p_nodePotNew += nNodes;
-					}
+						NodePot(nodeMap[n1]-1, k) *= original.EdgePot(e, k, clamped[i]-1);
 				}
 			}
 		}

@@ -91,7 +91,6 @@ void CRF::Sample_Tree(int size)
 	}
 
 	double sumProb, *prob = (double *) R_alloc(maxState, sizeof(double));
-	double *p_nodeBel;
 
 	GetRNGstate();
 	for (int i = 0; i < size; i++)
@@ -102,12 +101,8 @@ void CRF::Sample_Tree(int size)
 			e = parentEdge[j];
 			if (e == -1)
 			{
-				p_nodeBel = nodeBel + n;
 				for (int k = 0; k < nStates[n]; k++)
-				{
-					prob[k] = p_nodeBel[0];
-					p_nodeBel += nNodes;
-				}
+					prob[k] = NodeBel(n, k);
 			}
 			else
 			{

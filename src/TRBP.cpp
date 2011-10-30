@@ -17,7 +17,7 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double **scal
 	double *outgoing = (double *) R_alloc(maxState, sizeof(double));
 
 	int s, r, e, n;
-	double mesg, sumMesg, *p_nodePot, *p_messages;
+	double mesg, sumMesg, *p_messages;
 
 	for (int i = 0; i < nEdges; i++)
 	{
@@ -47,12 +47,8 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double **scal
 		{
 			/* gather incoming messages */
 
-			p_nodePot = nodePot + s;
 			for (int i = 0; i < nStates[s]; i++)
-			{
-				incoming[i] = p_nodePot[0];
-				p_nodePot += nNodes;
-			}
+				incoming[i] = NodePot(s, i);
 			for (int i = 0; i < nAdj[s]; i++)
 			{
 				e = AdjEdges(s, i);
@@ -231,25 +227,17 @@ void CRF::TRBP_Message2NodeBelief(double *messages_1, double *messages_2, double
 		nodeBel[i] = nodePot[i];
 
 	int n1, n2;
-	double sumBel, *p_nodeBel;
+	double sumBel;
 	double *p1_messages = messages_1;
 	double *p2_messages = messages_2;
 	for (int i = 0; i < nEdges; i++)
 	{
 		n1 = EdgesBegin(i);
 		n2 = EdgesEnd(i);
-		p_nodeBel = nodeBel + n1;
 		for (int j = 0; j < nStates[n1]; j++)
-		{
-			p_nodeBel[0] *= R_pow(p1_messages[j], mu[i]);
-			p_nodeBel += nNodes;
-		}
-		p_nodeBel = nodeBel + n2;
+			NodeBel(n1, j) *= R_pow(p1_messages[j], mu[i]);
 		for (int j = 0; j < nStates[n2]; j++)
-		{
-			p_nodeBel[0] *= R_pow(p2_messages[j], mu[i]);
-			p_nodeBel += nNodes;
-		}
+			NodeBel(n2, j) *= R_pow(p2_messages[j], mu[i]);
 		p1_messages += maxState;
 		p2_messages += maxState;
 	}
@@ -257,18 +245,10 @@ void CRF::TRBP_Message2NodeBelief(double *messages_1, double *messages_2, double
 	for (int i = 0; i < nNodes; i++)
 	{
 		sumBel = 0;
-		p_nodeBel = nodeBel + i;
 		for (int j = 0; j < nStates[i]; j++)
-		{
-			sumBel += p_nodeBel[0];
-			p_nodeBel += nNodes;
-		}
-		p_nodeBel = nodeBel + i;
+			sumBel += NodeBel(i, j);
 		for (int j = 0; j < nStates[i]; j++)
-		{
-			p_nodeBel[0] /= sumBel;
-			p_nodeBel += nNodes;
-		}
+			NodeBel(i, j) /= sumBel;
 	}
 }
 
@@ -283,28 +263,24 @@ void CRF::TRBP_Message2EdgeBelief(double *messages_1, double *messages_2, double
 	}
 
 	int n1, n2;
-	double bel, sumBel, *p_nodeBel;
+	double bel, sumBel;
 	double *p1_messages = messages_1;
 	double *p2_messages = messages_2;
 	for (int i = 0; i < nEdges; i++)
 	{
 		n1 = EdgesBegin(i);
 		n2 = EdgesEnd(i);
-		p_nodeBel = nodeBel + n1;
 		for (int j = 0; j < nStates[n1]; j++)
 		{
-			bel = p1_messages[j] == 0 ? 0 : p_nodeBel[0] / p1_messages[j];
+			bel = p1_messages[j] == 0 ? 0 : NodeBel(n1, j) / p1_messages[j];
 			for (int k = 0; k < nStates[n2]; k++)
 				EdgeBel(i, j, k) *= bel;
-			p_nodeBel += nNodes;
 		}
-		p_nodeBel = nodeBel + n2;
 		for (int j = 0; j < nStates[n2]; j++)
 		{
-			bel = p2_messages[j] == 0 ? 0 : p_nodeBel[0] / p2_messages[j];
+			bel = p2_messages[j] == 0 ? 0 : NodeBel(n2, j) / p2_messages[j];
 			for (int k = 0; k < nStates[n1]; k++)
 				EdgeBel(i, k, j) *= bel;
-			p_nodeBel += nNodes;
 		}
 
 		sumBel = 0;
@@ -331,22 +307,18 @@ void CRF::TRBP_BetheFreeEnergy(double *mu)
 	double nodeEnergy, nodeEntropy, edgeEnergy, edgeEntropy;
 	nodeEnergy = nodeEntropy = edgeEnergy = edgeEntropy = 0;
 
-	double entropy, sum_mu;
-	double *p_nodeBel, *p_nodePot;
+	double entropy, bel, sum_mu;
 	for (int i = 0; i < nNodes; i++)
 	{
 		entropy = 0;
-		p_nodeBel = nodeBel + i;
-		p_nodePot = nodePot + i;
 		for (int j = 0; j < nStates[i]; j++)
 		{
-			if (p_nodeBel[0] > 0)
+			bel = NodeBel(i, j);
+			if (bel > 0)
 			{
-				nodeEnergy -= p_nodeBel[0] * log(p_nodePot[0]);
-				entropy += p_nodeBel[0] * log(p_nodeBel[0]);
+				nodeEnergy -= bel * log(NodePot(i, j));
+				entropy += bel * log(bel);
 			}
-			p_nodeBel += nNodes;
-			p_nodePot += nNodes;
 		}
 		sum_mu = 0;
 		for (int j = 0; j < nAdj[i]; j++)
@@ -355,7 +327,6 @@ void CRF::TRBP_BetheFreeEnergy(double *mu)
 	}
 
 	int n1, n2;
-	double bel;
 	for (int i = 0; i < nEdges; i++)
 	{
 		entropy = 0;
