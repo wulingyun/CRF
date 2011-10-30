@@ -278,8 +278,7 @@ void CRF::TRBP_Message2EdgeBelief(double *messages_1, double *messages_2, double
 {
 	for (int i=0; i < nEdges; i++)
 	{
-		int n = nStates[EdgesBegin(i)] * nStates[EdgesEnd(i)];
-		for (int j = 0; j < n; j++)
+		for (int j = 0; j < nEdgeStates[i]; j++)
 			edgeBel[i][j] = scaleEdgePot[i][j];
 	}
 
@@ -382,13 +381,11 @@ void CRF::TRBP_BetheFreeEnergy(double *mu)
 
 void CRF::TRBP_ScaleEdgePot(double *mu, double **scaleEdgePot)
 {
-	int n;
 	double inv_mu;
 	for (int i = 0; i < nEdges; i++)
 	{
 		inv_mu = 1/mu[i];
-		n = nStates[EdgesBegin(i)] * nStates[EdgesEnd(i)];
-		for (int j = 0; j < n; j++)
+		for (int j = 0; j < nEdgeStates[i]; j++)
 			scaleEdgePot[i][j] = R_pow(edgePot[i][j], inv_mu);
 	}
 }

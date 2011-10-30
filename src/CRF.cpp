@@ -14,6 +14,7 @@ CRF::CRF()
 
 	nodePot = NULL;
 	edgePot = NULL;
+	nEdgeStates = NULL;
 
 	labels = NULL;
 
@@ -72,10 +73,12 @@ void CRF::Set_Data(SEXP _crf)
 	PROTECT(_edgePot = AS_LIST(getListElement(_crf, "edge.pot")));
 	nodePot = NUMERIC_POINTER(_nodePot);
 	edgePot = (double **) R_alloc(nEdges, sizeof(double *));
+	nEdgeStates = (double *) R_alloc(nEdges, sizeof(double));
 	for (int i = 0; i < nEdges; i++)
 	{
 		PROTECT(_temp = AS_NUMERIC(VECTOR_ELT(_edgePot, i)));
 		edgePot[i] = NUMERIC_POINTER(_temp);
+		nEdgeStates[i] = nStates[EdgesBegin(i)] * nStates[EdgesEnd(i)];
 	}
 
 	numProtect = 10 + nNodes * 2 + nEdges;
@@ -105,10 +108,8 @@ void CRF::Init_EdgeBel()
 	SEXP _temp;
 	for (int i = 0; i < nEdges; i++)
 	{
-		int n1 = nStates[EdgesBegin(i)];
-		int n2 = nStates[EdgesEnd(i)];
-		PROTECT(_temp = NEW_NUMERIC(n1 * n2));
-		setDim2(_temp, n1, n2);
+		PROTECT(_temp = NEW_NUMERIC(nEdgeStates[i]));
+		setDim2(_temp, nStates[EdgesBegin(i)], nStates[EdgesEnd(i)]);
 		edgeBel[i] = NUMERIC_POINTER(_temp);
 		setValues(_temp, edgeBel[i], 0.0);
 		SET_VECTOR_ELT(_edgeBel, i, _temp);

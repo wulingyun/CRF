@@ -57,11 +57,9 @@ void CRF::Infer_Sample()
 	}
 	for (int i = 0; i < length(_nodeBel); i++)
 		nodeBel[i] /= nSamples;
-	int n;
 	for (int i = 0; i < nEdges; i++)
 	{
-		n = nStates[EdgesBegin(i)] * nStates[EdgesEnd(i)];
-		for (int j = 0; j < n; j++)
+		for (int j = 0; j < nEdgeStates[i]; j++)
 			edgeBel[i][j] /= nSamples;
 	}
 	*logZ = log(maxPot * nSamples / freq);

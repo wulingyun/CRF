@@ -53,11 +53,9 @@ void CRF::Message2NodeBelief(double *messages_1, double *messages_2)
 
 void CRF::Message2EdgeBelief(double *messages_1, double *messages_2)
 {
-	int n;
 	for (int i = 0; i < nEdges; i++)
 	{
-		n = nStates[EdgesBegin(i)] * nStates[EdgesEnd(i)];
-		for (int j = 0; j < n; j++)
+		for (int j = 0; j < nEdgeStates[i]; j++)
 			edgeBel[i][j] = edgePot[i][j];
 	}
 

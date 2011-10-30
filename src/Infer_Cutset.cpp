@@ -136,8 +136,7 @@ void CRFclamped::Infer_Cutset(int engine)
 		original.nodeBel[i] /= Z;
 	for (int i = 0; i < original.nEdges; i++)
 	{
-		int n = original.nStates[original.EdgesBegin(i)] * original.nStates[original.EdgesEnd(i)];
-		for (int j = 0; j < n; j++)
+		for (int j = 0; j < original.nEdgeStates[i]; j++)
 			original.edgeBel[i][j] /= Z;
 	}
 	*(original.logZ) = log(Z);
