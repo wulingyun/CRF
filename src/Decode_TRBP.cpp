@@ -22,7 +22,7 @@ void CRF::Decode_TRBP(int maxIter, double cutoff, int verbose)
 	double **scaleEdgePot = (double **) R_alloc(nEdges, sizeof(double *));
 	for (int i = 0; i < nEdges; i++)
 	{
-		scaleEdgePot[i] = (double *) R_alloc(nStates[EdgesBegin(i)] * nStates[EdgesEnd(i)], sizeof(double));
+		scaleEdgePot[i] = (double *) R_alloc(nEdgeStates[i], sizeof(double));
 	}
 	TRBP_Weights(mu);
 	TRBP_ScaleEdgePot(mu, scaleEdgePot);

@@ -48,7 +48,7 @@ public:
 	int *nAdj, **adjNodes, **adjEdges;
 
 	SEXP _nodePot, _edgePot;
-	double *nodePot, **edgePot;
+	double *nodePot, **edgePot, *nEdgeStates;
 
 	SEXP _labels;
 	int *labels;
