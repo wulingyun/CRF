@@ -39,12 +39,11 @@ void CRF::Sample_Chain(int size)
 			alpha[nNodes * i] /= kappa[0];
 	}
 
-	double *p_alpha, *p0_alpha, *p_nodePot;
+	double *p_alpha, *p0_alpha;
 	double sumPot;
 	for (int i = 1; i < nNodes; i++)
 	{
 		p0_alpha = alpha + i;
-		p_nodePot = nodePot + i;
 		for (int j = 0; j < nStates[i]; j++)
 		{
 			p_alpha = alpha + i - 1;
@@ -54,10 +53,9 @@ void CRF::Sample_Chain(int size)
 				sumPot += p_alpha[0] * EdgePot(i-1, k, j);
 				p_alpha += nNodes;
 			}
-			p0_alpha[0] = sumPot * p_nodePot[0];
+			p0_alpha[0] = sumPot * NodePot(i, j);
 			kappa[i] += p0_alpha[0];
 			p0_alpha += nNodes;
-			p_nodePot += nNodes;
 		}
 		if (kappa[i] != 0)
 		{

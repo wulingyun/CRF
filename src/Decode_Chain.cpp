@@ -35,13 +35,12 @@ void CRF::Decode_Chain()
 			alpha[nNodes * i] /= kappa[0];
 	}
 
-	double *p_alpha, *p0_alpha, *p_nodePot;
+	double *p_alpha, *p0_alpha;
 	double pot, maxPot;
 	int maxIndex, *p_backlinks;
 	for (int i = 1; i < nNodes; i++)
 	{
 		p0_alpha = alpha + i;
-		p_nodePot = nodePot + i;
 		p_backlinks = backlinks + i;
 		for (int j = 0; j < nStates[i]; j++)
 		{
@@ -58,11 +57,10 @@ void CRF::Decode_Chain()
 				}
 				p_alpha += nNodes;
 			}
-			p0_alpha[0] = maxPot * p_nodePot[0];
+			p0_alpha[0] = maxPot * NodePot(i, j);
 			kappa[i] += p0_alpha[0];
 			p_backlinks[0] = maxIndex;
 			p0_alpha += nNodes;
-			p_nodePot += nNodes;
 			p_backlinks += nNodes;
 		}
 		if (kappa[i] != 0)

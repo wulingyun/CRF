@@ -24,7 +24,7 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 	double *incoming = (double *) R_alloc(maxState, sizeof(double));
 
 	int s, r, e, n;
-	double mesg, sumMesg, *p_nodePot, *p_messages;
+	double mesg, sumMesg, *p_messages;
 
 	int done = 0;
 	while (!done)
@@ -71,12 +71,8 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 
 					/* gather incoming messages */
 
-					p_nodePot = nodePot + s;
 					for (int j = 0; j < nStates[s]; j++)
-					{
-						incoming[j] = p_nodePot[0];
-						p_nodePot += nNodes;
-					}
+						incoming[j] = NodePot(s, j);
 					for (int j = 0; j < nAdj[s]; j++)
 					{
 						if (j != n)

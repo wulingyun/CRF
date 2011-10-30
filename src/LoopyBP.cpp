@@ -13,7 +13,7 @@ void CRF::LoopyBP(double *messages_1, double *messages_2, int maxIter, double cu
 	double *outgoing = (double *) R_alloc(maxState, sizeof(double));
 
 	int s, r, e, n;
-	double mesg, sumMesg, *p_nodePot, *p_messages;
+	double mesg, sumMesg, *p_messages;
 
 	for (int i = 0; i < nEdges; i++)
 	{
@@ -43,12 +43,8 @@ void CRF::LoopyBP(double *messages_1, double *messages_2, int maxIter, double cu
 		{
 			/* gather incoming messages */
 
-			p_nodePot = nodePot + s;
 			for (int i = 0; i < nStates[s]; i++)
-			{
-				incoming[i] = p_nodePot[0];
-				p_nodePot += nNodes;
-			}
+				incoming[i] = NodePot(s, i);
 			for (int i = 0; i < nAdj[s]; i++)
 			{
 				e = AdjEdges(s, i);

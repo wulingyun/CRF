@@ -41,7 +41,6 @@ void CRF::Sample_Gibbs(int burnIn, int *start, int size)
 	double sumProb, *prob = (double *) R_alloc(maxState, sizeof(double));
 
 	int e, n, n1, n2;
-	double *p_nodePot;
 
 	GetRNGstate();
 	for (int iter = 0; iter < burnIn+size; iter++)
@@ -51,12 +50,8 @@ void CRF::Sample_Gibbs(int burnIn, int *start, int size)
 		for (int i = 0; i < nNodes; i++)
 		{
 			n = nStates[i];
-			p_nodePot = nodePot + i;
 			for (int j = 0; j < n; j++)
-			{
-				prob[j] = p_nodePot[0];
-				p_nodePot += nNodes;
-			}
+				prob[j] = NodePot(i, j);
 			for (int j = 0; j < nAdj[i]; j++)
 			{
 				e = AdjEdges(i, j);
