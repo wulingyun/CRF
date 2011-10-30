@@ -7,8 +7,8 @@ make.crf <- function(adj.matrix, nstates)
 
 	e <- which(adj.matrix != 0, arr.ind = TRUE)
 	e <- matrix(c(e, e[,2], e[,1]), ncol=2)
-	e <- matrix(e[e[,1] < e[,2],], ncol=2)
-	data$edges <- e[order(e[,1]),]
+	e <- unique(matrix(e[e[,1] < e[,2],], ncol=2))
+	data$edges <- matrix(e[order(e[,1], e[,2]),], ncol=2)
 	data$n.edges <- nrow(data$edges)
 
 	data <- make.adj.info(data)
