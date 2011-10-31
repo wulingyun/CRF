@@ -35,7 +35,7 @@ The function will return a CRF data structure, which is a list with components:
 \item{adj.nodes}{The list of adjacent nodes for each node. It is a list of length \code{n.nodes} and the i-th element is a vector of length \code{n.adj[i]}.}
 \item{adj.edges}{The list of adjacent edges for each node. It is similiar to \code{adj.nodes} while contains the edge ids instead of node ids.}
 \item{node.pot}{The node potentials. It is a matrix with dimmension \code{(n.nodes, max.state)}. Each row \code{node.pot[i,]} denotes the node potentials of the i-th node.}
-\item{edge.pot}{The edge potentials. It is a 3-dimmensional array with dimmension \code{(max.state, max.state, n.edges)}. Each sub-array \code{edge.pot[,,i]} denotes the edge potentials of the i-th edge.}
+\item{edge.pot}{The edge potentials. It is a list of \code{n.edges} matrixes. Each matrix \code{edge.pot[[i]]}, with dimension \code{(n.states[edges[i,1]], n.states[edges[i,2]])}, denotes the edge potentials of the i-th edge.}
 }
 
 \seealso{
@@ -64,8 +64,8 @@ crf$node.pot[4,] <- c(9, 1)
 
 for (i in 1:crf$n.edges)
 {
-   crf$edge.pot[1,,i] <- c(2, 1)
-   crf$edge.pot[2,,i] <- c(1, 2)
+   crf$edge.pot[[i]][1,] <- c(2, 1)
+   crf$edge.pot[[i]][2,] <- c(1, 2)
 }
 
 }
