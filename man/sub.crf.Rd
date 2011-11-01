@@ -10,7 +10,7 @@ Generate sub CRF data structure by selecting some nodes
 }
 
 \usage{
-clamp.crf(crf, clamped)
+sub.crf(crf, subset)
 }
 
 \arguments{
