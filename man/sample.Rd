@@ -19,16 +19,22 @@ Generating samples from the distribution
 sample.exact(crf, size)
 sample.chain(crf, size)
 sample.tree(crf, size)
-sample.conditional(crf, clamped, sample.method, ...)
-sample.cutset(crf, cutset, size)
+sample.conditional(crf, size, clamped, sample.method, ...)
+sample.cutset(crf, size, cutset, engine = "default")
 sample.gibbs(crf, size, burn.in = 1000,
-             start = apply(crf$node.pot, 1, which.max), ...)
+             start = apply(crf$node.pot, 1, which.max))
 }
 
 \arguments{
-  \item{crf}{
-%%     ~~Describe \code{crf} here~~
-}
+  \item{crf}{}
+  \item{size}{}
+  \item{clamped}{}
+  \item{cutset}{}
+  \item{sample.method}{}
+  \item{engine}{}
+  \item{burn.in}{}
+  \item{start}{}
+  \item{...}{}
 }
 
 \details{
@@ -65,12 +71,12 @@ sample.gibbs(crf, size, burn.in = 1000,
 \examples{
 library(CRF)
 data(Small)
-sample.exact(small.crf, 100)
-sample.chain(small.crf, 100)
-sample.tree(small.crf, 100)
-sample.conditional(small.crf, c(0,1,0,0), sample.exact, 100)
-sample.cutset(small.crf, c(2), 100)
-sample.gibbs(small.crf, 100)
+s <- sample.exact(small.crf, 100)
+s <- sample.chain(small.crf, 100)
+s <- sample.tree(small.crf, 100)
+s <- sample.conditional(small.crf, 100, c(0,1,0,0), sample.exact)
+s <- sample.cutset(small.crf, 100, c(2))
+s <- sample.gibbs(small.crf, 100)
 }
 
 \keyword{ sample }

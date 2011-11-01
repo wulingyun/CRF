@@ -26,11 +26,12 @@ decode.exact(crf)
 decode.chain(crf)
 decode.tree(crf)
 decode.conditional(crf, clamped, decode.method, ...)
-decode.cutset(crf, cutset)
+decode.cutset(crf, cutset, engine = "default",
+              start = apply(crf$node.pot, 1, which.max))
 decode.sample(crf, sample.method, ...)
 decode.marginal(crf, infer.method, ...)
-decode.lbp(crf, max.iter=10000, cutoff=1e-4, verbose=0)
-decode.trbp(crf, max.iter=10000, cutoff=1e-4, verbose=0)
+decode.lbp(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
+decode.trbp(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 decode.greedy(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
 decode.icm(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
 decode.block(crf, blocks, decode.method = decode.tree, restart = 0,
@@ -38,9 +39,20 @@ decode.block(crf, blocks, decode.method = decode.tree, restart = 0,
 }
 
 \arguments{
-  \item{crf}{
-%%     ~~Describe \code{crf} here~~
-}
+  \item{crf}{}
+  \item{clamped}{}
+  \item{cutset}{}
+  \item{decode.method}{}
+  \item{infer.method}{}
+  \item{sample.method}{}
+  \item{engine}{}
+  \item{start}{}
+  \item{max.iter}{}
+  \item{cutoff}{}
+  \item{verbose}{}
+  \item{restart}{}
+  \item{blocks}{}
+  \item{...}{}
 }
 
 \details{
@@ -83,18 +95,18 @@ decode.block(crf, blocks, decode.method = decode.tree, restart = 0,
 \examples{
 library(CRF)
 data(Small)
-decode.exact(small.crf)
-decode.chain(small.crf)
-decode.tree(small.crf)
-decode.conditional(small.crf, c(0,1,0,0), decode.exact)
-decode.cutset(small.crf, c(2))
-decode.sample(small.crf, sample.exact, 10000)
-decode.marginal(small.crf, infer.exact)
-decode.lbp(small.crf)
-decode.trbp(small.crf)
-decode.greedy(small.crf)
-decode.icm(small.crf)
-decode.block(small.crf, list(c(1,3), c(2,4)))
+d <- decode.exact(small.crf)
+d <- decode.chain(small.crf)
+d <- decode.tree(small.crf)
+d <- decode.conditional(small.crf, c(0,1,0,0), decode.exact)
+d <- decode.cutset(small.crf, c(2))
+d <- decode.sample(small.crf, sample.exact, 10000)
+d <- decode.marginal(small.crf, infer.exact)
+d <- decode.lbp(small.crf)
+d <- decode.trbp(small.crf)
+d <- decode.greedy(small.crf)
+d <- decode.icm(small.crf)
+d <- decode.block(small.crf, list(c(1,3), c(2,4)))
 }
 
 \keyword{ decode }

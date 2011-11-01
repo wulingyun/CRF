@@ -22,16 +22,23 @@ infer.exact(crf)
 infer.chain(crf)
 infer.tree(crf)
 infer.conditional(crf, clamped, infer.method, ...)
-infer.cutset(crf, cutset)
+infer.cutset(crf, cutset, engine = "default")
 infer.sample(crf, sample.method, ...)
 infer.lbp(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 infer.trbp(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 }
 
 \arguments{
-  \item{crf}{
-%%     ~~Describe \code{crf} here~~
-}
+  \item{crf}{}
+  \item{clamped}{}
+  \item{cutset}{}
+  \item{infer.method}{}
+  \item{sample.method}{}
+  \item{engine}{}
+  \item{max.iter}{}
+  \item{cutoff}{}
+  \item{verbose}{}
+  \item{...}{}
 }
 
 \details{
@@ -70,14 +77,14 @@ infer.trbp(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 \examples{
 library(CRF)
 data(Small)
-infer.exact(small.crf)
-infer.chain(small.crf)
-infer.tree(small.crf)
-infer.conditional(small.crf, c(0,1,0,0), infer.exact)
-infer.cutset(small.crf, c(2))
-infer.sample(small.crf, sample.exact, 10000)
-infer.lbp(small.crf)
-infer.trbp(small.crf)
+i <- infer.exact(small.crf)
+i <- infer.chain(small.crf)
+i <- infer.tree(small.crf)
+i <- infer.conditional(small.crf, c(0,1,0,0), infer.exact)
+i <- infer.cutset(small.crf, c(2))
+i <- infer.sample(small.crf, sample.exact, 10000)
+i <- infer.lbp(small.crf)
+i <- infer.trbp(small.crf)
 }
 
 \keyword{ infer }
