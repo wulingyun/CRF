@@ -111,6 +111,7 @@ public:
 	void TRBP_BetheFreeEnergy(double *mu);
 	void TRBP_Weights(double *mu);
 	void TRBP_ScaleEdgePot(double *mu, double **scaleEdgePot);
+	void TRBP_MinSpanTree(int *tree, double *costs);
 
 	/* Decoding methods */
 	void Decode_Exact();

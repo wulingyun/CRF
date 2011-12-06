@@ -150,7 +150,7 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double **scal
 
 /* Minimum Weight Spanning Tree using Kruskal algorithm */
 
-void MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs)
+void CRF::TRBP_MinSpanTree(int *tree, double *costs)
 {
 	int *index = (int *) R_alloc(nEdges, sizeof(int));
 	for (int i = 0; i < nEdges; i++)
@@ -167,11 +167,11 @@ void MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs)
 	int n = 0, n1, n2;
 	for (int i = 0; i < nEdges; i++)
 	{
-		n1 = edges[index[i]] - 1;
-		n2 = edges[index[i] + nEdges] - 1;
+		n1 = EdgesBegin(index[i]);
+		n2 = EdgesEnd(index[i]);
 		if (label[n1] != label[n2])
 		{
-			for (int j = 0; j < nEdges; j++)
+			for (int j = 0; j < nNodes; j++)
 				if (label[j] == label[n2])
 					label[j] = label[n1];
 			tree[index[i]] = 1;
@@ -198,7 +198,7 @@ void CRF::TRBP_Weights(double *mu)
 		for (int i = 0; i < nEdges; i++)
 			costs[i] = unif_rand();
 
-		MinSpanTree(tree, nNodes, nEdges, edges, costs);
+		TRBP_MinSpanTree(tree, costs);
 
 		for (int i = 0; i < nEdges; i++)
 			if (tree[i])
