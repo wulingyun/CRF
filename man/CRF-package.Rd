@@ -30,6 +30,8 @@ Decoding: Computing the most likely configuration
   \item \code{\link{decode.trbp}}           Approximate decoding using max-product tree-reweighted belief propagtion
   \item \code{\link{decode.greedy}}         Approximate decoding with greedy algorithm
   \item \code{\link{decode.icm}}            Approximate decoding with the iterated conditional modes algorithm
+  \item \code{\link{decode.block}}          Approximate decoding with the block iterated conditional modes algorithm
+  \item \code{\link{decode.ilp}}            Exact decoding with an integer linear programming formulation and approximate using LP relaxation
 }
 
 Inference: Computing the partition function and marginal probabilities
