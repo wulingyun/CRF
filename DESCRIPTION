@@ -5,6 +5,7 @@ Title: CRF - Conditional Random Fields
 Author: Ling-Yun Wu <wulingyun@gmail.com>
 Author@R: c(person("Ling-Yun", "Wu", email = "wulingyun@gmail.com"))
 Maintainer: Ling-Yun Wu <wulingyun@gmail.com>
+Imports: Rglpk (>= 0.3-5)
 Depends: R (>= 2.12.0)
 Description: Library to decode/infer/sample/train Conditional Random Fields
 License: GPL (>= 2)

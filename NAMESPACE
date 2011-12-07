@@ -1,5 +1,4 @@
 useDynLib(CRF)
-import(Rglpk)
 export(make.crf)
 export(clamp.crf)
 export(clamp.reset)
