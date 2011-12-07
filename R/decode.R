@@ -124,6 +124,7 @@ decode.ilp <- function(crf)
 	{
 		obj[vmap.edges[i,1]:vmap.edges[i,2]] <- -log(crf$edge.pot[[i]])
 	}
+	obj[is.infinite(obj)] <- 1000
 
 	cnum.nodes <- crf$n.nodes
 	cnum.edges <- sum(crf$n.states[crf$edges])
@@ -157,6 +158,7 @@ decode.ilp <- function(crf)
 
 	dir <- rep("==", cnum.total)
 	types <- rep("B", vnum.total)
+
 	result <- Rglpk_solve_LP(obj, mat, dir, rhs, types)
 
 	if (result$status != 0)
