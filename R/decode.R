@@ -94,7 +94,7 @@ decode.block <- function(crf, blocks, decode.method = decode.tree, restart = 0, 
 	decode
 }
 
-decode.ilp <- function(crf)
+decode.ilp <- function(crf, lp.rounding = FALSE)
 {
 	vmap.nodes <- matrix(nrow=crf$n.nodes, ncol=2)
 	vmap.edges <- matrix(nrow=crf$n.edges, ncol=2)
@@ -153,13 +153,22 @@ decode.ilp <- function(crf)
 		}
 	}
 
+	dir <- rep("==", cnum.total)
 	rhs <- rep(0, cnum.total)
 	rhs[1:cnum.nodes] <- 1
 
-	dir <- rep("==", cnum.total)
-	types <- rep("B", vnum.total)
+	if (lp.rounding)
+	{
+		types <- rep("C", vnum.total)
+		bounds <- list(upper = list(ind = 1:vnum.total, val = rep(1, vnum.total)))
+	}
+	else
+	{
+		types <- rep("B", vnum.total)
+		bounds <- NULL
+	}
 
-	result <- Rglpk_solve_LP(obj, mat, dir, rhs, types)
+	result <- Rglpk_solve_LP(obj, mat, dir, rhs, types = types, bounds = bounds)
 
 	if (result$status != 0)
 	{
