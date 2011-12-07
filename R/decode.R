@@ -168,7 +168,7 @@ decode.ilp <- function(crf, lp.rounding = FALSE)
 		bounds <- NULL
 	}
 
-	result <- Rglpk_solve_LP(obj, mat, dir, rhs, types = types, bounds = bounds)
+	result <- Rglpk::Rglpk_solve_LP(obj, mat, dir, rhs, types = types, bounds = bounds)
 
 	if (result$status != 0)
 	{
