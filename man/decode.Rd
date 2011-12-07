@@ -12,6 +12,7 @@
 \alias{decode.greedy}
 \alias{decode.icm}
 \alias{decode.block}
+\alias{decode.ilp}
 
 \title{
 Decoding methods
@@ -36,6 +37,7 @@ decode.greedy(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
 decode.icm(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
 decode.block(crf, blocks, decode.method = decode.tree, restart = 0,
              start = apply(crf$node.pot, 1, which.max), ...)
+decode.ilp(crf, lp.rounding = FALSE)
 }
 
 \arguments{
@@ -52,6 +54,7 @@ decode.block(crf, blocks, decode.method = decode.tree, restart = 0,
   \item{verbose}{}
   \item{restart}{}
   \item{blocks}{}
+  \item{lp.rounding}{}
   \item{...}{}
 }
 
@@ -69,6 +72,7 @@ decode.block(crf, blocks, decode.method = decode.tree, restart = 0,
   \item \code{\link{decode.greedy}}         Approximate decoding with greedy algorithm
   \item \code{\link{decode.icm}}            Approximate decoding with the iterated conditional modes algorithm
   \item \code{\link{decode.block}}          Approximate decoding with the block iterated conditional modes algorithm
+  \item \code{\link{decode.ilp}}            Exact decoding with an integer linear programming formulation and approximate using LP relaxation
 }
 }
 
@@ -107,6 +111,7 @@ d <- decode.trbp(small.crf)
 d <- decode.greedy(small.crf)
 d <- decode.icm(small.crf)
 d <- decode.block(small.crf, list(c(1,3), c(2,4)))
+d <- decode.ilp(small.crf)
 }
 
 \keyword{ decode }
