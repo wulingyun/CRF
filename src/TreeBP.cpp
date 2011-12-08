@@ -10,9 +10,9 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 	int **waiting = (int **) R_alloc(nNodes, sizeof(int *));
 	int *nUnsent = (int *) R_alloc(nNodes, sizeof(int));
 	int **unsent = (int **) R_alloc(nNodes, sizeof(int *));
-	int nSenderQueue, senderQueueHead, senderQueueTail;
+	int senderQueueHead, senderQueueTail;
 	int *senderQueue = (int *) R_alloc(nNodes * 2, sizeof(int *));
-	nSenderQueue = senderQueueHead = senderQueueTail = 0;
+	senderQueueHead = senderQueueTail = 0;
 	for (int i = 0; i < nNodes; i++)
 	{
 		nWaiting[i] = nUnsent[i] = nAdj[i];
@@ -21,10 +21,7 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 		for (int j = 0; j < nAdj[i]; j++)
 			waiting[i][j] = unsent[i][j] = 1;
 		if (nAdj[i] == 1)
-		{
-			nSenderQueue++;
 			senderQueue[senderQueueTail++] = i;
-		}
 	}
 
 	int nReceiverQueue;
@@ -34,11 +31,10 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 	int s, r, e, n;
 	double mesg, sumMesg, *p_messages;
 
-	while (nSenderQueue > 0)
+	while (senderQueueHead < senderQueueTail)
 	{
 		R_CheckUserInterrupt();
 
-		nSenderQueue--;
 		s = senderQueue[senderQueueHead++];
 
 		nReceiverQueue = 0;
@@ -72,10 +68,7 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 				}
 
 			if (nUnsent[r] > 0 && nWaiting[r] <= 1)
-			{
-				nSenderQueue++;
 				senderQueue[senderQueueTail++] = r;
-			}
 
 			/* gather incoming messages */
 
