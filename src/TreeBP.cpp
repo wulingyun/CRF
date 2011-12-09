@@ -10,12 +10,12 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 	int *nWaiting = (int *) R_alloc(nNodes, sizeof(int));
 	int **waiting = (int **) R_alloc(nNodes, sizeof(int *));
 	int *sent = (int *) R_alloc(nNodes, sizeof(int));
-	int senderQueueHead, senderQueueTail, nReceiverQueue;
-	int *senderQueue = (int *) R_alloc(nNodes * 2, sizeof(int));
-	int *receiverQueue = (int *) R_alloc(nNodes, sizeof(int));
+	int senderHead, senderTail, nReceiver;
+	int *sender = (int *) R_alloc(nNodes * 2, sizeof(int));
+	int *receiver = (int *) R_alloc(nNodes, sizeof(int));
 	double **incoming = (double **) R_alloc(nNodes, sizeof(double *));
 
-	senderQueueHead = senderQueueTail = nReceiverQueue = 0;
+	senderHead = senderTail = nReceiver = 0;
 	for (int i = 0; i < nNodes; i++)
 	{
 		nWaiting[i] = nAdj[i];
@@ -24,7 +24,7 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 			waiting[i][j] = 1;
 		sent[i] = -1;
 		if (nAdj[i] == 1)
-			senderQueue[senderQueueTail++] = i;
+			sender[senderTail++] = i;
 		incoming[i] = (double *) R_alloc(maxState, sizeof(double));
 		for (int j = 0; j < nStates[i]; j++)
 			incoming[i][j] = NodePot(i, j);
@@ -34,21 +34,21 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 	double mesg, sumMesg, *p_messages;
 	double *outgoing = (double *) R_alloc(maxState, sizeof(double));
 
-	while (senderQueueHead < senderQueueTail)
+	while (senderHead < senderTail)
 	{
 		R_CheckUserInterrupt();
 
-		s = senderQueue[senderQueueHead++];
+		s = sender[senderHead++];
 		if (sent[s] == -2) continue;
 
-		nReceiverQueue = 0;
+		nReceiver = 0;
 		if (nWaiting[s] == 1)
 		{
 			for (int i = 0; i < nAdj[s]; i++)
 			{
 				if (waiting[s][i])
 				{
-					receiverQueue[nReceiverQueue++] = i;
+					receiver[nReceiver++] = i;
 					sent[s] = nAdj[s] == 1 ? -2 : i;
 					break;
 				}
@@ -58,13 +58,13 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 		{
 			for (int i = 0; i < nAdj[s]; i++)
 				if (sent[s] != i)
-					receiverQueue[nReceiverQueue++] = i;
+					receiver[nReceiver++] = i;
 			sent[s] = -2;
 		}
 
-		for (int i = 0; i < nReceiverQueue; i++)
+		for (int i = 0; i < nReceiver; i++)
 		{
-			n = receiverQueue[i];
+			n = receiver[i];
 			r = AdjNodes(s, n);
 
 			for (int j = 0; j < nAdj[r]; j++)
@@ -76,7 +76,7 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 				}
 
 			if (sent[r] != -2 && nWaiting[r] <= 1)
-				senderQueue[senderQueueTail++] = r;
+				sender[senderTail++] = r;
 
 			/* send messages */
 
