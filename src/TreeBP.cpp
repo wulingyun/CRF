@@ -5,13 +5,17 @@
 void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 {
 	for (int i = 0; i < maxState * nEdges; i++)
-		messages_1[i] = messages_2[i] = 0;
+		messages_1[i] = messages_2[i] = 1;
+
 	int *nWaiting = (int *) R_alloc(nNodes, sizeof(int));
 	int **waiting = (int **) R_alloc(nNodes, sizeof(int *));
 	int *sent = (int *) R_alloc(nNodes, sizeof(int));
-	int senderQueueHead, senderQueueTail;
-	int *senderQueue = (int *) R_alloc(nNodes * 2, sizeof(int *));
-	senderQueueHead = senderQueueTail = 0;
+	int senderQueueHead, senderQueueTail, nReceiverQueue;
+	int *senderQueue = (int *) R_alloc(nNodes * 2, sizeof(int));
+	int *receiverQueue = (int *) R_alloc(nNodes, sizeof(int));
+	double **incoming = (double **) R_alloc(nNodes, sizeof(double *));
+
+	senderQueueHead = senderQueueTail = nReceiverQueue = 0;
 	for (int i = 0; i < nNodes; i++)
 	{
 		nWaiting[i] = nAdj[i];
@@ -21,14 +25,14 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 		sent[i] = -1;
 		if (nAdj[i] == 1)
 			senderQueue[senderQueueTail++] = i;
+		incoming[i] = (double *) R_alloc(maxState, sizeof(double));
+		for (int j = 0; j < nStates[i]; j++)
+			incoming[i][j] = NodePot(i, j);
 	}
-
-	int nReceiverQueue;
-	int *receiverQueue = (int *) R_alloc(nNodes, sizeof(int *));
-	double *incoming = (double *) R_alloc(maxState, sizeof(double));
 
 	int s, r, e, n;
 	double mesg, sumMesg, *p_messages;
+	double *outgoing = (double *) R_alloc(maxState, sizeof(double));
 
 	while (senderQueueHead < senderQueueTail)
 	{
@@ -74,31 +78,15 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 			if (sent[r] != -2 && nWaiting[r] <= 1)
 				senderQueue[senderQueueTail++] = r;
 
-			/* gather incoming messages */
-
-			for (int j = 0; j < nStates[s]; j++)
-				incoming[j] = NodePot(s, j);
-			for (int j = 0; j < nAdj[s]; j++)
-			{
-				if (j != n)
-				{
-					e = AdjEdges(s, j);
-					if (EdgesBegin(e) == s)
-						p_messages = messages_1;
-					else
-						p_messages = messages_2;
-					p_messages += maxState * e;
-					for (int k = 0; k < nStates[s]; k++)
-						incoming[k] *= p_messages[k];
-				}
-			}
-
 			/* send messages */
 
 			e = AdjEdges(s, n);
 			sumMesg = 0;
 			if (EdgesBegin(e) == s)
 			{
+				p_messages = messages_1 + maxState * e;
+				for (int j = 0; j < nStates[s]; j++)
+					outgoing[j] = p_messages[j] == 0 ? 0 : incoming[s][j] / p_messages[j];
 				p_messages = messages_2 + maxState * e;
 				for (int j = 0; j < nStates[r]; j++)
 				{
@@ -107,7 +95,7 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 					{
 						for (int k = 0; k < nStates[s]; k++)
 						{
-							mesg = incoming[k] * EdgePot(e, k, j);
+							mesg = outgoing[k] * EdgePot(e, k, j);
 							if (mesg > p_messages[j])
 								p_messages[j] = mesg;
 						}
@@ -115,13 +103,16 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 					else
 					{
 						for (int k = 0; k < nStates[s]; k++)
-							p_messages[j] += incoming[k] * EdgePot(e, k, j);
+							p_messages[j] += outgoing[k] * EdgePot(e, k, j);
 					}
 					sumMesg += p_messages[j];
 				}
 			}
 			else
 			{
+				p_messages = messages_2 + maxState * e;
+				for (int j = 0; j < nStates[s]; j++)
+					outgoing[j] = p_messages[j] == 0 ? 0 : incoming[s][j] / p_messages[j];
 				p_messages = messages_1 + maxState * e;
 				for (int j = 0; j < nStates[r]; j++)
 				{
@@ -130,7 +121,7 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 					{
 						for (int k = 0; k < nStates[s]; k++)
 						{
-							mesg = incoming[k] * EdgePot(e, j, k);
+							mesg = outgoing[k] * EdgePot(e, j, k);
 							if (mesg > p_messages[j])
 								p_messages[j] = mesg;
 						}
@@ -139,14 +130,17 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 					{
 						for (int k = 0; k < nStates[s]; k++)
 						{
-							p_messages[j] += incoming[k] * EdgePot(e, j, k);
+							p_messages[j] += outgoing[k] * EdgePot(e, j, k);
 						}
 					}
 					sumMesg += p_messages[j];
 				}
 			}
 			for (int j = 0; j < nStates[r]; j++)
+			{
 				p_messages[j] /= sumMesg;
+				incoming[r][j] *= p_messages[j];
+			}
 		}
 	}
 }
