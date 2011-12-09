@@ -8,18 +8,17 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 		messages_1[i] = messages_2[i] = 0;
 	int *nWaiting = (int *) R_alloc(nNodes, sizeof(int));
 	int **waiting = (int **) R_alloc(nNodes, sizeof(int *));
-	int *nUnsent = (int *) R_alloc(nNodes, sizeof(int));
-	int **unsent = (int **) R_alloc(nNodes, sizeof(int *));
+	int *sent = (int *) R_alloc(nNodes, sizeof(int));
 	int senderQueueHead, senderQueueTail;
 	int *senderQueue = (int *) R_alloc(nNodes * 2, sizeof(int *));
 	senderQueueHead = senderQueueTail = 0;
 	for (int i = 0; i < nNodes; i++)
 	{
-		nWaiting[i] = nUnsent[i] = nAdj[i];
+		nWaiting[i] = nAdj[i];
 		waiting[i] = (int *) R_alloc(nAdj[i], sizeof(int));
-		unsent[i] = (int *) R_alloc(nAdj[i], sizeof(int));
 		for (int j = 0; j < nAdj[i]; j++)
-			waiting[i][j] = unsent[i][j] = 1;
+			waiting[i][j] = 1;
+		sent[i] = -1;
 		if (nAdj[i] == 1)
 			senderQueue[senderQueueTail++] = i;
 	}
@@ -36,28 +35,33 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 		R_CheckUserInterrupt();
 
 		s = senderQueue[senderQueueHead++];
+		if (sent[s] == -2) continue;
 
 		nReceiverQueue = 0;
 		if (nWaiting[s] == 1)
 		{
 			for (int i = 0; i < nAdj[s]; i++)
-				if (waiting[s][i] && unsent[s][i])
+			{
+				if (waiting[s][i])
+				{
 					receiverQueue[nReceiverQueue++] = i;
+					sent[s] = nAdj[s] == 1 ? -2 : i;
+					break;
+				}
+			}
 		}
 		else
 		{
 			for (int i = 0; i < nAdj[s]; i++)
-				if (unsent[s][i])
+				if (sent[s] != i)
 					receiverQueue[nReceiverQueue++] = i;
+			sent[s] = -2;
 		}
 
 		for (int i = 0; i < nReceiverQueue; i++)
 		{
 			n = receiverQueue[i];
 			r = AdjNodes(s, n);
-
-			unsent[s][n] = 0;
-			nUnsent[s]--;
 
 			for (int j = 0; j < nAdj[r]; j++)
 				if (AdjNodes(r, j) == s)
@@ -67,7 +71,7 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 					break;
 				}
 
-			if (nUnsent[r] > 0 && nWaiting[r] <= 1)
+			if (sent[r] != -2 && nWaiting[r] <= 1)
 				senderQueue[senderQueueTail++] = r;
 
 			/* gather incoming messages */
