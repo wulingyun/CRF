@@ -27,6 +27,7 @@ CRF::CRF()
 
 	maxNodePot = NULL;
 	maxEdgePot = NULL;
+	messages = NULL;
 
 	numProtect = 0;
 }

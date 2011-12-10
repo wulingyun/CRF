@@ -1,26 +1,30 @@
 #include "CRF.h"
 
+/* BP messages init */
+
+void CRF::MessagesInit()
+{
+	int dim[] = {2, nEdges, maxState};
+	messages = (double ***) allocArray<double, 3>(dim);
+}
+
 /* Node beliefs */
 
-void CRF::Message2NodeBelief(double *messages_1, double *messages_2)
+void CRF::Messages2NodeBel()
 {
 	for (int i = 0; i < length(_nodePot); i++)
 		nodeBel[i] = nodePot[i];
 
 	int n1, n2;
 	double sumBel;
-	double *p1_messages = messages_1;
-	double *p2_messages = messages_2;
 	for (int i = 0; i < nEdges; i++)
 	{
 		n1 = EdgesBegin(i);
 		n2 = EdgesEnd(i);
 		for (int j = 0; j < nStates[n1]; j++)
-			NodeBel(n1, j) *= p1_messages[j];
+			NodeBel(n1, j) *= messages[0][i][j];
 		for (int j = 0; j < nStates[n2]; j++)
-			NodeBel(n2, j) *= p2_messages[j];
-		p1_messages += maxState;
-		p2_messages += maxState;
+			NodeBel(n2, j) *= messages[1][i][j];
 	}
 
 	for (int i = 0; i < nNodes; i++)
@@ -35,7 +39,7 @@ void CRF::Message2NodeBelief(double *messages_1, double *messages_2)
 
 /* Edge beliefs */
 
-void CRF::Message2EdgeBelief(double *messages_1, double *messages_2)
+void CRF::Messages2EdgeBel()
 {
 	for (int i = 0; i < nEdges; i++)
 	{
@@ -45,21 +49,19 @@ void CRF::Message2EdgeBelief(double *messages_1, double *messages_2)
 
 	int n1, n2;
 	double bel, sumBel;
-	double *p1_messages = messages_1;
-	double *p2_messages = messages_2;
 	for (int i = 0; i < nEdges; i++)
 	{
 		n1 = EdgesBegin(i);
 		n2 = EdgesEnd(i);
 		for (int j = 0; j < nStates[n1]; j++)
 		{
-			bel = p1_messages[j] == 0 ? 0 : NodeBel(n1, j) / p1_messages[j];
+			bel = messages[0][i][j] == 0 ? 0 : NodeBel(n1, j) / messages[0][i][j];
 			for (int k = 0; k < nStates[n2]; k++)
 				EdgeBel(i, j, k) *= bel;
 		}
 		for (int j = 0; j < nStates[n2]; j++)
 		{
-			bel = p2_messages[j] == 0 ? 0 : NodeBel(n2, j) / p2_messages[j];
+			bel = messages[1][i][j] == 0 ? 0 : NodeBel(n2, j) / messages[1][i][j];
 			for (int k = 0; k < nStates[n1]; k++)
 				EdgeBel(i, k, j) *= bel;
 		}
@@ -75,9 +77,6 @@ void CRF::Message2EdgeBelief(double *messages_1, double *messages_2)
 			for (int k = 0; k < nStates[n1]; k++)
 				EdgeBel(i, k, j) /= sumBel;
 		}
-
-		p1_messages += maxState;
-		p2_messages += maxState;
 	}
 }
 
