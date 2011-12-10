@@ -15,10 +15,9 @@ SEXP Infer_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose)
 
 void CRF::Infer_LBP(int maxIter, double cutoff, int verbose)
 {
-	double *messages_1 = (double *) R_alloc(maxState * nEdges, sizeof(double)); // Messages from n2 to n1 at edge (n1, n2)
-	double *messages_2 = (double *) R_alloc(maxState * nEdges, sizeof(double)); // Messages from n1 to n2 at edge (n1, n2)
-	LoopyBP(messages_1, messages_2, maxIter, cutoff, verbose);
-	Message2NodeBelief(messages_1, messages_2);
-	Message2EdgeBelief(messages_1, messages_2);
+	MessagesInit();
+	LoopyBP(maxIter, cutoff, verbose);
+	Messages2NodeBel();
+	Messages2EdgeBel();
 	BetheFreeEnergy();
 }

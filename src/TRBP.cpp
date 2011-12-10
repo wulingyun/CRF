@@ -3,32 +3,35 @@
 
 /* Tree-Reweighted BP */
 
-void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double **scaleEdgePot, int maxIter, double cutoff, int verbose, bool maximize)
+void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, int verbose, bool maximize)
 {
 	double **originalEdgePot = edgePot;
 	edgePot = scaleEdgePot;
 
-	double *old_messages_1 = (double *) R_alloc(maxState * nEdges, sizeof(double));
-	double *old_messages_2 = (double *) R_alloc(maxState * nEdges, sizeof(double));
-	for (int i = 0; i < maxState * nEdges; i++)
-		old_messages_1[i] = old_messages_2[i] = 0;
+	int dim[] = {2, nEdges, maxState};
+	double ***old_messages = (double ***) allocArray<double, 3>(dim);
+
+	for (int i = 0; i < nEdges; i++)
+		for (int j = 0; j < maxState; j++)
+		{
+			messages[0][i][j] = old_messages[0][i][j] = 0;
+			messages[1][i][j] = old_messages[1][i][j] = 0;
+		}
 
 	double *incoming = (double *) R_alloc(maxState, sizeof(double));
 	double *outgoing = (double *) R_alloc(maxState, sizeof(double));
 
 	int s, r, e, n;
-	double mesg, sumMesg, *p_messages;
+	double m, *msg, sumMsg;
 
 	for (int i = 0; i < nEdges; i++)
 	{
-		p_messages = messages_1 + maxState * i;
 		n = EdgesBegin(i);
 		for (int j = 0; j < nStates[n]; j++)
-			p_messages[j] = 1.0 / nStates[n];
-		p_messages = messages_2 + maxState * i;
+			messages[0][i][j] = 1.0 / nStates[n];
 		n = EdgesEnd(i);
 		for (int j = 0; j < nStates[n]; j++)
-			p_messages[j] = 1.0 / nStates[n];
+			messages[1][i][j] = 1.0 / nStates[n];
 	}
 
 	double difference = 0;
@@ -36,12 +39,7 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double **scal
 	{
 		R_CheckUserInterrupt();
 
-		p_messages = old_messages_1;
-		old_messages_1 = messages_1;
-		messages_1 = p_messages;
-		p_messages = old_messages_2;
-		old_messages_2 = messages_2;
-		messages_2 = p_messages;
+		swap(old_messages, messages);
 
 		for (s = 0; s < nNodes; s++)
 		{
@@ -53,12 +51,11 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double **scal
 			{
 				e = AdjEdges(s, i);
 				if (EdgesBegin(e) == s)
-					p_messages = old_messages_1;
+					msg = old_messages[0][e];
 				else
-					p_messages = old_messages_2;
-				p_messages += maxState * e;
+					msg = old_messages[1][e];
 				for (int k = 0; k < nStates[s]; k++)
-					incoming[k] *= R_pow(p_messages[k], mu[e]);
+					incoming[k] *= R_pow(msg[k], mu[e]);
 			}
 
 			/* send messages */
@@ -69,73 +66,73 @@ void CRF::TRBP(double *messages_1, double *messages_2, double *mu, double **scal
 				e = AdjEdges(s, i);
 
 				if (EdgesBegin(e) == s)
-					p_messages = old_messages_1;
+					msg = old_messages[0][e];
 				else
-					p_messages = old_messages_2;
-				p_messages += maxState * e;
+					msg = old_messages[1][e];
 				for (int k = 0; k < nStates[s]; k++)
-					outgoing[k] = p_messages[k] == 0 ? 0 : incoming[k] / p_messages[k];
+					outgoing[k] = msg[k] == 0 ? 0 : incoming[k] / msg[k];
 
-				sumMesg = 0;
+				sumMsg = 0;
 				if (EdgesBegin(e) == s)
 				{
-					p_messages = messages_2 + maxState * e;
+					msg = messages[1][e];
 					for (int j = 0; j < nStates[r]; j++)
 					{
-						p_messages[j] = 0;
+						msg[j] = 0;
 						if (maximize)
 						{
 							for (int k = 0; k < nStates[s]; k++)
 							{
-								mesg = outgoing[k] * EdgePot(e, k, j);
-								if (mesg > p_messages[j])
-									p_messages[j] = mesg;
+								m = outgoing[k] * EdgePot(e, k, j);
+								if (m > msg[j])
+									msg[j] = m;
 							}
 						}
 						else
 						{
 							for (int k = 0; k < nStates[s]; k++)
-								p_messages[j] += outgoing[k] * EdgePot(e, k, j);
+								msg[j] += outgoing[k] * EdgePot(e, k, j);
 						}
-						sumMesg += p_messages[j];
+						sumMsg += msg[j];
 					}
 				}
 				else
 				{
-					p_messages = messages_1 + maxState * e;
+					msg = messages[0][e];
 					for (int j = 0; j < nStates[r]; j++)
 					{
-						p_messages[j] = 0;
+						msg[j] = 0;
 						if (maximize)
 						{
 							for (int k = 0; k < nStates[s]; k++)
 							{
-								mesg = outgoing[k] * EdgePot(e, j, k);
-								if (mesg > p_messages[j])
-									p_messages[j] = mesg;
+								m = outgoing[k] * EdgePot(e, j, k);
+								if (m > msg[j])
+									msg[j] = m;
 							}
 						}
 						else
 						{
 							for (int k = 0; k < nStates[s]; k++)
 							{
-								p_messages[j] += outgoing[k] * EdgePot(e, j, k);
+								msg[j] += outgoing[k] * EdgePot(e, j, k);
 							}
 						}
-						sumMesg += p_messages[j];
+						sumMsg += msg[j];
 					}
 				}
 				for (int j = 0; j < nStates[r]; j++)
-					p_messages[j] /= sumMesg;
+					msg[j] /= sumMsg;
 			}
 		}
 
 		difference = 0;
-		for (int i = 0; i < maxState * nEdges; i++)
-		{
-			difference += fabs(messages_1[i] - old_messages_1[i]);
-			difference += fabs(messages_2[i] - old_messages_2[i]);
-		}
+		for (int i = 0; i < nEdges; i++)
+			for (int j = 0; j < maxState; j++)
+			{
+				difference += fabs(messages[0][i][j] - old_messages[0][i][j]);
+				difference += fabs(messages[1][i][j] - old_messages[1][i][j]);
+			}
 		if (verbose)
 			Rprintf("TRBP: Iteration %d, Difference = %f\n", iter, difference);
 		if (difference <= cutoff)
@@ -221,25 +218,21 @@ void CRF::TRBP_Weights(double *mu)
 
 /* Node beliefs */
 
-void CRF::TRBP_Message2NodeBelief(double *messages_1, double *messages_2, double *mu)
+void CRF::TRBP_Messages2NodeBel(double *mu)
 {
 	for (int i = 0; i < length(_nodePot); i++)
 		nodeBel[i] = nodePot[i];
 
 	int n1, n2;
 	double sumBel;
-	double *p1_messages = messages_1;
-	double *p2_messages = messages_2;
 	for (int i = 0; i < nEdges; i++)
 	{
 		n1 = EdgesBegin(i);
 		n2 = EdgesEnd(i);
 		for (int j = 0; j < nStates[n1]; j++)
-			NodeBel(n1, j) *= R_pow(p1_messages[j], mu[i]);
+			NodeBel(n1, j) *= R_pow(messages[0][i][j], mu[i]);
 		for (int j = 0; j < nStates[n2]; j++)
-			NodeBel(n2, j) *= R_pow(p2_messages[j], mu[i]);
-		p1_messages += maxState;
-		p2_messages += maxState;
+			NodeBel(n2, j) *= R_pow(messages[1][i][j], mu[i]);
 	}
 
 	for (int i = 0; i < nNodes; i++)
@@ -254,7 +247,7 @@ void CRF::TRBP_Message2NodeBelief(double *messages_1, double *messages_2, double
 
 /* Edge beliefs */
 
-void CRF::TRBP_Message2EdgeBelief(double *messages_1, double *messages_2, double *mu, double **scaleEdgePot)
+void CRF::TRBP_Messages2EdgeBel(double *mu, double **scaleEdgePot)
 {
 	for (int i=0; i < nEdges; i++)
 	{
@@ -264,21 +257,19 @@ void CRF::TRBP_Message2EdgeBelief(double *messages_1, double *messages_2, double
 
 	int n1, n2;
 	double bel, sumBel;
-	double *p1_messages = messages_1;
-	double *p2_messages = messages_2;
 	for (int i = 0; i < nEdges; i++)
 	{
 		n1 = EdgesBegin(i);
 		n2 = EdgesEnd(i);
 		for (int j = 0; j < nStates[n1]; j++)
 		{
-			bel = p1_messages[j] == 0 ? 0 : NodeBel(n1, j) / p1_messages[j];
+			bel = messages[0][i][j] == 0 ? 0 : NodeBel(n1, j) / messages[0][i][j];
 			for (int k = 0; k < nStates[n2]; k++)
 				EdgeBel(i, j, k) *= bel;
 		}
 		for (int j = 0; j < nStates[n2]; j++)
 		{
-			bel = p2_messages[j] == 0 ? 0 : NodeBel(n2, j) / p2_messages[j];
+			bel = messages[1][i][j] == 0 ? 0 : NodeBel(n2, j) / messages[1][i][j];
 			for (int k = 0; k < nStates[n1]; k++)
 				EdgeBel(i, k, j) *= bel;
 		}
@@ -294,9 +285,6 @@ void CRF::TRBP_Message2EdgeBelief(double *messages_1, double *messages_2, double
 			for (int k = 0; k < nStates[n1]; k++)
 				EdgeBel(i, k, j) /= sumBel;
 		}
-
-		p1_messages += maxState;
-		p2_messages += maxState;
 	}
 }
 

@@ -2,36 +2,42 @@
 
 /* Tree BP */
 
-void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
+void CRF::TreeBP(bool maximize)
 {
-	for (int i = 0; i < maxState * nEdges; i++)
-		messages_1[i] = messages_2[i] = 1;
+	for (int i = 0; i < nEdges; i++)
+		for (int j = 0; j < maxState; j++)
+		{
+			messages[0][i][j] = messages[1][i][j] = 1;
+		}
 
 	int *nWaiting = (int *) R_alloc(nNodes, sizeof(int));
-	int **waiting = (int **) R_alloc(nNodes, sizeof(int *));
+	int dim_waiting[] = {nNodes, 1};
+	for (int i = 0; i < nNodes; i++)
+		if (nAdj[i] > dim_waiting[1])
+			dim_waiting[1] = nAdj[i];
+	int **waiting = (int **) allocArray<int, 2>(dim_waiting);
 	int *sent = (int *) R_alloc(nNodes, sizeof(int));
 	int senderHead, senderTail, nReceiver;
 	int *sender = (int *) R_alloc(nNodes * 2, sizeof(int));
 	int *receiver = (int *) R_alloc(nNodes, sizeof(int));
-	double **incoming = (double **) R_alloc(nNodes, sizeof(double *));
+	int dim_incoming[] = {nNodes, maxState};
+	double **incoming = (double **) allocArray<double, 2>(dim_incoming);
 
 	senderHead = senderTail = nReceiver = 0;
 	for (int i = 0; i < nNodes; i++)
 	{
 		nWaiting[i] = nAdj[i];
-		waiting[i] = (int *) R_alloc(nAdj[i], sizeof(int));
 		for (int j = 0; j < nAdj[i]; j++)
 			waiting[i][j] = 1;
 		sent[i] = -1;
 		if (nAdj[i] == 1)
 			sender[senderTail++] = i;
-		incoming[i] = (double *) R_alloc(maxState, sizeof(double));
 		for (int j = 0; j < nStates[i]; j++)
 			incoming[i][j] = NodePot(i, j);
 	}
 
 	int s, r, e, n;
-	double mesg, sumMesg, *p_messages;
+	double m, *msg, sumMsg;
 	double *outgoing = (double *) R_alloc(maxState, sizeof(double));
 
 	while (senderHead < senderTail)
@@ -81,65 +87,63 @@ void CRF::TreeBP(double *messages_1, double *messages_2, bool maximize)
 			/* send messages */
 
 			e = AdjEdges(s, n);
-			sumMesg = 0;
+			sumMsg = 0;
 			if (EdgesBegin(e) == s)
 			{
-				p_messages = messages_1 + maxState * e;
 				for (int j = 0; j < nStates[s]; j++)
-					outgoing[j] = p_messages[j] == 0 ? 0 : incoming[s][j] / p_messages[j];
-				p_messages = messages_2 + maxState * e;
+					outgoing[j] = messages[0][e][j] == 0 ? 0 : incoming[s][j] / messages[0][e][j];
+				msg = messages[1][e];
 				for (int j = 0; j < nStates[r]; j++)
 				{
-					p_messages[j] = 0;
+					msg[j] = 0;
 					if (maximize)
 					{
 						for (int k = 0; k < nStates[s]; k++)
 						{
-							mesg = outgoing[k] * EdgePot(e, k, j);
-							if (mesg > p_messages[j])
-								p_messages[j] = mesg;
+							m = outgoing[k] * EdgePot(e, k, j);
+							if (m > msg[j])
+								msg[j] = m;
 						}
 					}
 					else
 					{
 						for (int k = 0; k < nStates[s]; k++)
-							p_messages[j] += outgoing[k] * EdgePot(e, k, j);
+							msg[j] += outgoing[k] * EdgePot(e, k, j);
 					}
-					sumMesg += p_messages[j];
+					sumMsg += msg[j];
 				}
 			}
 			else
 			{
-				p_messages = messages_2 + maxState * e;
 				for (int j = 0; j < nStates[s]; j++)
-					outgoing[j] = p_messages[j] == 0 ? 0 : incoming[s][j] / p_messages[j];
-				p_messages = messages_1 + maxState * e;
+					outgoing[j] = messages[1][e][j] == 0 ? 0 : incoming[s][j] / messages[1][e][j];
+				msg = messages[0][e];
 				for (int j = 0; j < nStates[r]; j++)
 				{
-					p_messages[j] = 0;
+					msg[j] = 0;
 					if (maximize)
 					{
 						for (int k = 0; k < nStates[s]; k++)
 						{
-							mesg = outgoing[k] * EdgePot(e, j, k);
-							if (mesg > p_messages[j])
-								p_messages[j] = mesg;
+							m = outgoing[k] * EdgePot(e, j, k);
+							if (m > msg[j])
+								msg[j] = m;
 						}
 					}
 					else
 					{
 						for (int k = 0; k < nStates[s]; k++)
 						{
-							p_messages[j] += outgoing[k] * EdgePot(e, j, k);
+							msg[j] += outgoing[k] * EdgePot(e, j, k);
 						}
 					}
-					sumMesg += p_messages[j];
+					sumMsg += msg[j];
 				}
 			}
 			for (int j = 0; j < nStates[r]; j++)
 			{
-				p_messages[j] /= sumMesg;
-				incoming[r][j] *= p_messages[j];
+				msg[j] /= sumMsg;
+				incoming[r][j] *= msg[j];
 			}
 		}
 	}
