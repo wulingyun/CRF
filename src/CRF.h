@@ -48,7 +48,8 @@ public:
 	int *nAdj, **adjNodes, **adjEdges;
 
 	SEXP _nodePot, _edgePot;
-	double *nodePot, **edgePot, *nEdgeStates;
+	double *nodePot, **edgePot;
+	int *nEdgeStates;
 
 	SEXP _labels;
 	int *labels;
@@ -266,6 +267,24 @@ void **allocArray(int dim[n])
 			array[j] = (void *) sub;
 			sub += dim[i];
 		}
+	}
+	return array;
+};
+
+template <class T>
+T **allocArray2(int dim1, int *dim2)
+{
+	T *block, **array;
+	int array_size;
+	array_size = 0;
+	for (int i = 0; i < dim1; i++)
+		array_size += dim2[i];
+	block = (T *) R_alloc(array_size, sizeof(T));
+	array = (T **) R_alloc(dim1, sizeof(T *));
+	for (int i = 0; i < dim1; i++)
+	{
+		array[i] = block;
+		block += dim2[i];
 	}
 	return array;
 };
