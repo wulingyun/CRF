@@ -74,7 +74,7 @@ void CRF::Set_Data(SEXP _crf)
 	PROTECT(_edgePot = AS_LIST(getListElement(_crf, "edge.pot")));
 	nodePot = NUMERIC_POINTER(_nodePot);
 	edgePot = (double **) R_alloc(nEdges, sizeof(double *));
-	nEdgeStates = (double *) R_alloc(nEdges, sizeof(double));
+	nEdgeStates = (int *) R_alloc(nEdges, sizeof(int));
 	for (int i = 0; i < nEdges; i++)
 	{
 		PROTECT(_temp = AS_NUMERIC(VECTOR_ELT(_edgePot, i)));

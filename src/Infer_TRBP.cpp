@@ -16,11 +16,8 @@ SEXP Infer_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose)
 void CRF::Infer_TRBP(int maxIter, double cutoff, int verbose)
 {
 	double *mu = (double *) R_alloc(nEdges, sizeof(double));
-	double **scaleEdgePot = (double **) R_alloc(nEdges, sizeof(double *));
-	for (int i = 0; i < nEdges; i++)
-	{
-		scaleEdgePot[i] = (double *) R_alloc(nEdgeStates[i], sizeof(double));
-	}
+	double **scaleEdgePot = (double **) allocArray2<double>(nEdges, nEdgeStates);
+
 	TRBP_Weights(mu);
 	TRBP_ScaleEdgePot(mu, scaleEdgePot);
 	MessagesInit();
