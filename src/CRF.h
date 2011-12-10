@@ -243,30 +243,27 @@ void swap(T &a, T &b)
 template <class T, int n>
 void **allocArray(int dim[n])
 {
-	T *block;
-	int array_size;
-	void **array, **sub;
-	array_size = 1;
-	for (int i = 0; i < n; i++)
-		array_size *= dim[i];
-	block = (T *) R_alloc(array_size, sizeof(T));
-	array_size /= dim[n-1];
-	array = (void **) R_alloc(array_size, sizeof(void *));
-	for (int i = 0; i < array_size; i++)
+	int size1, size2;
+	void **array, **sub1, **sub2, **tmp;
+	size1 = dim[0];
+	array = sub1 = (void **) R_alloc(size1, sizeof(void *));
+	for (int i = 1; i < n-1; i++)
 	{
-		array[i] = block;
-		block += dim[n-1];
-	}
-	for (int i = n-2; i > 0; i--)
-	{
-		sub = array;
-		array_size /= dim[i];
-		array = (void **) R_alloc(array_size, sizeof(void *));
-		for (int j = 0; j < array_size; j++)
+		size2 = size1 * dim[i];
+		tmp = sub2 = (void **) R_alloc(size2, sizeof(void *));
+		for (int j = 0; j < size1; j++)
 		{
-			array[j] = (void *) sub;
-			sub += dim[i];
+			sub1[j] = (void *) tmp;
+			tmp += dim[i];
 		}
+		size1 = size2;
+		sub1 = sub2;
+	}
+	T *block = (T *) R_alloc(size1 * dim[n-1], sizeof(T));
+	for (int i = 0; i < size1; i++)
+	{
+		sub1[i] = block;
+		block += dim[n-1];
 	}
 	return array;
 };
