@@ -14,6 +14,7 @@ extern "C" {
 	SEXP Decode_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Decode_Greedy(SEXP _crf, SEXP _restart, SEXP _start);
 	SEXP Decode_ICM(SEXP _crf, SEXP _restart, SEXP _start);
+	SEXP Decode_Junction(SEXP _crf);
 
 	/* Inference */
 	SEXP Infer_Exact(SEXP _crf);
@@ -116,6 +117,9 @@ public:
 	void TRBP_ScaleEdgePot(double *mu, double **scaleEdgePot);
 	void TRBP_MinSpanTree(int *tree, double *costs);
 
+	/* Junction tree functions */
+	void JunctionTreeInit();
+
 	/* Decoding methods */
 	void Decode_Exact();
 	void Decode_Chain();
@@ -125,6 +129,7 @@ public:
 	void Decode_TRBP(int maxIter, double cutoff, int verbose);
 	void Decode_Greedy(int restart = 0, int *start = 0);
 	void Decode_ICM(int restart = 0, int *start = 0);
+	void Decode_Junction();
 
 	/* Inference methods */
 	void Infer_Exact();
