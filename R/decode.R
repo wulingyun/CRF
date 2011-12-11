@@ -182,3 +182,6 @@ decode.ilp <- function(crf, lp.rounding = FALSE)
 	}
 	apply(node.bel, 1, which.max)
 }
+
+decode.junction <- function(crf)
+	.Call("Decode_Junction", crf);
