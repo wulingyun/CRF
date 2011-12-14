@@ -33,60 +33,107 @@ void CRF::JunctionTreeInit()
 		neighbors[n2][nNeighbors[n2]++] = n1;
 	}
 
+	int *nMissingEdges = (int *) R_alloc(nNodes, sizeof(int));
+	for (int i = 0; i < nNodes; i++)
+	{
+		nMissingEdges[i] = 0;
+		for (int k1 = 0; k1 < nNeighbors[i]-1; k1++)
+		{
+			n1 = neighbors[i][k1];
+			for (int k2 = k1+1; k2 < nNeighbors[i]; k2++)
+			{
+				n2 = neighbors[i][k2];
+				if (adj[n1][n2] == 0)
+				{
+					nMissingEdges[i]++;
+				}
+			}
+		}
+	}
+
 	int n, m;
+	int treeWidth = 0;
 	while (1)
 	{
 		n = -1;
-		m = nNodes;
+		m = nNodes * nNodes;
 		for (int i = 0; i < nNodes; i++)
 		{
-			if (nNeighbors[i] > 0 && nNeighbors[i] < m)
+			if (nNeighbors[i] > 0 && nMissingEdges[i] < m)
 			{
 				n = i;
-				m = nNeighbors[i];
+				m = nMissingEdges[i];
 			}
 		}
 		if (n < 0)
 			break;
 
-		for (int i = 0; i < m; i++)
+
+		for (int j1 = 0; j1 < nNeighbors[n]-1; j1++)
 		{
-			n1 = neighbors[n][i];
-			for (int j = i+1; j < m; j++)
+			n1 = neighbors[n][j1];
+			for (int j2 = j1+1; j2 < nNeighbors[n]; j2++)
 			{
-				n2 = neighbors[n][j];
+				n2 = neighbors[n][j2];
 				if (adj[n1][n2] == 0)
 				{
-					adj[n1][n2] = adj[n2][n1] = 1;
+					m = 0;
+					for (int k1 = 0; k1 < nNeighbors[n1]; k1++)
+					{
+						for (int k2 = 0; k2 < nNeighbors[n2]; k2++)
+						{
+							if (neighbors[n1][k1] == neighbors[n2][k2])
+							{
+								m++;
+								nMissingEdges[neighbors[n1][k1]]--;
+								break;
+							}
+						}
+					}
+					nMissingEdges[n1] += nNeighbors[n1]-m;
+					nMissingEdges[n2] += nNeighbors[n2]-m;
 					neighbors[n1][nNeighbors[n1]++] = n2;
 					neighbors[n2][nNeighbors[n2]++] = n1;
+					adj[n1][n2] = adj[n2][n1] = 1;
 				}
 			}
-			for (int j = 0; j < nNeighbors[n1]; j++)
+		}
+		for (int j1 = 0; j1 < nNeighbors[n]; j1++)
+		{
+			n1 = neighbors[n][j1];
+			clusters[nClusters][j1] = n1;
+			m = 0;
+			for (int k1 = 0; k1 < nNeighbors[n1]; k1++)
 			{
-				if (neighbors[n1][j] == n)
+				for (int k = 0; k < nNeighbors[n]; k++)
 				{
-					for (int k = j; k < nNeighbors[n1]-1; k++)
+					if (neighbors[n1][k1] == neighbors[n][k])
 					{
-						neighbors[n1][k] = neighbors[n1][k+1];
+						m++;
+						break;
 					}
+				}
+			}
+			nMissingEdges[n1] -= nNeighbors[n1]-1-m;
+			for (int k1 = 0; k1 < nNeighbors[n1]; k1++)
+			{
+				if (neighbors[n1][k1] == n)
+				{
+					for (int j = k1; j < nNeighbors[n1]-1; j++)
+						neighbors[n1][j] = neighbors[n1][j+1];
 					nNeighbors[n1]--;
 					break;
 				}
 			}
-			adj[n1][n] = adj[n][n1] = 0;
-			clusters[nClusters][i] = neighbors[n][i];
 		}
+		clusters[nClusters][nNeighbors[n]] = n;
+		clusterSize[nClusters++] = nNeighbors[n]+1;
 		nNeighbors[n] = 0;
-		clusters[nClusters][m] = n;
-		clusterSize[nClusters++] = m+1;
-	}
-	int treeWidth = 0;
-	for (int i = 0; i < nClusters; i++)
-	{
-		if (clusterSize[i] > treeWidth)
-			treeWidth = clusterSize[i];
+
+		if (clusterSize[nClusters-1] > treeWidth)
+			treeWidth = clusterSize[nClusters-1];
+		//Rprintf("%d, %d\n", nClusters, treeWidth);
 	}
 	treeWidth--;
-	Rprintf("%d, %d\n", nClusters, treeWidth);
+	Rprintf("%d\n", treeWidth);
 }
