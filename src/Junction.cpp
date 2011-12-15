@@ -156,9 +156,25 @@ void CRF::JunctionTreeInit()
 		nMissingEdges[n] = -1;
 		nNeighbors[n] = 0;
 		Insert(clusters[nClusters], clusterSize[nClusters], n);
-		if (clusterSize[nClusters] > treeWidth)
+		if (treeWidth < clusterSize[nClusters])
 			treeWidth = clusterSize[nClusters];
-		nClusters++;
+		else if (treeWidth > clusterSize[nClusters])
+		{
+			for (int i = 0; i < nClusters; i++)
+			{
+				if (clusterSize[i] > clusterSize[nClusters] && clusters[i][0] <= clusters[nClusters][0] && clusters[i][clusterSize[i]-1] >= clusters[nClusters][clusterSize[nClusters]-1])
+				{
+					m = Intersection(overlap, clusters[i], clusterSize[i], clusters[nClusters], clusterSize[nClusters]);
+					if (m == clusterSize[nClusters])
+					{
+						clusterSize[nClusters] = 0;
+						break;
+					}
+				}
+			}
+		}
+		if (clusterSize[nClusters] > 0)
+			nClusters++;
 	}
 	treeWidth--;
 	Rprintf("%d, %d\n", nClusters, treeWidth);
