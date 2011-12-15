@@ -1,5 +1,62 @@
 #include "CRF.h"
 
+/* Get intersection of two ascending ordered vectors */
+
+int Intersection(int *overlap, int *vector1, int size1, int *vector2, int size2)
+{
+	int n, i1, i2;
+	n = i1 = i2 = 0;
+	while (i1 < size1 && i2 < size2)
+	{
+		if (vector1[i1] == vector2[i2])
+		{
+			overlap[n++] = vector1[i1++];
+			i2++;
+		}
+		else if (vector1[i1] < vector2[i2])
+			i1++;
+		else
+			i2++;
+	}
+	return n;
+}
+
+/* Insert element to ascending ordered vector */
+
+void Insert(int *vector, int &size, int v)
+{
+	int k = size;
+	for (int i = 0; i < size; i++)
+	{
+		if (vector[i] > v)
+		{
+			for (int j = size; j > i; j--)
+				vector[j] = vector[j-1];
+			k = i;
+			break;
+		}
+	}
+	vector[k] = v;
+	size++;
+}
+
+/* Remove element from ascending ordered vector */
+
+void Remove(int *vector, int &size, int v)
+{
+
+	for (int i = 0; i < size; i++)
+	{
+		if (vector[i] == v)
+		{
+			for (int j = i; j < size-1; j++)
+				vector[j] = vector[j+1];
+			size--;
+			break;
+		}
+	}
+}
+
 /* Junction tree init */
 
 void CRF::JunctionTreeInit()
@@ -28,9 +85,9 @@ void CRF::JunctionTreeInit()
 	{
 		n1 = EdgesBegin(i);
 		n2 = EdgesEnd(i);
+		Insert(neighbors[n1], nNeighbors[n1], n2);
+		Insert(neighbors[n2], nNeighbors[n2], n1);
 		adj[n1][n2] = adj[n2][n1] = 1;
-		neighbors[n1][nNeighbors[n1]++] = n2;
-		neighbors[n2][nNeighbors[n2]++] = n1;
 	}
 
 	int *nMissingEdges = (int *) R_alloc(nNodes, sizeof(int));
@@ -51,15 +108,16 @@ void CRF::JunctionTreeInit()
 		}
 	}
 
-	int n, m;
+	int n, m, maxMissingEdges = nNodes * nNodes;
 	int treeWidth = 0;
+	int *overlap = (int *) R_alloc(nNodes, sizeof(int));
 	while (1)
 	{
 		n = -1;
-		m = nNodes * nNodes;
+		m = maxMissingEdges;
 		for (int i = 0; i < nNodes; i++)
 		{
-			if (nNeighbors[i] > 0 && nMissingEdges[i] < m)
+			if (nMissingEdges[i] >= 0 && nMissingEdges[i] < m)
 			{
 				n = i;
 				m = nMissingEdges[i];
@@ -67,7 +125,6 @@ void CRF::JunctionTreeInit()
 		}
 		if (n < 0)
 			break;
-
 
 		for (int j1 = 0; j1 < nNeighbors[n]-1; j1++)
 		{
@@ -77,23 +134,13 @@ void CRF::JunctionTreeInit()
 				n2 = neighbors[n][j2];
 				if (adj[n1][n2] == 0)
 				{
-					m = 0;
-					for (int k1 = 0; k1 < nNeighbors[n1]; k1++)
-					{
-						for (int k2 = 0; k2 < nNeighbors[n2]; k2++)
-						{
-							if (neighbors[n1][k1] == neighbors[n2][k2])
-							{
-								m++;
-								nMissingEdges[neighbors[n1][k1]]--;
-								break;
-							}
-						}
-					}
+					m = Intersection(overlap, neighbors[n1], nNeighbors[n1], neighbors[n2], nNeighbors[n2]);
+					for (int k = 0; k < m; k++)
+						nMissingEdges[overlap[k]]--;
 					nMissingEdges[n1] += nNeighbors[n1]-m;
 					nMissingEdges[n2] += nNeighbors[n2]-m;
-					neighbors[n1][nNeighbors[n1]++] = n2;
-					neighbors[n2][nNeighbors[n2]++] = n1;
+					Insert(neighbors[n1], nNeighbors[n1], n2);
+					Insert(neighbors[n2], nNeighbors[n2], n1);
 					adj[n1][n2] = adj[n2][n1] = 1;
 				}
 			}
@@ -101,39 +148,18 @@ void CRF::JunctionTreeInit()
 		for (int j1 = 0; j1 < nNeighbors[n]; j1++)
 		{
 			n1 = neighbors[n][j1];
-			clusters[nClusters][j1] = n1;
-			m = 0;
-			for (int k1 = 0; k1 < nNeighbors[n1]; k1++)
-			{
-				for (int k = 0; k < nNeighbors[n]; k++)
-				{
-					if (neighbors[n1][k1] == neighbors[n][k])
-					{
-						m++;
-						break;
-					}
-				}
-			}
+			m = Intersection(overlap, neighbors[n1], nNeighbors[n1], neighbors[n], nNeighbors[n]);
 			nMissingEdges[n1] -= nNeighbors[n1]-1-m;
-			for (int k1 = 0; k1 < nNeighbors[n1]; k1++)
-			{
-				if (neighbors[n1][k1] == n)
-				{
-					for (int j = k1; j < nNeighbors[n1]-1; j++)
-						neighbors[n1][j] = neighbors[n1][j+1];
-					nNeighbors[n1]--;
-					break;
-				}
-			}
+			Remove(neighbors[n1], nNeighbors[n1], n);
+			Insert(clusters[nClusters], clusterSize[nClusters], n1);
 		}
-		clusters[nClusters][nNeighbors[n]] = n;
-		clusterSize[nClusters++] = nNeighbors[n]+1;
+		nMissingEdges[n] = -1;
 		nNeighbors[n] = 0;
-
-		if (clusterSize[nClusters-1] > treeWidth)
-			treeWidth = clusterSize[nClusters-1];
-		//Rprintf("%d, %d\n", nClusters, treeWidth);
+		Insert(clusters[nClusters], clusterSize[nClusters], n);
+		if (clusterSize[nClusters] > treeWidth)
+			treeWidth = clusterSize[nClusters];
+		nClusters++;
 	}
 	treeWidth--;
-	Rprintf("%d\n", treeWidth);
+	Rprintf("%d, %d\n", nClusters, treeWidth);
 }
