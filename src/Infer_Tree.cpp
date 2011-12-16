@@ -14,7 +14,6 @@ void CRF::Infer_Tree()
 
 	MessagesInit();
 	TreeBP();
-	Messages2NodeBel();
 	Messages2EdgeBel();
 	BetheFreeEnergy();
 

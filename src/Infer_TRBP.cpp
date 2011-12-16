@@ -18,11 +18,10 @@ void CRF::Infer_TRBP(int maxIter, double cutoff, int verbose)
 	double *mu = (double *) R_alloc(nEdges, sizeof(double));
 	double **scaleEdgePot = (double **) allocArray2<double>(nEdges, nEdgeStates);
 
+	MessagesInit();
 	TRBP_Weights(mu);
 	TRBP_ScaleEdgePot(mu, scaleEdgePot);
-	MessagesInit();
 	TRBP(mu, scaleEdgePot, maxIter, cutoff, verbose);
-	TRBP_Messages2NodeBel(mu);
 	TRBP_Messages2EdgeBel(mu, scaleEdgePot);
 	TRBP_BetheFreeEnergy(mu);
 }

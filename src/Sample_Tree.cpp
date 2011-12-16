@@ -27,7 +27,6 @@ void CRF::Sample_Tree(int size)
 
 	MessagesInit();
 	TreeBP();
-	Messages2NodeBel();
 	Messages2EdgeBel();
 
 	/* Sampling */

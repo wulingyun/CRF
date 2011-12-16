@@ -5,8 +5,7 @@
 
 void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, int verbose, bool maximize)
 {
-	double **originalEdgePot = edgePot;
-	edgePot = scaleEdgePot;
+	swap(edgePot, scaleEdgePot);
 
 	int dim[] = {2, nEdges, maxState};
 	double ***old_messages = (double ***) allocArray<double, 3>(dim);
@@ -18,7 +17,6 @@ void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, in
 			messages[1][i][j] = old_messages[1][i][j] = 0;
 		}
 
-	double *incoming = (double *) R_alloc(maxState, sizeof(double));
 	double *outgoing = (double *) R_alloc(maxState, sizeof(double));
 
 	int s, r, e, n;
@@ -46,7 +44,7 @@ void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, in
 			/* gather incoming messages */
 
 			for (int i = 0; i < nStates[s]; i++)
-				incoming[i] = NodePot(s, i);
+				NodeBel(s, i) = NodePot(s, i);
 			for (int i = 0; i < nAdj[s]; i++)
 			{
 				e = AdjEdges(s, i);
@@ -55,7 +53,7 @@ void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, in
 				else
 					msg = old_messages[1][e];
 				for (int k = 0; k < nStates[s]; k++)
-					incoming[k] *= R_pow(msg[k], mu[e]);
+					NodeBel(s, k) *= R_pow(msg[k], mu[e]);
 			}
 
 			/* send messages */
@@ -70,7 +68,7 @@ void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, in
 				else
 					msg = old_messages[1][e];
 				for (int k = 0; k < nStates[s]; k++)
-					outgoing[k] = msg[k] == 0 ? 0 : incoming[k] / msg[k];
+					outgoing[k] = msg[k] == 0 ? 0 : NodeBel(s, k) / msg[k];
 
 				sumMsg = 0;
 				if (EdgesBegin(e) == s)
@@ -142,7 +140,17 @@ void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, in
 	if (difference > cutoff)
 		warning("Tree-Reweighted BP did not converge in %d iterations! (diff = %f)", maxIter, difference);
 
-	edgePot = originalEdgePot;
+	double sumBel;
+	for (int i = 0; i < nNodes; i++)
+	{
+		sumBel = 0;
+		for (int j = 0; j < nStates[i]; j++)
+			sumBel += NodeBel(i, j);
+		for (int j = 0; j < nStates[i]; j++)
+			NodeBel(i, j) /= sumBel;
+	}
+
+	swap(edgePot, scaleEdgePot);
 }
 
 /* Minimum Weight Spanning Tree using Kruskal algorithm */
@@ -214,35 +222,6 @@ void CRF::TRBP_Weights(double *mu)
 
 	for (int i = 0; i < nEdges; i++)
 		mu[i] /= n;
-}
-
-/* Node beliefs */
-
-void CRF::TRBP_Messages2NodeBel(double *mu)
-{
-	for (int i = 0; i < length(_nodePot); i++)
-		nodeBel[i] = nodePot[i];
-
-	int n1, n2;
-	double sumBel;
-	for (int i = 0; i < nEdges; i++)
-	{
-		n1 = EdgesBegin(i);
-		n2 = EdgesEnd(i);
-		for (int j = 0; j < nStates[n1]; j++)
-			NodeBel(n1, j) *= R_pow(messages[0][i][j], mu[i]);
-		for (int j = 0; j < nStates[n2]; j++)
-			NodeBel(n2, j) *= R_pow(messages[1][i][j], mu[i]);
-	}
-
-	for (int i = 0; i < nNodes; i++)
-	{
-		sumBel = 0;
-		for (int j = 0; j < nStates[i]; j++)
-			sumBel += NodeBel(i, j);
-		for (int j = 0; j < nStates[i]; j++)
-			NodeBel(i, j) /= sumBel;
-	}
 }
 
 /* Edge beliefs */

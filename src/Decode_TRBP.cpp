@@ -19,10 +19,9 @@ void CRF::Decode_TRBP(int maxIter, double cutoff, int verbose)
 	double *mu = (double *) R_alloc(nEdges, sizeof(double));
 	double **scaleEdgePot = (double **) allocArray2<double>(nEdges, nEdgeStates);
 
+	MessagesInit();
 	TRBP_Weights(mu);
 	TRBP_ScaleEdgePot(mu, scaleEdgePot);
-	MessagesInit();
 	TRBP(mu, scaleEdgePot, maxIter, cutoff, verbose, true);
-	TRBP_Messages2NodeBel(mu);
 	MaxOfMarginals();
 }

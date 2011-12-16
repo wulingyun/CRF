@@ -105,12 +105,10 @@ public:
 	void TreeBP(bool maximize = false);
 	void LoopyBP(int maxIter, double cutoff, int verbose, bool maximize = false);
 	void MessagesInit();
-	void Messages2NodeBel();
 	void Messages2EdgeBel();
 	void MaxOfMarginals();
 	void BetheFreeEnergy();
 	void TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, int verbose, bool maximize = false);
-	void TRBP_Messages2NodeBel(double *mu);
 	void TRBP_Messages2EdgeBel(double *mu, double **scaleEdgePot);
 	void TRBP_BetheFreeEnergy(double *mu);
 	void TRBP_Weights(double *mu);
