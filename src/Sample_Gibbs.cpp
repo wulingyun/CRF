@@ -74,7 +74,7 @@ void CRF::Sample_Gibbs(int burnIn, int *start, int size)
 			for (int j = 0; j < n; j++)
 				prob[j] /= sumProb;
 
-			y[i] = sample(n, prob);
+			y[i] = SampleFrom(n, prob);
 		}
 
 		if (iter >= burnIn)

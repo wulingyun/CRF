@@ -123,7 +123,7 @@ void CRF::Sample_Tree(int size)
 				for (int k = 0; k < nStates[n]; k++)
 					prob[k] /= sumProb;
 			}
-			y[n] = sample(nStates[n], prob);
+			y[n] = SampleFrom(nStates[n], prob);
 		}
 
 		for (int j = 0; j < nNodes; j++)
