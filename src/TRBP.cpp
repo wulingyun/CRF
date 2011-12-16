@@ -153,77 +153,6 @@ void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, in
 	swap(edgePot, scaleEdgePot);
 }
 
-/* Minimum Weight Spanning Tree using Kruskal algorithm */
-
-void CRF::TRBP_MinSpanTree(int *tree, double *costs)
-{
-	int *index = (int *) R_alloc(nEdges, sizeof(int));
-	for (int i = 0; i < nEdges; i++)
-	{
-		tree[i] = 0;
-		index[i] = i;
-	}
-	rsort_with_index(costs, index, nEdges);
-
-	int *label = (int *) R_alloc(nNodes, sizeof(int));
-	for (int i = 0; i < nNodes; i++)
-		label[i] = i;
-
-	int n = 0, n1, n2;
-	for (int i = 0; i < nEdges; i++)
-	{
-		n1 = EdgesBegin(index[i]);
-		n2 = EdgesEnd(index[i]);
-		if (label[n1] != label[n2])
-		{
-			for (int j = 0; j < nNodes; j++)
-				if (label[j] == label[n2])
-					label[j] = label[n1];
-			tree[index[i]] = 1;
-			if (++n >= nNodes - 1)
-				break;
-		}
-	}
-}
-
-/* Calculate Tree Weights */
-
-void CRF::TRBP_Weights(double *mu)
-{
-	for (int i = 0; i < nEdges; i++)
-		mu[i] = 0;
-
-	int *tree = (int *) R_alloc(nEdges, sizeof(int));
-	double *costs = (double *) R_alloc(nEdges, sizeof(double));
-	int n = 0, loop = 1;
-
-	GetRNGstate();
-	while (loop)
-	{
-		for (int i = 0; i < nEdges; i++)
-			costs[i] = unif_rand();
-
-		TRBP_MinSpanTree(tree, costs);
-
-		for (int i = 0; i < nEdges; i++)
-			if (tree[i])
-				mu[i]++;
-		n++;
-
-		loop = 0;
-		for (int i = 0; i < nEdges; i++)
-			if (mu[i] <= 0)
-			{
-				loop = 1;
-				break;
-			}
-	}
-	PutRNGstate();
-
-	for (int i = 0; i < nEdges; i++)
-		mu[i] /= n;
-}
-
 /* Edge beliefs */
 
 void CRF::TRBP_Messages2EdgeBel(double *mu, double **scaleEdgePot)
@@ -317,8 +246,47 @@ void CRF::TRBP_BetheFreeEnergy(double *mu)
 	*logZ = - nodeEnergy + nodeEntropy - edgeEnergy + edgeEntropy;
 }
 
-void CRF::TRBP_ScaleEdgePot(double *mu, double **scaleEdgePot)
+/* initialize TRBP parameters */
+
+void CRF::TRBP_Init(double *mu, double **scaleEdgePot)
 {
+	/* Calculate Tree Weights */
+
+	for (int i = 0; i < nEdges; i++)
+		mu[i] = 0;
+
+	int *tree = (int *) R_alloc(nEdges, sizeof(int));
+	double *costs = (double *) R_alloc(nEdges, sizeof(double));
+	int n = 0, loop = 1;
+
+	GetRNGstate();
+	while (loop)
+	{
+		for (int i = 0; i < nEdges; i++)
+			costs[i] = unif_rand();
+
+		MinSpanTree(tree, nNodes, nEdges, edges, costs);
+
+		for (int i = 0; i < nEdges; i++)
+			if (tree[i])
+				mu[i]++;
+		n++;
+
+		loop = 0;
+		for (int i = 0; i < nEdges; i++)
+			if (mu[i] <= 0)
+			{
+				loop = 1;
+				break;
+			}
+	}
+	PutRNGstate();
+
+	for (int i = 0; i < nEdges; i++)
+		mu[i] /= n;
+
+	/* scale edge potentials */
+	
 	double inv_mu;
 	for (int i = 0; i < nEdges; i++)
 	{

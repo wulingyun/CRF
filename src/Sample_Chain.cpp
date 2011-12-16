@@ -81,7 +81,7 @@ void CRF::Sample_Chain(int size)
 			prob[j] = p_alpha[0];
 			p_alpha += nNodes;
 		}
-		y[nNodes-1] = sample(nStates[nNodes-1], prob);
+		y[nNodes-1] = SampleFrom(nStates[nNodes-1], prob);
 		for (int j = nNodes-2; j >= 0; j--)
 		{
 			p_alpha = alpha + j;
@@ -97,7 +97,7 @@ void CRF::Sample_Chain(int size)
 				for (int k = 0; k < nStates[j]; k++)
 					prob[k] /= sumProb;
 			}
-			y[j] = sample(nStates[j], prob);
+			y[j] = SampleFrom(nStates[j], prob);
 		}
 
 		for (int j = 0; j < nNodes; j++)
