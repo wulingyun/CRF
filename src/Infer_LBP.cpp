@@ -17,7 +17,6 @@ void CRF::Infer_LBP(int maxIter, double cutoff, int verbose)
 {
 	MessagesInit();
 	LoopyBP(maxIter, cutoff, verbose);
-	Messages2NodeBel();
 	Messages2EdgeBel();
 	BetheFreeEnergy();
 }

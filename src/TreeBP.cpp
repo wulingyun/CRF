@@ -16,8 +16,6 @@ void CRF::TreeBP(bool maximize)
 	int senderHead, senderTail, nReceiver;
 	int *sender = (int *) R_alloc(nNodes * 2, sizeof(int));
 	int *receiver = (int *) R_alloc(nNodes, sizeof(int));
-	int dim_incoming[] = {nNodes, maxState};
-	double **incoming = (double **) allocArray<double, 2>(dim_incoming);
 
 	senderHead = senderTail = nReceiver = 0;
 	for (int i = 0; i < nNodes; i++)
@@ -29,7 +27,7 @@ void CRF::TreeBP(bool maximize)
 		if (nAdj[i] == 1)
 			sender[senderTail++] = i;
 		for (int j = 0; j < nStates[i]; j++)
-			incoming[i][j] = NodePot(i, j);
+			NodeBel(i, j) = NodePot(i, j);
 	}
 
 	int s, r, e, n;
@@ -87,7 +85,7 @@ void CRF::TreeBP(bool maximize)
 			if (EdgesBegin(e) == s)
 			{
 				for (int j = 0; j < nStates[s]; j++)
-					outgoing[j] = messages[0][e][j] == 0 ? 0 : incoming[s][j] / messages[0][e][j];
+					outgoing[j] = messages[0][e][j] == 0 ? 0 : NodeBel(s, j) / messages[0][e][j];
 				msg = messages[1][e];
 				for (int j = 0; j < nStates[r]; j++)
 				{
@@ -112,7 +110,7 @@ void CRF::TreeBP(bool maximize)
 			else
 			{
 				for (int j = 0; j < nStates[s]; j++)
-					outgoing[j] = messages[1][e][j] == 0 ? 0 : incoming[s][j] / messages[1][e][j];
+					outgoing[j] = messages[1][e][j] == 0 ? 0 : NodeBel(s, j) / messages[1][e][j];
 				msg = messages[0][e];
 				for (int j = 0; j < nStates[r]; j++)
 				{
@@ -139,8 +137,18 @@ void CRF::TreeBP(bool maximize)
 			for (int j = 0; j < nStates[r]; j++)
 			{
 				msg[j] /= sumMsg;
-				incoming[r][j] *= msg[j];
+				NodeBel(r, j) *= msg[j];
 			}
 		}
+	}
+
+	double sumBel;
+	for (int i = 0; i < nNodes; i++)
+	{
+		sumBel = 0;
+		for (int j = 0; j < nStates[i]; j++)
+			sumBel += NodeBel(i, j);
+		for (int j = 0; j < nStates[i]; j++)
+			NodeBel(i, j) /= sumBel;
 	}
 }

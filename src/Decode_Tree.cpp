@@ -15,7 +15,6 @@ void CRF::Decode_Tree()
 
 	MessagesInit();
 	TreeBP(true);
-	Messages2NodeBel();
 	MaxOfMarginals();
 
 	vmaxset(vmax); 

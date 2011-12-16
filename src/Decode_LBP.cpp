@@ -18,6 +18,5 @@ void CRF::Decode_LBP(int maxIter, double cutoff, int verbose)
 {
 	MessagesInit();
 	LoopyBP(maxIter, cutoff, verbose, true);
-	Messages2NodeBel();
 	MaxOfMarginals();
 }

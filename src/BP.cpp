@@ -8,35 +8,6 @@ void CRF::MessagesInit()
 	messages = (double ***) allocArray<double, 3>(dim);
 }
 
-/* Node beliefs */
-
-void CRF::Messages2NodeBel()
-{
-	for (int i = 0; i < length(_nodePot); i++)
-		nodeBel[i] = nodePot[i];
-
-	int n1, n2;
-	double sumBel;
-	for (int i = 0; i < nEdges; i++)
-	{
-		n1 = EdgesBegin(i);
-		n2 = EdgesEnd(i);
-		for (int j = 0; j < nStates[n1]; j++)
-			NodeBel(n1, j) *= messages[0][i][j];
-		for (int j = 0; j < nStates[n2]; j++)
-			NodeBel(n2, j) *= messages[1][i][j];
-	}
-
-	for (int i = 0; i < nNodes; i++)
-	{
-		sumBel = 0;
-		for (int j = 0; j < nStates[i]; j++)
-			sumBel += NodeBel(i, j);
-		for (int j = 0; j < nStates[i]; j++)
-			NodeBel(i, j) /= sumBel;
-	}
-}
-
 /* Edge beliefs */
 
 void CRF::Messages2EdgeBel()

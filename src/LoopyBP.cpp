@@ -14,7 +14,6 @@ void CRF::LoopyBP(int maxIter, double cutoff, int verbose, bool maximize)
 			messages[1][i][j] = old_messages[1][i][j] = 0;
 		}
 
-	double *incoming = (double *) R_alloc(maxState, sizeof(double));
 	double *outgoing = (double *) R_alloc(maxState, sizeof(double));
 
 	int s, r, e, n;
@@ -42,7 +41,7 @@ void CRF::LoopyBP(int maxIter, double cutoff, int verbose, bool maximize)
 			/* gather incoming messages */
 
 			for (int i = 0; i < nStates[s]; i++)
-				incoming[i] = NodePot(s, i);
+				NodeBel(s, i) = NodePot(s, i);
 			for (int i = 0; i < nAdj[s]; i++)
 			{
 				e = AdjEdges(s, i);
@@ -51,7 +50,7 @@ void CRF::LoopyBP(int maxIter, double cutoff, int verbose, bool maximize)
 				else
 					msg = old_messages[1][e];
 				for (int k = 0; k < nStates[s]; k++)
-					incoming[k] *= msg[k];
+					NodeBel(s, k) *= msg[k];
 			}
 
 			/* send messages */
@@ -66,7 +65,7 @@ void CRF::LoopyBP(int maxIter, double cutoff, int verbose, bool maximize)
 				else
 					msg = old_messages[1][e];
 				for (int k = 0; k < nStates[s]; k++)
-					outgoing[k] = msg[k] == 0 ? 0 : incoming[k] / msg[k];
+					outgoing[k] = msg[k] == 0 ? 0 : NodeBel(s, k) / msg[k];
 
 				sumMsg = 0;
 				if (EdgesBegin(e) == s)
@@ -135,4 +134,14 @@ void CRF::LoopyBP(int maxIter, double cutoff, int verbose, bool maximize)
 
 	if (difference > cutoff)
 		warning("Loopy BP did not converge in %d iterations! (diff = %f)", maxIter, difference);
+
+	double sumBel;
+	for (int i = 0; i < nNodes; i++)
+	{
+		sumBel = 0;
+		for (int j = 0; j < nStates[i]; j++)
+			sumBel += NodeBel(i, j);
+		for (int j = 0; j < nStates[i]; j++)
+			NodeBel(i, j) /= sumBel;
+	}
 }
