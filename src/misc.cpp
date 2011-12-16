@@ -105,3 +105,60 @@ void MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs)
 		}
 	}
 }
+
+/* Get intersection of two ascending ordered vectors */
+
+int Intersection(int *overlap, int *vector1, int size1, int *vector2, int size2)
+{
+	int n, i1, i2;
+	n = i1 = i2 = 0;
+	while (i1 < size1 && i2 < size2)
+	{
+		if (vector1[i1] == vector2[i2])
+		{
+			overlap[n++] = vector1[i1++];
+			i2++;
+		}
+		else if (vector1[i1] < vector2[i2])
+			i1++;
+		else
+			i2++;
+	}
+	return n;
+}
+
+/* Insert element to ascending ordered vector */
+
+void Insert(int *vector, int &size, int v)
+{
+	int k = size;
+	for (int i = 0; i < size; i++)
+	{
+		if (vector[i] > v)
+		{
+			for (int j = size; j > i; j--)
+				vector[j] = vector[j-1];
+			k = i;
+			break;
+		}
+	}
+	vector[k] = v;
+	size++;
+}
+
+/* Remove element from ascending ordered vector */
+
+void Remove(int *vector, int &size, int v)
+{
+
+	for (int i = 0; i < size; i++)
+	{
+		if (vector[i] == v)
+		{
+			for (int j = i; j < size-1; j++)
+				vector[j] = vector[j+1];
+			size--;
+			break;
+		}
+	}
+}

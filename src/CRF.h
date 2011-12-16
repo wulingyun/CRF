@@ -39,6 +39,8 @@ extern "C" {
 	SEXP Get_LogPotential(SEXP _crf, SEXP _configuration);
 }
 
+class JunctionTree;
+
 /* CRF class */
 
 class CRF {
@@ -64,6 +66,8 @@ public:
 
 	double *maxNodePot, *maxEdgePot, unclampedUB;
 	double ***messages;
+
+	JunctionTree *jTree;
 
 	int numProtect;
 
@@ -211,3 +215,14 @@ inline int &CRF::Samples(int i, int n)
 {
 	return samples[i + nSamples * n];
 }
+
+/* JunctionTree class */
+
+class JunctionTree
+{
+public:
+	CRF &crf;
+	int **clusters, *clusterSize, nClusters;
+
+	JunctionTree(CRF &c);
+};
