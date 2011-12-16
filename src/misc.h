@@ -23,6 +23,12 @@ int SampleFrom(int n, double *prob);
 /* minimum weight spanning tree using Kruskal algorithm */
 void MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs);
 
+/* utils for ascending ordered vector */
+
+int Intersection(int *overlap, int *vector1, int size1, int *vector2, int size2);
+void Insert(int *vector, int &size, int v);
+void Remove(int *vector, int &size, int v);
+
 /* swap variables */
 template <class T>
 void swap(T &a, T &b)

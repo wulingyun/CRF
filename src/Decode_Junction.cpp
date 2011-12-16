@@ -13,7 +13,7 @@ void CRF::Decode_Junction()
 {
 	void *vmax = vmaxget(); 
 
-	JunctionTreeInit();
+	jTree = new JunctionTree(*this);
 
 	vmaxset(vmax); 
 }
