@@ -131,7 +131,7 @@ JunctionTree::JunctionTree(CRF &crf)
 	C_freeVector(nNeighbors);
 	C_freeVector(nMissingEdges);
 
-	m = nClusters * (nClusters - 1);
+	m = nClusters * (nClusters - 1) / 2;
 	int *tree = (int *) C_allocVector<int>(m);
 	int *edges = (int *) C_allocVector<int>(m * 2);
 	int *weights = (int *) C_allocVector<int>(m);
@@ -148,7 +148,7 @@ JunctionTree::JunctionTree(CRF &crf)
 			n++;
 		}
 	}
-	MinSpanTree(tree, nClusters, m, edges, costs);
+	MinSpanTree(tree, nClusters, m, edges, costs, 0);
 
 	nSeperators = nClusters - 1;
 	seperatorEdges = (int **) R_allocArray<int>(nSeperators, 2);
