@@ -75,7 +75,7 @@ int SampleFrom(int n, double *prob)
 
 /* minimum weight spanning tree using Kruskal algorithm */
 
-void MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs)
+void MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs, int node_index_from)
 {
 	int *index = (int *) R_alloc(nEdges, sizeof(int));
 	for (int i = 0; i < nEdges; i++)
@@ -92,8 +92,8 @@ void MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs)
 	int n = 0, n1, n2;
 	for (int i = 0; i < nEdges; i++)
 	{
-		n1 = edges[index[i]] - 1;
-		n2 = edges[index[i] + nEdges] - 1;
+		n1 = edges[index[i]] - node_index_from;
+		n2 = edges[index[i] + nEdges] - node_index_from;
 		if (label[n1] != label[n2])
 		{
 			for (int j = 0; j < nNodes; j++)
