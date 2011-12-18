@@ -220,10 +220,24 @@ class JunctionTree
 {
 public:
 	CRF &original;
-	int **clusters, *clusterSize, nClusters;
-	int **seperatorEdges, **seperators, *seperatorSize, nSeperators;
+	int nNodes, nEdges, *nStates;
+	int nClusters, **clusters, *clusterSize;
+	int nSeperators, **seperators, *seperatorSize, **seperatorEdges;
 	int *nClusterStates, *nSeperatorStates;
 	double **clusterBel, **seperatorBel;
 
+	int cid, sid, *masks, *states;
+
 	JunctionTree(CRF &crf);
+
+	double &ClusterBel(int n, int *states);
+	double &SeperatorBel(int n, int *states);
+
+	void InitStates(int c, int s);
+	void ResetClusterState();
+	bool NextClusterState();
+	bool NextSeperatorState();
+
+	void SendMessagesFromCluster(int c, int s);
+	void SendMessagesFromSeperator(int s, int c);
 };

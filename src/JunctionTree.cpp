@@ -5,9 +5,11 @@
 JunctionTree::JunctionTree(CRF &crf)
 : original(crf)
 {
-	int nNodes = original.nNodes;
-	clusterSize = (int *) R_allocVector<int>(nNodes);
+	nNodes = original.nNodes;
+	nEdges = original.nEdges;
+	nStates = original.nStates;
 	nClusters = 0;
+	clusterSize = (int *) R_allocVector<int>(nNodes);
 
 	int **cliques = (int **) C_allocArray<int>(nNodes, nNodes);
 	int **adj = (int **) C_allocArray<int>(nNodes, nNodes);
@@ -25,7 +27,7 @@ JunctionTree::JunctionTree(CRF &crf)
 	}
 
 	int n1, n2;
-	for (int i = 0; i < original.nEdges; i++)
+	for (int i = 0; i < nEdges; i++)
 	{
 		n1 = original.EdgesBegin(i);
 		n2 = original.EdgesEnd(i);
@@ -183,7 +185,7 @@ JunctionTree::JunctionTree(CRF &crf)
 	{
 		nClusterStates[i] = 1;
 		for (int j = 0; j < clusterSize[i]; j++)
-			nClusterStates[i] *= original.nStates[clusters[i][j]];
+			nClusterStates[i] *= nStates[clusters[i][j]];
 	}
 
 	nSeperatorStates = (int *) R_allocVector<int>(nSeperators);
@@ -191,9 +193,135 @@ JunctionTree::JunctionTree(CRF &crf)
 	{
 		nSeperatorStates[i] = 1;
 		for (int j = 0; j < seperatorSize[i]; j++)
-			nSeperatorStates[i] *= original.nStates[seperators[i][j]];
+			nSeperatorStates[i] *= nStates[seperators[i][j]];
 	}
 
 	clusterBel = (double **) R_allocArray2<double>(nClusters, nClusterStates);
 	seperatorBel = (double **) R_allocArray2<double>(nSeperators, nSeperatorStates);
+	masks = (int *) R_allocVector<int>(nNodes);
+	states = (int *) R_allocVector<int>(nNodes);
+}
+
+double &JunctionTree::ClusterBel(int c, int *states)
+{
+	int k = states[clusters[c][0]];
+	for (int i = 1; i < clusterSize[c]-1; i++)
+	{
+		k *= nStates[clusters[c][i]];
+		k += states[clusters[c][i]];
+	}
+	return clusterBel[c][k];
+}
+
+double &JunctionTree::SeperatorBel(int s, int *states)
+{
+	int k = states[seperators[s][0]];
+	for (int i = 1; i < seperatorSize[s]-1; i++)
+	{
+		k *= nStates[seperators[s][i]];
+		k += states[seperators[s][i]];
+	}
+	return seperatorBel[s][k];
+}
+
+void JunctionTree::InitStates(int c, int s)
+{
+	cid = c;
+	sid = s;
+	for (int i = 0; i < clusterSize[cid]; i++)
+		masks[clusters[cid][i]] = 0;
+	for (int i = 0; i < seperatorSize[sid]; i++)
+	{
+		masks[seperators[sid][i]] = 1;
+		states[seperators[sid][i]] = 0;
+	}
+}
+
+void JunctionTree::ResetClusterState()
+{
+	for (int i = 0; i < clusterSize[cid]; i++)
+	{
+		if (masks[clusters[cid][i]])
+			continue;
+		states[clusters[cid][i]] = 0;
+	}
+}
+
+bool JunctionTree::NextClusterState()
+{
+	int index, n;
+	for (index = 0; index < clusterSize[cid]; index++)
+	{
+		n = clusters[cid][index];
+		if (masks[n])
+			continue;
+		states[n] += 1;
+		if (states[n] < nStates[n])
+			break;
+		else
+			states[n] = 0;
+	}
+	if (index == clusterSize[cid])
+		return 0;
+	else
+		return 1;
+}
+
+bool JunctionTree::NextSeperatorState()
+{
+	int index, n;
+	for (index = 0; index < seperatorSize[sid]; index++)
+	{
+		n = seperators[sid][index];
+		states[n] += 1;
+		if (states[n] < nStates[n])
+			break;
+		else
+			states[n] = 0;
+	}
+	if (index == seperatorSize[sid])
+		return 0;
+	else
+		return 1;
+}
+
+void JunctionTree::SendMessagesFromCluster(int c, int s)
+{
+	InitStates(c, s);
+
+	double msg;
+	do
+	{
+		ResetClusterState();
+
+		msg = 0;
+		do
+		{
+			msg += ClusterBel(c, states);
+		}
+		while (NextClusterState());
+
+		double &bel = SeperatorBel(s, states);
+		bel = msg / bel;
+	}
+	while (NextSeperatorState());
+}
+
+void JunctionTree::SendMessagesFromSeperator(int s, int c)
+{
+	InitStates(c, s);
+
+	double msg;
+	do
+	{
+		ResetClusterState();
+
+		msg = SeperatorBel(s, states);
+		do
+		{
+			ClusterBel(c, states) *= msg;
+		}
+		while (NextClusterState());
+	}
+	while (NextSeperatorState());
 }
