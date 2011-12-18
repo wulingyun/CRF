@@ -143,10 +143,7 @@ JunctionTree::JunctionTree(CRF &crf)
 		{
 			edges[n] = i;
 			edges[n + m] = j;
-			if (clusters[i][0] <= clusters[nClusters][clusterSize[nClusters]-1] && clusters[i][clusterSize[i]-1] >= clusters[nClusters][0])
-				weights[n] = Intersection(overlap, clusters[i], clusterSize[i], clusters[j], clusterSize[j]);
-			else
-				weights[n] = 0;
+			weights[n] = Intersection(overlap, clusters[i], clusterSize[i], clusters[j], clusterSize[j]);
 			costs[n] = -weights[n];
 			n++;
 		}
