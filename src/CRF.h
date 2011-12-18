@@ -221,8 +221,9 @@ class JunctionTree
 public:
 	CRF &original;
 	int **clusters, *clusterSize, nClusters;
-	int **treeEdges, nTreeEdges;
-	int **seperators, *seperatorSize;
+	int **seperatorEdges, **seperators, *seperatorSize, nSeperators;
+	int *nClusterStates, *nSeperatorStates;
+	double **clusterBel, **seperatorBel;
 
 	JunctionTree(CRF &crf);
 };
