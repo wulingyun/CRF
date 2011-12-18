@@ -111,6 +111,8 @@ void MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs)
 int Intersection(int *overlap, int *vector1, int size1, int *vector2, int size2)
 {
 	int n, i1, i2;
+	if (vector1[0] > vector2[size2-1] || vector2[0] > vector1[size1-1])
+		return 0;
 	n = i1 = i2 = 0;
 	while (i1 < size1 && i2 < size2)
 	{
