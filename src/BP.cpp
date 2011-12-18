@@ -4,8 +4,7 @@
 
 void CRF::MessagesInit()
 {
-	int dim[] = {2, nEdges, maxState};
-	messages = (double ***) allocArray<double, 3>(dim);
+	messages = (double ***) R_allocArray<double>(2, nEdges, maxState);
 }
 
 /* Edge beliefs */

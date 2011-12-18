@@ -2,20 +2,20 @@
 
 /* build junction tree */
 
-JunctionTree::JunctionTree(CRF &c)
-: crf(c)
+JunctionTree::JunctionTree(CRF &crf)
+: original(crf)
 {
-	int nNodes = crf.nNodes;
-	int nEdges = crf.nEdges;
-	int dim[] = {nNodes, nNodes};
-
-	clusters = (int **) allocArray<int, 2>(dim);
-	clusterSize = (int *) R_alloc(nNodes, sizeof(int));
+	int nNodes = original.nNodes;
+	clusterSize = (int *) R_allocVector<int>(nNodes);
 	nClusters = 0;
 
-	int **adj = (int **) allocArray<int, 2>(dim);
-	int **neighbors = (int **) allocArray<int, 2>(dim);
-	int *nNeighbors = (int *) R_alloc(nNodes, sizeof(int));
+	int **cliques = (int **) C_allocArray<int>(nNodes, nNodes);
+	int **adj = (int **) C_allocArray<int>(nNodes, nNodes);
+	int **neighbors = (int **) C_allocArray<int>(nNodes, nNodes);
+	int *nNeighbors = (int *) C_allocVector<int>(nNodes);
+	int *nMissingEdges = (int *) C_allocVector<int>(nNodes);
+	int *overlap = (int *) C_allocVector<int>(nNodes);
+
 	for (int i = 0; i < nNodes; i++)
 	{
 		for (int j = 0; j < nNodes; j++)
@@ -25,16 +25,15 @@ JunctionTree::JunctionTree(CRF &c)
 	}
 
 	int n1, n2;
-	for (int i = 0; i < nEdges; i++)
+	for (int i = 0; i < original.nEdges; i++)
 	{
-		n1 = crf.EdgesBegin(i);
-		n2 = crf.EdgesEnd(i);
+		n1 = original.EdgesBegin(i);
+		n2 = original.EdgesEnd(i);
 		Insert(neighbors[n1], nNeighbors[n1], n2);
 		Insert(neighbors[n2], nNeighbors[n2], n1);
 		adj[n1][n2] = adj[n2][n1] = 1;
 	}
 
-	int *nMissingEdges = (int *) R_alloc(nNodes, sizeof(int));
 	for (int i = 0; i < nNodes; i++)
 	{
 		nMissingEdges[i] = 0;
@@ -54,7 +53,6 @@ JunctionTree::JunctionTree(CRF &c)
 
 	int n, m, maxMissingEdges = nNodes * nNodes;
 	int treeWidth = 0;
-	int *overlap = (int *) R_alloc(nNodes, sizeof(int));
 	while (1)
 	{
 		n = -1;
@@ -95,20 +93,20 @@ JunctionTree::JunctionTree(CRF &c)
 			m = Intersection(overlap, neighbors[n1], nNeighbors[n1], neighbors[n], nNeighbors[n]);
 			nMissingEdges[n1] -= nNeighbors[n1]-1-m;
 			Remove(neighbors[n1], nNeighbors[n1], n);
-			Insert(clusters[nClusters], clusterSize[nClusters], n1);
+			Insert(cliques[nClusters], clusterSize[nClusters], n1);
 		}
 		nMissingEdges[n] = -1;
 		nNeighbors[n] = 0;
-		Insert(clusters[nClusters], clusterSize[nClusters], n);
+		Insert(cliques[nClusters], clusterSize[nClusters], n);
 		if (treeWidth < clusterSize[nClusters])
 			treeWidth = clusterSize[nClusters];
 		else if (treeWidth > clusterSize[nClusters])
 		{
 			for (int i = 0; i < nClusters; i++)
 			{
-				if (clusterSize[i] > clusterSize[nClusters] && clusters[i][0] <= clusters[nClusters][0] && clusters[i][clusterSize[i]-1] >= clusters[nClusters][clusterSize[nClusters]-1])
+				if (clusterSize[i] > clusterSize[nClusters] && cliques[i][0] <= cliques[nClusters][0] && cliques[i][clusterSize[i]-1] >= cliques[nClusters][clusterSize[nClusters]-1])
 				{
-					m = Intersection(overlap, clusters[i], clusterSize[i], clusters[nClusters], clusterSize[nClusters]);
+					m = Intersection(overlap, cliques[i], clusterSize[i], cliques[nClusters], clusterSize[nClusters]);
 					if (m == clusterSize[nClusters])
 					{
 						clusterSize[nClusters] = 0;
@@ -122,4 +120,62 @@ JunctionTree::JunctionTree(CRF &c)
 	}
 	treeWidth--;
 	Rprintf("%d, %d\n", nClusters, treeWidth);
+
+	m = nClusters * (nClusters - 1);
+	int *tree = (int *) C_allocVector<int>(m);
+	int *edges = (int *) C_allocVector<int>(m * 2);
+	int *weights = (int *) C_allocVector<int>(m);
+	double *costs = (double *) C_allocVector<double>(m);
+	n = 0;
+	for (int i = 0; i < nClusters-1; i++)
+	{
+		for (int j = i+1; j < nClusters; j++)
+		{
+			edges[n] = i;
+			edges[n + m] = j;
+			weights[n] = Intersection(overlap, cliques[i], clusterSize[i], cliques[j], clusterSize[j]);
+			costs[n] = -weights[n];
+			n++;
+		}
+	}
+	MinSpanTree(tree, nClusters, m, edges, costs);
+
+	nTreeEdges = nClusters - 1;
+	treeEdges = (int **) R_allocArray<int>(nTreeEdges, 2);
+	seperatorSize = (int *) R_allocVector<int>(nTreeEdges);
+	n = 0;
+	for (int i = 0; i < m; i++)
+	{
+		if (tree[i])
+		{
+			treeEdges[n][0] = edges[i];
+			treeEdges[n][1] = edges[i + m];
+			seperatorSize[n] = weights[i];
+			n++;
+		}
+	}
+
+	seperators = (int **) R_allocArray2<int>(nTreeEdges, seperatorSize);
+	for (int i = 0; i < nTreeEdges; i++)
+	{
+		n1 = treeEdges[i][0];
+		n2 = treeEdges[i][1];
+		Intersection(seperators[i], cliques[n1], clusterSize[n1], cliques[n2], clusterSize[n2]);
+	}
+
+	clusters = (int **) R_allocArray2<int>(nClusters, clusterSize);
+	for (int i = 0; i < nClusters; i++)
+		for (int j = 0; j < clusterSize[i]; j++)
+			clusters[i][j] = cliques[i][j];
+
+	C_freeArray<int, 2>(cliques);
+	C_freeArray<int, 2>(adj);
+	C_freeArray<int, 2>(neighbors);
+	C_freeVector(nNeighbors);
+	C_freeVector(nMissingEdges);
+	C_freeVector(overlap);
+	C_freeVector(tree);
+	C_freeVector(edges);
+	C_freeVector(weights);
+	C_freeVector(costs);
 }

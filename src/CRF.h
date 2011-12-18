@@ -67,8 +67,6 @@ public:
 	double *maxNodePot, *maxEdgePot, unclampedUB;
 	double ***messages;
 
-	JunctionTree *jTree;
-
 	int numProtect;
 
 	CRF();
@@ -221,8 +219,10 @@ inline int &CRF::Samples(int i, int n)
 class JunctionTree
 {
 public:
-	CRF &crf;
+	CRF &original;
 	int **clusters, *clusterSize, nClusters;
+	int **treeEdges, nTreeEdges;
+	int **seperators, *seperatorSize;
 
-	JunctionTree(CRF &c);
+	JunctionTree(CRF &crf);
 };
