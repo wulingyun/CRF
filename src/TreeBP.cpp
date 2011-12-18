@@ -11,7 +11,7 @@ void CRF::TreeBP(bool maximize)
 		}
 
 	int *nWaiting = (int *) R_alloc(nNodes, sizeof(int));
-	int **waiting = (int **) allocArray2<int>(nNodes, nAdj);
+	int **waiting = (int **) R_allocArray2<int>(nNodes, nAdj);
 	int *sent = (int *) R_alloc(nNodes, sizeof(int));
 	int senderHead, senderTail, nReceiver;
 	int *sender = (int *) R_alloc(nNodes * 2, sizeof(int));

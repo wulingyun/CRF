@@ -73,7 +73,7 @@ int SampleFrom(int n, double *prob)
 	return select;
 }
 
-/* Minimum Weight Spanning Tree using Kruskal algorithm */
+/* minimum weight spanning tree using Kruskal algorithm */
 
 void MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs)
 {
