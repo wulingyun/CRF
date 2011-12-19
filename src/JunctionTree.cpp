@@ -127,9 +127,6 @@ JunctionTree::JunctionTree(CRF &crf)
 	C_freeVector(nNeighbors);
 	C_freeVector(nMissingEdges);
 
-	treeWidth--;
-	Rprintf("%d, %d\n", nClusters, treeWidth);
-
 	/* cluster information */
 
 	int **cliqueEdges = C_allocArray<int>(nClusters, nEdges);
@@ -402,7 +399,7 @@ void JunctionTree::SendMessagesFromClusterMax(int c, int s)
 		while (NextClusterState());
 
 		double &bel = SeperatorBel(s, states);
-		bel = msg / bel;
+		bel = (bel == 0) ? 0 : msg / bel;
 	}
 	while (NextSeperatorState());
 }
@@ -474,7 +471,7 @@ void JunctionTree::InitMessages()
 	C_freeVector(edgeFree);
 }
 
-void JunctionTree::Messages2NodeBel()
+void JunctionTree::Messages2NodeBel(bool maximize)
 {
 	int *nodeFree = (int *) C_allocVector<int>(nNodes);
 	for (int i = 0; i < nNodes; i++)
@@ -496,11 +493,24 @@ void JunctionTree::Messages2NodeBel()
 					states[n] = j;
 					ResetClusterState();
 					bel = 0;
-					do
+					if (maximize)
 					{
-						bel += ClusterBel(c, states);
+						do
+						{
+							double b = ClusterBel(c, states);
+							if (b > bel)
+								bel = b;
+						}
+						while (NextClusterState());
 					}
-					while (NextClusterState());
+					else
+					{
+						do
+						{
+							bel += ClusterBel(c, states);
+						}
+						while (NextClusterState());
+					}
 					original.NodeBel(n, j) = bel;
 				}
 				masks[n] = 0;
@@ -643,5 +653,5 @@ void JunctionTree::SendMessages(bool maximize)
 	C_freeVector(sender);
 	C_freeVector(receiver);
 
-	Messages2NodeBel();
+	Messages2NodeBel(maximize);
 }
