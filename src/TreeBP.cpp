@@ -31,7 +31,7 @@ void CRF::TreeBP(bool maximize)
 	}
 
 	int s, r, e, n;
-	double m, *msg, sumMsg;
+	double *msg;
 	double *outgoing = (double *) R_alloc(maxState, sizeof(double));
 
 	while (senderHead < senderTail)
@@ -62,10 +62,13 @@ void CRF::TreeBP(bool maximize)
 			sent[s] = -2;
 		}
 
+		/* send messages */
+
 		for (int i = 0; i < nReceiver; i++)
 		{
 			n = receiver[i];
 			r = AdjNodes(s, n);
+			e = AdjEdges(s, n);
 
 			for (int j = 0; j < nAdj[r]; j++)
 				if (AdjNodes(r, j) == s)
@@ -78,67 +81,13 @@ void CRF::TreeBP(bool maximize)
 			if (sent[r] != -2 && nWaiting[r] <= 1)
 				sender[senderTail++] = r;
 
-			/* send messages */
-
-			e = AdjEdges(s, n);
-			sumMsg = 0;
-			if (EdgesBegin(e) == s)
-			{
-				for (int j = 0; j < nStates[s]; j++)
-					outgoing[j] = messages[0][e][j] == 0 ? 0 : NodeBel(s, j) / messages[0][e][j];
-				msg = messages[1][e];
-				for (int j = 0; j < nStates[r]; j++)
-				{
-					msg[j] = 0;
-					if (maximize)
-					{
-						for (int k = 0; k < nStates[s]; k++)
-						{
-							m = outgoing[k] * EdgePot(e, k, j);
-							if (m > msg[j])
-								msg[j] = m;
-						}
-					}
-					else
-					{
-						for (int k = 0; k < nStates[s]; k++)
-							msg[j] += outgoing[k] * EdgePot(e, k, j);
-					}
-					sumMsg += msg[j];
-				}
-			}
+			if (maximize)
+				msg = SendMessagesMax(s, r, e, outgoing, messages);
 			else
-			{
-				for (int j = 0; j < nStates[s]; j++)
-					outgoing[j] = messages[1][e][j] == 0 ? 0 : NodeBel(s, j) / messages[1][e][j];
-				msg = messages[0][e];
-				for (int j = 0; j < nStates[r]; j++)
-				{
-					msg[j] = 0;
-					if (maximize)
-					{
-						for (int k = 0; k < nStates[s]; k++)
-						{
-							m = outgoing[k] * EdgePot(e, j, k);
-							if (m > msg[j])
-								msg[j] = m;
-						}
-					}
-					else
-					{
-						for (int k = 0; k < nStates[s]; k++)
-						{
-							msg[j] += outgoing[k] * EdgePot(e, j, k);
-						}
-					}
-					sumMsg += msg[j];
-				}
-			}
+				msg = SendMessagesSum(s, r, e, outgoing, messages);
+
 			for (int j = 0; j < nStates[r]; j++)
-			{
-				msg[j] /= sumMsg;
 				NodeBel(r, j) *= msg[j];
-			}
 		}
 	}
 
