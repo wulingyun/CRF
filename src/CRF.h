@@ -100,6 +100,8 @@ public:
 	/* Utils */
 	double Get_Potential(int *configuration);
 	double Get_LogPotential(int *configuration);
+	void Normalize_NodeBel();
+	void Normalize_EdgeBel();
 	void UB_Init();
 	void UB_Clamp(int *clamped);
 	double UB_Estimate();
@@ -117,9 +119,6 @@ public:
 	void TRBP_Messages2EdgeBel(double *mu, double **scaleEdgePot);
 	void TRBP_BetheFreeEnergy(double *mu);
 	void TRBP_Init(double *mu, double **scaleEdgePot);
-
-	/* Junction tree functions */
-	void JunctionTreeInit();
 
 	/* Decoding methods */
 	void Decode_Exact();

@@ -298,7 +298,10 @@ void JunctionTree::InitStateMasks(int c, int s)
 {
 	cid = c;
 	for (int i = 0; i < nClusterNodes[cid]; i++)
+	{
 		masks[clusterNodes[cid][i]] = 0;
+		states[clusterNodes[cid][i]] = 0;
+	}
 	if (s >= 0)
 	{
 		sid = s;
@@ -328,7 +331,7 @@ bool JunctionTree::NextClusterState()
 		n = clusterNodes[cid][index];
 		if (masks[n])
 			continue;
-		states[n] += 1;
+		states[n]++;
 		if (states[n] < nStates[n])
 			break;
 		else
@@ -346,7 +349,7 @@ bool JunctionTree::NextSeperatorState()
 	for (index = 0; index < nSeperatorNodes[sid]; index++)
 	{
 		n = seperatorNodes[sid][index];
-		states[n] += 1;
+		states[n]++;
 		if (states[n] < nStates[n])
 			break;
 		else
@@ -425,6 +428,13 @@ void JunctionTree::SendMessagesFromSeperator(int s, int c)
 
 void JunctionTree::InitMessages()
 {
+	for (int i = 0; i < nClusters; i++)
+		for (int j = 0; j < nClusterStates[i]; j++)
+			clusterBel[i][j] = 1;
+	for (int i = 0; i < nSeperators; i++)
+		for (int j = 0; j < nSeperatorStates[i]; j++)
+			seperatorBel[i][j] = 1;
+
 	int *nodeFree = (int *) C_allocVector<int>(nNodes);
 	int *edgeFree = (int *) C_allocVector<int>(nEdges);
 	for (int i = 0; i < nNodes; i++)
@@ -459,10 +469,6 @@ void JunctionTree::InitMessages()
 		for (int i = 0; i < nClusterEdges[c]; i++)
 			edgeFree[clusterEdges[c][i]] = 0;
 	}
-
-	for (int i = 0; i < nSeperators; i++)
-		for (int j = 0; j < nSeperatorStates[i]; j++)
-			seperatorBel[i][j] = 1;
 
 	C_freeVector(nodeFree);
 	C_freeVector(edgeFree);
@@ -502,6 +508,7 @@ void JunctionTree::Messages2NodeBel()
 			}
 		}
 	}
+	original.Normalize_NodeBel();
 
 	C_freeVector(nodeFree);
 }
@@ -546,6 +553,7 @@ void JunctionTree::Messages2EdgeBel()
 			}
 		}
 	}
+	original.Normalize_EdgeBel();
 
 	C_freeVector(edgeFree);
 }
@@ -628,6 +636,12 @@ void JunctionTree::SendMessages(bool maximize)
 			SendMessagesFromSeperator(e, r);
 		}
 	}
+
+	C_freeVector(nWaiting);
+	C_freeArray<int, 2>(waiting);
+	C_freeVector(sent);
+	C_freeVector(sender);
+	C_freeVector(receiver);
 
 	Messages2NodeBel();
 }
