@@ -246,7 +246,7 @@ public:
 	void SendMessagesFromClusterMax(int c, int s);
 	void SendMessagesFromSeperator(int s, int c);
 	void InitMessages();
-	void Messages2NodeBel();
+	void Messages2NodeBel(bool maximize = false);
 	void Messages2EdgeBel();
 
 	void SendMessages(bool maximize = false);
