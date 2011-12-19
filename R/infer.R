@@ -37,6 +37,9 @@ infer.cutset <- function(crf, cutset, engine = "default")
 	.Call("Infer_Cutset", newcrf, engine.id[engine])
 }
 
+infer.junction <- function(crf)
+	.Call("Infer_Junction", crf)
+
 infer.sample <- function(crf, sample.method, ...)
 	.Call("Infer_Sample", crf, sample.method(crf, ...))
 

@@ -15,7 +15,6 @@ SEXP Infer_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose)
 
 void CRF::Infer_LBP(int maxIter, double cutoff, int verbose)
 {
-	MessagesInit();
 	LoopyBP(maxIter, cutoff, verbose);
 	Messages2EdgeBel();
 	BetheFreeEnergy();

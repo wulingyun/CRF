@@ -25,6 +25,7 @@ extern "C" {
 	SEXP Infer_Sample(SEXP _crf, SEXP _samples);
 	SEXP Infer_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Infer_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
+	SEXP Infer_Junction(SEXP _crf);
 
 	/* Sampling */
 	SEXP Sample_Exact(SEXP _crf, SEXP _size);
@@ -107,7 +108,6 @@ public:
 	/* BP functions */
 	void TreeBP(bool maximize = false);
 	void LoopyBP(int maxIter, double cutoff, int verbose, bool maximize = false);
-	void MessagesInit();
 	void Messages2EdgeBel();
 	void MaxOfMarginals();
 	void BetheFreeEnergy();
@@ -139,6 +139,7 @@ public:
 	void Infer_Sample();
 	void Infer_LBP(int maxIter, double cutoff, int verbose);
 	void Infer_TRBP(int maxIter, double cutoff, int verbose);
+	void Infer_Junction();
 
 	/* Sampling methods */
 	void Sample_Exact(int size = 0);
@@ -223,8 +224,10 @@ class JunctionTree
 public:
 	CRF &original;
 	int nNodes, nEdges, *nStates;
-	int nClusters, **clusters, *clusterSize;
-	int nSeperators, **seperators, *seperatorSize, **seperatorEdges;
+
+	int nClusters, **clusterNodes, *nClusterNodes, **clusterEdges, *nClusterEdges;
+	int nSeperators, **seperatorNodes, *nSeperatorNodes, **seperators;
+	int *nAdj, **adjClusters, **adjSeperators;
 	int *nClusterStates, *nSeperatorStates;
 	double **clusterBel, **seperatorBel;
 
@@ -235,7 +238,7 @@ public:
 	double &ClusterBel(int n, int *states);
 	double &SeperatorBel(int n, int *states);
 
-	void InitStates(int c, int s);
+	void InitStateMasks(int c, int s = -1);
 	void ResetClusterState();
 	bool NextClusterState();
 	bool NextSeperatorState();
@@ -243,4 +246,9 @@ public:
 	void SendMessagesFromClusterSum(int c, int s);
 	void SendMessagesFromClusterMax(int c, int s);
 	void SendMessagesFromSeperator(int s, int c);
+	void InitMessages();
+	void Messages2NodeBel();
+	void Messages2EdgeBel();
+
+	void SendMessages(bool maximize = false);
 };
