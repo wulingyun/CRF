@@ -111,6 +111,8 @@ public:
 	void Messages2EdgeBel();
 	void MaxOfMarginals();
 	void BetheFreeEnergy();
+	double *SendMessagesSum(int s, int r, int e, double *outgoing, double ***old_messages);
+	double *SendMessagesMax(int s, int r, int e, double *outgoing, double ***old_messages);
 	void TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, int verbose, bool maximize = false);
 	void TRBP_Messages2EdgeBel(double *mu, double **scaleEdgePot);
 	void TRBP_BetheFreeEnergy(double *mu);

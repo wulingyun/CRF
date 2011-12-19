@@ -116,3 +116,83 @@ void CRF::BetheFreeEnergy()
 
 	*logZ = - nodeEnergy + nodeEntropy - edgeEnergy + edgeEntropy;
 }
+
+/* send sum-product messages */
+
+double *CRF::SendMessagesSum(int s, int r, int e, double *outgoing, double ***old_messages)
+{
+	double *msg, sumMsg = 0;
+	if (EdgesBegin(e) == s)
+	{
+		for (int j = 0; j < nStates[s]; j++)
+			outgoing[j] = old_messages[0][e][j] == 0 ? 0 : NodeBel(s, j) / old_messages[0][e][j];
+		msg = messages[1][e];
+		for (int j = 0; j < nStates[r]; j++)
+		{
+			msg[j] = 0;
+			for (int k = 0; k < nStates[s]; k++)
+				msg[j] += outgoing[k] * EdgePot(e, k, j);
+			sumMsg += msg[j];
+		}
+	}
+	else
+	{
+		for (int j = 0; j < nStates[s]; j++)
+			outgoing[j] = old_messages[1][e][j] == 0 ? 0 : NodeBel(s, j) / old_messages[1][e][j];
+		msg = messages[0][e];
+		for (int j = 0; j < nStates[r]; j++)
+		{
+			msg[j] = 0;
+			for (int k = 0; k < nStates[s]; k++)
+				msg[j] += outgoing[k] * EdgePot(e, j, k);
+			sumMsg += msg[j];
+		}
+	}
+	for (int j = 0; j < nStates[r]; j++)
+		msg[j] /= sumMsg;
+	return msg;
+}
+
+/* send max-product messages */
+
+double *CRF::SendMessagesMax(int s, int r, int e, double *outgoing, double ***old_messages)
+{
+	double *msg, m, sumMsg = 0;
+	if (EdgesBegin(e) == s)
+	{
+		for (int j = 0; j < nStates[s]; j++)
+			outgoing[j] = old_messages[0][e][j] == 0 ? 0 : NodeBel(s, j) / old_messages[0][e][j];
+		msg = messages[1][e];
+		for (int j = 0; j < nStates[r]; j++)
+		{
+			msg[j] = 0;
+			for (int k = 0; k < nStates[s]; k++)
+			{
+				m = outgoing[k] * EdgePot(e, k, j);
+				if (m > msg[j])
+					msg[j] = m;
+			}
+			sumMsg += msg[j];
+		}
+	}
+	else
+	{
+		for (int j = 0; j < nStates[s]; j++)
+			outgoing[j] = old_messages[1][e][j] == 0 ? 0 : NodeBel(s, j) / old_messages[1][e][j];
+		msg = messages[0][e];
+		for (int j = 0; j < nStates[r]; j++)
+		{
+			msg[j] = 0;
+			for (int k = 0; k < nStates[s]; k++)
+			{
+				m = outgoing[k] * EdgePot(e, j, k);
+				if (m > msg[j])
+					msg[j] = m;
+			}
+			sumMsg += msg[j];
+		}
+	}
+	for (int j = 0; j < nStates[r]; j++)
+		msg[j] /= sumMsg;
+	return msg;
+}
