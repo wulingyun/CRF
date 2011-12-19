@@ -75,9 +75,9 @@ int SampleFrom(int n, double *prob)
 
 /* minimum weight spanning tree using Kruskal algorithm */
 
-void MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs, int node_index_from)
+int MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs, int node_index_from)
 {
-	int *index = (int *) R_alloc(nEdges, sizeof(int));
+	int *index = (int *) C_allocVector<int>(nEdges);
 	for (int i = 0; i < nEdges; i++)
 	{
 		tree[i] = 0;
@@ -85,25 +85,30 @@ void MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs, i
 	}
 	rsort_with_index(costs, index, nEdges);
 
-	int *label = (int *) R_alloc(nNodes, sizeof(int));
+	int *label = (int *) C_allocVector<int>(nNodes);
 	for (int i = 0; i < nNodes; i++)
 		label[i] = i;
 
 	int n = 0, n1, n2;
 	for (int i = 0; i < nEdges; i++)
 	{
-		n1 = edges[index[i]] - node_index_from;
-		n2 = edges[index[i] + nEdges] - node_index_from;
-		if (label[n1] != label[n2])
+		n1 = label[edges[index[i]] - node_index_from];
+		n2 = label[edges[index[i] + nEdges] - node_index_from];
+		if (n1 != n2)
 		{
 			for (int j = 0; j < nNodes; j++)
-				if (label[j] == label[n2])
-					label[j] = label[n1];
+				if (label[j] == n2)
+					label[j] = n1;
 			tree[index[i]] = 1;
 			if (++n >= nNodes - 1)
 				break;
 		}
 	}
+
+	C_freeVector(index);
+	C_freeVector(label);
+
+	return n;
 }
 
 /* Get intersection of two ascending ordered vectors */

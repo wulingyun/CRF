@@ -165,39 +165,38 @@ JunctionTree::JunctionTree(CRF &crf)
 
 	/* construct junction tree by max weighted spanning tree */
 
-	m = nClusters * (nClusters - 1) / 2;
-	int *tree = (int *) C_allocVector<int>(m);
-	int *edges = (int *) C_allocVector<int>(m * 2);
-	int *weights = (int *) C_allocVector<int>(m);
-	double *costs = (double *) C_allocVector<double>(m);
+	int nCliqueEdges = nClusters * (nClusters - 1) / 2;
+	int *tree = (int *) C_allocVector<int>(nCliqueEdges);
+	int *edges = (int *) C_allocVector<int>(nCliqueEdges * 2);
+	int *weights = (int *) C_allocVector<int>(nCliqueEdges);
+	double *costs = (double *) C_allocVector<double>(nCliqueEdges);
 	n = 0;
 	for (int i = 0; i < nClusters-1; i++)
 	{
 		for (int j = i+1; j < nClusters; j++)
 		{
 			edges[n] = i;
-			edges[n + m] = j;
+			edges[n + nCliqueEdges] = j;
 			weights[n] = Intersection(overlap, clusterNodes[i], nClusterNodes[i], clusterNodes[j], nClusterNodes[j]);
 			costs[n] = -weights[n];
 			n++;
 		}
 	}
-	MinSpanTree(tree, nClusters, m, edges, costs, 0);
+	nSeperators = MinSpanTree(tree, nClusters, nCliqueEdges, edges, costs, 0);
 
 	nAdj = (int *) R_allocVector<int>(nClusters);
 	for (int i = 0; i < nClusters; i++)
 		nAdj[i] = 0;
 
-	nSeperators = nClusters - 1;
 	seperators = (int **) R_allocArray<int>(nSeperators, 2);
 	nSeperatorNodes = (int *) R_allocVector<int>(nSeperators);
 	n = 0;
-	for (int i = 0; i < m; i++)
+	for (int i = 0; i < nCliqueEdges; i++)
 	{
 		if (tree[i])
 		{
 			n1 = edges[i];
-			n2 = edges[i + m];
+			n2 = edges[i + nCliqueEdges];
 			nAdj[n1]++;
 			nAdj[n2]++;
 			seperators[n][0] = n1;

@@ -21,7 +21,7 @@ void SetDim3(SEXP array, int x1, int x2, int x3);
 int SampleFrom(int n, double *prob);
 
 /* minimum weight spanning tree using Kruskal algorithm */
-void MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs, int node_index_from = 1);
+int MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs, int node_index_from = 1);
 
 /* utils for ascending ordered vector */
 
