@@ -160,3 +160,38 @@ void CRF::Set_Samples(SEXP _otherSamples)
 	nSamples = length(_samples) / nNodes;
 	numProtect++;
 }
+
+void CRF::Normalize_NodeBel()
+{
+	double sumBel;
+	for (int i = 0; i < nNodes; i++)
+	{
+		sumBel = 0;
+		for (int j = 0; j < nStates[i]; j++)
+			sumBel += NodeBel(i, j);
+		for (int j = 0; j < nStates[i]; j++)
+			NodeBel(i, j) /= sumBel;
+	}
+}
+
+void CRF::Normalize_EdgeBel()
+{
+	int n1, n2;
+	double sumBel;
+	for (int i = 0; i < nEdges; i++)
+	{
+		n1 = EdgesBegin(i);
+		n2 = EdgesEnd(i);
+		sumBel = 0;
+		for (int j = 0; j < nStates[n2]; j++)
+		{
+			for (int k = 0; k < nStates[n1]; k++)
+				sumBel += EdgeBel(i, k, j);
+		}
+		for (int j = 0; j < nStates[n2]; j++)
+		{
+			for (int k = 0; k < nStates[n1]; k++)
+				EdgeBel(i, k, j) /= sumBel;
+		}
+	}
+}
