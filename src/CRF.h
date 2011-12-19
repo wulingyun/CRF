@@ -238,6 +238,7 @@ public:
 	bool NextClusterState();
 	bool NextSeperatorState();
 
-	void SendMessagesFromCluster(int c, int s);
+	void SendMessagesFromClusterSum(int c, int s);
+	void SendMessagesFromClusterMax(int c, int s);
 	void SendMessagesFromSeperator(int s, int c);
 };
