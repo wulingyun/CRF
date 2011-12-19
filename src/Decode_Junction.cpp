@@ -14,6 +14,8 @@ void CRF::Decode_Junction()
 	void *vmax = vmaxget(); 
 
 	JunctionTree tree(*this);
+	tree.SendMessages(true);
+	MaxOfMarginals();
 
 	vmaxset(vmax); 
 }

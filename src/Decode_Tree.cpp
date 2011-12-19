@@ -13,7 +13,6 @@ void CRF::Decode_Tree()
 {
 	void *vmax = vmaxget(); 
 
-	MessagesInit();
 	TreeBP(true);
 	MaxOfMarginals();
 

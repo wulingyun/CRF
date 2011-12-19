@@ -4,11 +4,10 @@
 
 void CRF::TreeBP(bool maximize)
 {
+	messages = (double ***) R_allocArray<double>(2, nEdges, maxState);
 	for (int i = 0; i < nEdges; i++)
 		for (int j = 0; j < maxState; j++)
-		{
 			messages[0][i][j] = messages[1][i][j] = 1;
-		}
 
 	int *nWaiting = (int *) R_alloc(nNodes, sizeof(int));
 	int **waiting = (int **) R_allocArray2<int>(nNodes, nAdj);

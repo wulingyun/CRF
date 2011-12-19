@@ -24,6 +24,9 @@ decode.cutset <- function(crf, cutset, engine = "default", start = apply(crf$nod
 	.Call("Decode_Cutset", newcrf, engine.id[engine], start)
 }
 
+decode.junction <- function(crf)
+	.Call("Decode_Junction", crf);
+
 decode.sample <- function(crf, sample.method, ...)
 	.Call("Decode_Sample", crf, sample.method(crf, ...))
 
@@ -182,6 +185,3 @@ decode.ilp <- function(crf, lp.rounding = FALSE)
 	}
 	apply(node.bel, 1, which.max)
 }
-
-decode.junction <- function(crf)
-	.Call("Decode_Junction", crf);

@@ -7,6 +7,7 @@ void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, in
 {
 	swap(edgePot, scaleEdgePot);
 
+	messages = (double ***) R_allocArray<double>(2, nEdges, maxState);
 	double ***old_messages = (double ***) R_allocArray<double>(2, nEdges, maxState);
 
 	for (int i = 0; i < nEdges; i++)

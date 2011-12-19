@@ -1,12 +1,5 @@
 #include "CRF.h"
 
-/* BP messages init */
-
-void CRF::MessagesInit()
-{
-	messages = (double ***) R_allocArray<double>(2, nEdges, maxState);
-}
-
 /* Edge beliefs */
 
 void CRF::Messages2EdgeBel()
