@@ -24,6 +24,7 @@ Decoding: Computing the most likely configuration
   \item \code{\link{decode.tree}}           Exact decoding for tree- and forest-structured graphs with max-product belief propagation
   \item \code{\link{decode.conditional}}    Conditional decoding (takes another decoding method as input)
   \item \code{\link{decode.cutset}}         Exact decoding for graphs with a small cutset using cutset conditioning
+  \item \code{\link{decode.junction}}       Exact decoding for low-treewidth graphs using junction trees
   \item \code{\link{decode.sample}}         Approximate decoding using sampling (takes a sampling method as input)
   \item \code{\link{decode.marginal}}       Approximate decoding using inference (takes an inference method as input)
   \item \code{\link{decode.lbp}}            Approximate decoding using max-product loopy belief propagation
@@ -41,6 +42,7 @@ Inference: Computing the partition function and marginal probabilities
   \item \code{\link{infer.tree}}            Exact inference for tree- and forest-structured graphs with sum-product belief propagation
   \item \code{\link{infer.conditional}}     Conditional inference (takes another inference method as input)
   \item \code{\link{infer.cutset}}          Exact inference for graphs with a small cutset using cutset conditioning
+  \item \code{\link{infer.junction}}        Exact decoding for low-treewidth graphs using junction trees
   \item \code{\link{infer.sample}}          Approximate inference using sampling (takes a sampling method as input)
   \item \code{\link{infer.lbp}}             Approximate inference using sum-product loopy belief propagation
   \item \code{\link{infer.trbp}}            Approximate inference using sum-product tree-reweighted belief propagation
@@ -53,6 +55,7 @@ Sampling: Generating samples from the distribution
   \item \code{\link{sample.tree}}           Exact sampling for tree- and forest-structured graphs with sum-product belief propagation and backward-sampling
   \item \code{\link{sample.conditional}}    Conditional sampling (takes another sampling method as input)
   \item \code{\link{sample.cutset}}         Exact sampling for graphs with a small cutset using cutset conditioning
+  \item \code{\link{sample.junction}}       Exact sampling for low-treewidth graphs using junction trees
   \item \code{\link{sample.gibbs}}          Approximate sampling using a single-site Gibbs sampler
 }
 

@@ -5,6 +5,7 @@
 \alias{sample.tree}
 \alias{sample.conditional}
 \alias{sample.cutset}
+\alias{sample.junction}
 \alias{sample.gibbs}
 
 \title{
@@ -21,6 +22,7 @@ sample.chain(crf, size)
 sample.tree(crf, size)
 sample.conditional(crf, size, clamped, sample.method, ...)
 sample.cutset(crf, size, cutset, engine = "default")
+sample.junction(crf, size)
 sample.gibbs(crf, size, burn.in = 1000,
              start = apply(crf$node.pot, 1, which.max))
 }
@@ -44,6 +46,7 @@ sample.gibbs(crf, size, burn.in = 1000,
   \item \code{\link{sample.tree}}           Exact sampling for tree- and forest-structured graphs with sum-product belief propagation and backward-sampling
   \item \code{\link{sample.conditional}}    Conditional sampling (takes another sampling method as input)
   \item \code{\link{sample.cutset}}         Exact sampling for graphs with a small cutset using cutset conditioning
+  \item \code{\link{sample.junction}}       Exact sampling for low-treewidth graphs using junction trees
   \item \code{\link{sample.gibbs}}          Approximate sampling using a single-site Gibbs sampler
 }
 }
@@ -76,6 +79,7 @@ s <- sample.chain(small.crf, 100)
 s <- sample.tree(small.crf, 100)
 s <- sample.conditional(small.crf, 100, c(0,1,0,0), sample.exact)
 s <- sample.cutset(small.crf, 100, c(2))
+s <- sample.junction(small.crf, 100)
 s <- sample.gibbs(small.crf, 100)
 }
 

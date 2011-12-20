@@ -10,28 +10,29 @@ extern "C" {
 	SEXP Decode_Chain(SEXP _crf);
 	SEXP Decode_Tree(SEXP _crf);
 	SEXP Decode_Cutset(SEXP _crf, SEXP _engine, SEXP _start);
+	SEXP Decode_Junction(SEXP _crf);
 	SEXP Decode_Sample(SEXP _crf, SEXP _samples);
 	SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Decode_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Decode_Greedy(SEXP _crf, SEXP _restart, SEXP _start);
 	SEXP Decode_ICM(SEXP _crf, SEXP _restart, SEXP _start);
-	SEXP Decode_Junction(SEXP _crf);
 
 	/* Inference */
 	SEXP Infer_Exact(SEXP _crf);
 	SEXP Infer_Chain(SEXP _crf);
 	SEXP Infer_Tree(SEXP _crf);
 	SEXP Infer_Cutset(SEXP _crf, SEXP _engine);
+	SEXP Infer_Junction(SEXP _crf);
 	SEXP Infer_Sample(SEXP _crf, SEXP _samples);
 	SEXP Infer_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Infer_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
-	SEXP Infer_Junction(SEXP _crf);
 
 	/* Sampling */
 	SEXP Sample_Exact(SEXP _crf, SEXP _size);
 	SEXP Sample_Chain(SEXP _crf, SEXP _size);
 	SEXP Sample_Tree(SEXP _crf, SEXP _size);
 	SEXP Sample_Cutset(SEXP _crf, SEXP _size, SEXP _engine);
+	SEXP Sample_Junction(SEXP _crf, SEXP _size);
 	SEXP Sample_Gibbs(SEXP _crf, SEXP _size, SEXP _burnIn, SEXP _start);
 
 	/* Utils */
@@ -124,26 +125,27 @@ public:
 	void Decode_Exact();
 	void Decode_Chain();
 	void Decode_Tree();
+	void Decode_Junction();
 	void Decode_Sample();
 	void Decode_LBP(int maxIter, double cutoff, int verbose);
 	void Decode_TRBP(int maxIter, double cutoff, int verbose);
 	void Decode_Greedy(int restart = 0, int *start = 0);
 	void Decode_ICM(int restart = 0, int *start = 0);
-	void Decode_Junction();
 
 	/* Inference methods */
 	void Infer_Exact();
 	void Infer_Chain();
 	void Infer_Tree();
+	void Infer_Junction();
 	void Infer_Sample();
 	void Infer_LBP(int maxIter, double cutoff, int verbose);
 	void Infer_TRBP(int maxIter, double cutoff, int verbose);
-	void Infer_Junction();
 
 	/* Sampling methods */
 	void Sample_Exact(int size = 0);
 	void Sample_Chain(int size = 0);
 	void Sample_Tree(int size = 0);
+	void Sample_Junction(int size = 0);
 	void Sample_Gibbs(int burnIn, int *start, int size = 0);
 };
 
@@ -234,11 +236,15 @@ public:
 
 	JunctionTree(CRF &crf);
 
+	int States2Index(int nNodes, int *nodes, int *states);
+	int *Index2States(int nNodes, int *nodes, int index, int *states);
+
 	double &ClusterBel(int n, int *states);
 	double &SeperatorBel(int n, int *states);
 
 	void InitStateMasks(int c, int s = -1);
 	void ResetClusterState();
+	void ResetSeperatorState();
 	bool NextClusterState();
 	bool NextSeperatorState();
 
@@ -250,4 +256,15 @@ public:
 	void Messages2EdgeBel();
 
 	void SendMessages(bool maximize = false);
+	void Sample(int size);
 };
+
+inline double &JunctionTree::ClusterBel(int n, int *states)
+{
+	return clusterBel[n][States2Index(nClusterNodes[n], clusterNodes[n], states)];
+}
+
+inline double &JunctionTree::SeperatorBel(int n, int *states)
+{
+	return seperatorBel[n][States2Index(nSeperatorNodes[n], seperatorNodes[n], states)];
+}
