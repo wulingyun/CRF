@@ -107,7 +107,7 @@ void CRF::BetheFreeEnergy()
 		}
 	}
 
-	*logZ = - nodeEnergy + nodeEntropy - edgeEnergy + edgeEntropy;
+	*logZ = - (nodeEnergy + edgeEnergy - nodeEntropy - edgeEntropy);
 }
 
 /* send sum-product messages */

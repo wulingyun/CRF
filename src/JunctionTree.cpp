@@ -361,7 +361,7 @@ void JunctionTree::SendMessagesFromClusterSum(int c, int s)
 {
 	InitStateMasks(c, s);
 
-	double msg;
+	double msg, sumBel = 0;
 	do
 	{
 		ResetClusterState();
@@ -374,16 +374,19 @@ void JunctionTree::SendMessagesFromClusterSum(int c, int s)
 		while (NextClusterState());
 
 		double &bel = SeperatorBel(s, states);
-		bel = msg / bel;
+		sumBel += bel = (bel == 0) ? 0 : msg / bel;
 	}
 	while (NextSeperatorState());
+
+	for (int i = 0; i < nSeperatorStates[s]; i++)
+		seperatorBel[s][i] /= sumBel;
 }
 
 void JunctionTree::SendMessagesFromClusterMax(int c, int s)
 {
 	InitStateMasks(c, s);
 
-	double msg;
+	double msg, sumBel = 0;
 	do
 	{
 		ResetClusterState();
@@ -398,9 +401,12 @@ void JunctionTree::SendMessagesFromClusterMax(int c, int s)
 		while (NextClusterState());
 
 		double &bel = SeperatorBel(s, states);
-		bel = (bel == 0) ? 0 : msg / bel;
+		sumBel += bel = (bel == 0) ? 0 : msg / bel;
 	}
 	while (NextSeperatorState());
+
+	for (int i = 0; i < nSeperatorStates[s]; i++)
+		seperatorBel[s][i] /= sumBel;
 }
 
 void JunctionTree::SendMessagesFromSeperator(int s, int c)
