@@ -5,6 +5,7 @@
 \alias{infer.tree}
 \alias{infer.conditional}
 \alias{infer.cutset}
+\alias{infer.junction}
 \alias{infer.sample}
 \alias{infer.lbp}
 \alias{infer.trbp}
@@ -23,6 +24,7 @@ infer.chain(crf)
 infer.tree(crf)
 infer.conditional(crf, clamped, infer.method, ...)
 infer.cutset(crf, cutset, engine = "default")
+infer.junction(crf)
 infer.sample(crf, sample.method, ...)
 infer.lbp(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 infer.trbp(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
@@ -48,6 +50,7 @@ infer.trbp(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
   \item \code{\link{infer.tree}}            Exact inference for tree- and forest-structured graphs with sum-product belief propagation
   \item \code{\link{infer.conditional}}     Conditional inference (takes another inference method as input)
   \item \code{\link{infer.cutset}}          Exact inference for graphs with a small cutset using cutset conditioning
+  \item \code{\link{infer.junction}}        Exact decoding for low-treewidth graphs using junction trees
   \item \code{\link{infer.sample}}          Approximate inference using sampling (takes a sampling method as input)
   \item \code{\link{infer.lbp}}             Approximate inference using sum-product loopy belief propagation
   \item \code{\link{infer.trbp}}            Approximate inference using sum-product tree-reweighted belief propagation
@@ -82,6 +85,7 @@ i <- infer.chain(small.crf)
 i <- infer.tree(small.crf)
 i <- infer.conditional(small.crf, c(0,1,0,0), infer.exact)
 i <- infer.cutset(small.crf, c(2))
+i <- infer.junction(small.crf)
 i <- infer.sample(small.crf, sample.exact, 10000)
 i <- infer.lbp(small.crf)
 i <- infer.trbp(small.crf)

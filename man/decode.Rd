@@ -5,6 +5,7 @@
 \alias{decode.tree}
 \alias{decode.conditional}
 \alias{decode.cutset}
+\alias{decode.junction}
 \alias{decode.sample}
 \alias{decode.marginal}
 \alias{decode.lbp}
@@ -29,6 +30,7 @@ decode.tree(crf)
 decode.conditional(crf, clamped, decode.method, ...)
 decode.cutset(crf, cutset, engine = "default",
               start = apply(crf$node.pot, 1, which.max))
+decode.junction(crf)
 decode.sample(crf, sample.method, ...)
 decode.marginal(crf, infer.method, ...)
 decode.lbp(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
@@ -65,6 +67,7 @@ decode.ilp(crf, lp.rounding = FALSE)
   \item \code{\link{decode.tree}}           Exact decoding for tree- and forest-structured graphs with max-product belief propagation
   \item \code{\link{decode.conditional}}    Conditional decoding (takes another decoding method as input)
   \item \code{\link{decode.cutset}}         Exact decoding for graphs with a small cutset using cutset conditioning
+  \item \code{\link{decode.junction}}       Exact decoding for low-treewidth graphs using junction trees
   \item \code{\link{decode.sample}}         Approximate decoding using sampling (takes a sampling method as input)
   \item \code{\link{decode.marginal}}       Approximate decoding using inference (takes an inference method as input)
   \item \code{\link{decode.lbp}}            Approximate decoding using max-product loopy belief propagation
@@ -104,6 +107,7 @@ d <- decode.chain(small.crf)
 d <- decode.tree(small.crf)
 d <- decode.conditional(small.crf, c(0,1,0,0), decode.exact)
 d <- decode.cutset(small.crf, c(2))
+d <- decode.junction(small.crf)
 d <- decode.sample(small.crf, sample.exact, 10000)
 d <- decode.marginal(small.crf, infer.exact)
 d <- decode.lbp(small.crf)
