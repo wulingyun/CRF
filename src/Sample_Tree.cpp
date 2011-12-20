@@ -30,19 +30,16 @@ void CRF::Sample_Tree(int size)
 
 	/* Sampling */
 
-	int nOrdered = 0;
+	int nOrdered = 0, nQueue = 0;
 	int *ordered = (int *) R_alloc(nNodes, sizeof(int));
 	int *order = (int *) R_alloc(nNodes, sizeof(int));
 	int *parentEdge = (int *) R_alloc(nNodes, sizeof(int));
-
-	int nQueue;
 	int *queue = (int *) R_alloc(nNodes, sizeof(int *));
-	int s, e, n;
 
 	for (int i = 0; i < nNodes; i++)
-		ordered[i] = queue[i] = 0;
+		ordered[i] = 0;
 
-	int n1, n2;
+	int s, e, n, n1, n2;
 	for (int i = 0; i < nNodes; i++)
 	{
 		if (ordered[i])
@@ -53,20 +50,10 @@ void CRF::Sample_Tree(int size)
 		parentEdge[nOrdered] = -1;
 		nOrdered++;
 
-		queue[i] = 1;
-		nQueue = 1;
+		queue[nQueue++] = i;
 		while (nQueue > 0)
 		{
-			n1 = 0;
-			for (int j = 0; j < nNodes; j++)
-				if (queue[j])
-				{
-					n1 = j;
-					queue[j] = 0;
-					nQueue--;
-					break;
-				}
-
+			n1 = queue[--nQueue];
 			for (int j = 0; j < nAdj[n1]; j++)
 			{
 				n2 = AdjNodes(n1, j);
@@ -78,8 +65,7 @@ void CRF::Sample_Tree(int size)
 				parentEdge[nOrdered] = AdjEdges(n1, j);
 				nOrdered++;
 
-				queue[n2] = 1;
-				nQueue++;
+				queue[nQueue++] = n2;
 			}
 		}
 	}
