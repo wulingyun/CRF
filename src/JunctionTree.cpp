@@ -266,46 +266,41 @@ JunctionTree::JunctionTree(CRF &crf)
 	states = (int *) R_allocVector<int>(nNodes);
 }
 
-double &JunctionTree::ClusterBel(int c, int *states)
+int JunctionTree::States2Index(int nNodes, int *nodes, int *states)
 {
-	int n = nClusterNodes[c]-1;
-	int k = states[clusterNodes[c][n]];
+	int n = nNodes-1;
+	int k = states[nodes[n]];
 	for (int i = n-1; i >= 0; i--)
 	{
-		k *= nStates[clusterNodes[c][i]];
-		k += states[clusterNodes[c][i]];
+		k *= nStates[nodes[i]];
+		k += states[nodes[i]];
 	}
-	return clusterBel[c][k];
+	return k;
 }
 
-double &JunctionTree::SeperatorBel(int s, int *states)
+int *JunctionTree::Index2States(int nNodes, int *nodes, int index, int *states)
 {
-	int n = nSeperatorNodes[s]-1;
-	int k = states[seperatorNodes[s][n]];
-	for (int i = n-1; i >= 0; i--)
+	int n;
+	for (int i = 0; i < nNodes-1; i++)
 	{
-		k *= nStates[seperatorNodes[s][i]];
-		k += states[seperatorNodes[s][i]];
+		n = nStates[nodes[i]];
+		states[nodes[i]] = index % n;
+		index /= n;
 	}
-	return seperatorBel[s][k];
+	states[nodes[nNodes-1]] = index;
+	return states;
 }
 
 void JunctionTree::InitStateMasks(int c, int s)
 {
 	cid = c;
 	for (int i = 0; i < nClusterNodes[cid]; i++)
-	{
 		masks[clusterNodes[cid][i]] = 0;
-		states[clusterNodes[cid][i]] = 0;
-	}
 	if (s >= 0)
 	{
 		sid = s;
 		for (int i = 0; i < nSeperatorNodes[sid]; i++)
-		{
 			masks[seperatorNodes[sid][i]] = 1;
-			states[seperatorNodes[sid][i]] = 0;
-		}
 	}
 }
 
@@ -317,6 +312,12 @@ void JunctionTree::ResetClusterState()
 			continue;
 		states[clusterNodes[cid][i]] = 0;
 	}
+}
+
+void JunctionTree::ResetSeperatorState()
+{
+	for (int i = 0; i < nSeperatorNodes[sid]; i++)
+		states[seperatorNodes[sid][i]] = 0;
 }
 
 bool JunctionTree::NextClusterState()
@@ -362,11 +363,11 @@ void JunctionTree::SendMessagesFromClusterSum(int c, int s)
 	InitStateMasks(c, s);
 
 	double msg, sumBel = 0;
+	ResetSeperatorState();
 	do
 	{
-		ResetClusterState();
-
 		msg = 0;
+		ResetClusterState();
 		do
 		{
 			msg += ClusterBel(c, states);
@@ -387,11 +388,11 @@ void JunctionTree::SendMessagesFromClusterMax(int c, int s)
 	InitStateMasks(c, s);
 
 	double msg, sumBel = 0;
+	ResetSeperatorState();
 	do
 	{
-		ResetClusterState();
-
 		msg = 0;
+		ResetClusterState();
 		do
 		{
 			double &bel = ClusterBel(c, states);
@@ -414,11 +415,11 @@ void JunctionTree::SendMessagesFromSeperator(int s, int c)
 	InitStateMasks(c, s);
 
 	double msg;
+	ResetSeperatorState();
 	do
 	{
-		ResetClusterState();
-
 		msg = SeperatorBel(s, states);
+		ResetClusterState();
 		do
 		{
 			ClusterBel(c, states) *= msg;
@@ -448,6 +449,7 @@ void JunctionTree::InitMessages()
 	for (int c = 0; c < nClusters; c++)
 	{
 		InitStateMasks(c);
+		ResetClusterState();
 		do
 		{
 			double &bel = ClusterBel(c, states);
@@ -496,8 +498,8 @@ void JunctionTree::Messages2NodeBel(bool maximize)
 				for (int j = 0; j < nStates[n]; j++)
 				{
 					states[n] = j;
-					ResetClusterState();
 					bel = 0;
+					ResetClusterState();
 					if (maximize)
 					{
 						do
@@ -553,8 +555,8 @@ void JunctionTree::Messages2EdgeBel()
 					for (int k = 0; k < nStates[n2]; k++)
 					{
 						states[n2] = k;
-						ResetClusterState();
 						bel = 0;
+						ResetClusterState();
 						do
 						{
 							bel += ClusterBel(c, states);
@@ -659,4 +661,112 @@ void JunctionTree::SendMessages(bool maximize)
 	C_freeVector(receiver);
 
 	Messages2NodeBel(maximize);
+}
+
+void JunctionTree::Sample(int size)
+{
+	if (size <= 0)
+		size = original.nSamples;
+	else if (size > original.nSamples)
+		original.Init_Samples(size);
+
+	int nOrder = 0, nQueue = 0;
+	int *ordered = (int *) R_allocVector<int>(nClusters);
+	int *order = (int *) R_allocVector<int>(nClusters);
+	int *root = (int *) R_allocVector<int>(nClusters);
+	int *queue = (int *) R_allocVector<int>(nClusters);
+
+	for (int i = 0; i < nClusters; i++)
+		ordered[i] = root[i] = 0;
+
+	int n1, n2;
+	for (int i = 0; i < nClusters; i++)
+	{
+		if (ordered[i])
+			continue;
+
+		ordered[i] = root[i] = 1;
+		order[nOrder++] = i;
+
+		queue[nQueue++] = i;
+		while (nQueue > 0)
+		{
+			n1 = queue[--nQueue];
+			for (int j = 0; j < nAdj[n1]; j++)
+			{
+				n2 = adjClusters[n1][j];
+				if (ordered[n2])
+					continue;
+
+				ordered[n2] = 1;
+				order[nOrder++] = n2;
+
+				queue[nQueue++] = n2;
+			}
+		}
+	}
+
+	int maxState = 0;
+	for (int i = 0; i < nClusters; i++)
+		if (maxState < nClusterStates[i])
+			maxState = nClusterStates[i];
+
+	int *freeNodes = (int *) R_allocVector<int>(nNodes);
+	double sumProb, *prob = (double *) R_allocVector<double>(maxState);
+
+	int c, n, index, nFreeNodes, nProb;
+	GetRNGstate();
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < nNodes; j++)
+			states[j] = -1;
+
+		for (int j = 0; j < nClusters; j++)
+		{
+			c = order[j];
+			if (root[j])
+			{
+				nProb = nClusterStates[c];
+				sumProb = 0;
+				for (int k = 0; k < nProb; k++)
+					sumProb += prob[k] = clusterBel[c][k];
+
+				for (int k = 0; k < nProb; k++)
+					prob[k] /= sumProb;
+				index = SampleFrom(nProb, prob);
+				Index2States(nClusterNodes[c], clusterNodes[c], index, states);
+			}
+			else
+			{
+				InitStateMasks(c);
+				nFreeNodes = 0;
+				for (int k = 0; k < nClusterNodes[c]; k++)
+				{
+					n = clusterNodes[c][k];
+					if (states[n] >= 0)
+						masks[n] = 1;
+					else
+						freeNodes[nFreeNodes++] = n;
+				}
+
+				nProb = 0;
+				sumProb = 0;
+				ResetClusterState();
+				do
+				{
+					sumProb += prob[nProb++] = ClusterBel(c, states);
+				}
+				while (NextClusterState());
+
+				for (int k = 0; k < nProb; k++)
+					prob[k] /= sumProb;
+				index = SampleFrom(nProb, prob);
+				Index2States(nFreeNodes, freeNodes, index, states);
+			}
+		}
+
+		for (int j = 0; j < nNodes; j++)
+			original.Samples(i, j) = states[j] + 1;
+	}
+	PutRNGstate();
 }

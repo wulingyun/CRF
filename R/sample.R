@@ -25,5 +25,8 @@ sample.cutset <- function(crf, size, cutset, engine = "default")
 	.Call("Sample_Cutset", newcrf, size, engine.id[engine])
 }
 
+sample.junction <- function(crf, size)
+	.Call("Sample_Junction", crf, size)
+
 sample.gibbs <- function(crf, size, burn.in = 1000, start = apply(crf$node.pot, 1, which.max))
 	.Call("Sample_Gibbs", crf, size, burn.in, start)
