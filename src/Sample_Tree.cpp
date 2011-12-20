@@ -34,7 +34,7 @@ void CRF::Sample_Tree(int size)
 	int *ordered = (int *) R_alloc(nNodes, sizeof(int));
 	int *order = (int *) R_alloc(nNodes, sizeof(int));
 	int *parentEdge = (int *) R_alloc(nNodes, sizeof(int));
-	int *queue = (int *) R_alloc(nNodes, sizeof(int *));
+	int *queue = (int *) R_alloc(nNodes, sizeof(int));
 
 	for (int i = 0; i < nNodes; i++)
 		ordered[i] = 0;
