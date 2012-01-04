@@ -20,7 +20,10 @@ clamp.crf <- function(crf, clamped)
 	data$edge.map <- rep(0, crf$n.edges)
 	data$edge.map[data$edge.id] <- 1:data$n.edges
 
-	data <- make.adj.info(data)
+	adj.info <- .Call("Make_AdjInfo", data)
+	data$n.adj <- adj.info$n.adj
+	data$adj.nodes <- adj.info$adj.nodes
+	data$adj.edges <- adj.info$adj.edges
 
 	data$n.states <- crf$n.states[data$node.id]
 	data$max.state <- max(data$n.states)
@@ -61,7 +64,10 @@ sub.crf <- function(crf, subset)
 	data$edge.map <- rep(0, crf$n.edges)
 	data$edge.map[data$edge.id] <- 1:data$n.edges
 
-	data <- make.adj.info(data)
+	adj.info <- .Call("Make_AdjInfo", data)
+	data$n.adj <- adj.info$n.adj
+	data$adj.nodes <- adj.info$adj.nodes
+	data$adj.edges <- adj.info$adj.edges
 
 	data$n.states <- crf$n.states[data$node.id]
 	data$max.state <- max(data$n.states)

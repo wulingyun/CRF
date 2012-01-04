@@ -36,6 +36,7 @@ extern "C" {
 	SEXP Sample_Gibbs(SEXP _crf, SEXP _size, SEXP _burnIn, SEXP _start);
 
 	/* Utils */
+	SEXP Make_AdjInfo(SEXP _crf);
 	SEXP Clamp_NodePot(SEXP _crfClamped);
 	SEXP Get_Potential(SEXP _crf, SEXP _configuration);
 	SEXP Get_LogPotential(SEXP _crf, SEXP _configuration);
