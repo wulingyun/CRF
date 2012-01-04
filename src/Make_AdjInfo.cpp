@@ -15,7 +15,7 @@ SEXP Make_AdjInfo(SEXP _crf)
 	int *nAdjTemp, **adjNodesTemp, **adjEdgesTemp;
 	nAdjTemp = (int *) R_allocVector<int>(nNodes);
 	adjNodesTemp = (int **) R_allocArray<int>(nNodes, nNodes);
-	adjEdgesTemp = (int **) R_allocArray<int>(nNodes, nEdges);
+	adjEdgesTemp = (int **) R_allocArray<int>(nNodes, nNodes);
 
 	int n1, n2;
 	for (int i = 0; i < nNodes; i++)
@@ -53,8 +53,8 @@ SEXP Make_AdjInfo(SEXP _crf)
 		temp2 = INTEGER_POINTER(_temp2);
 		for (int j = 0; j < nAdj[i]; j++)
 		{
-			temp1[j] = adjNodesTemp[i][j];
-			temp2[j] = adjEdgesTemp[i][j];
+			temp1[j] = adjNodesTemp[i][j] + 1;
+			temp2[j] = adjEdgesTemp[i][j] + 1;
 		}
 		SET_VECTOR_ELT(_adjNodes, i, _temp1);
 		SET_VECTOR_ELT(_adjEdges, i, _temp2);
