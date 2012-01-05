@@ -43,7 +43,7 @@ make.node.pot <- function(crf, features, instance)
 	map <- features$node.pot > 0
 	pot <- features$node.pot
 	pot[map] <- features$params[features$node.pot[map]]
-	node.pot <- exp(rowSums(pot * rep(instance, each=length(crf$node.pot)), dims=2))
+	node.pot <- exp(rowSums(pot * as.vector(apply(instance, 2, function(i) rep(i, crf$max.state))), dims=2))
 }
 
 make.edge.pot <- function(crf, features, instance)
@@ -53,7 +53,7 @@ make.edge.pot <- function(crf, features, instance)
 		map <- features$edge.pot[[i]] > 0
 		pot <- features$edge.pot[[i]]
 		pot[map] <- features$params[features$edge.pot[[i]][map]]
-		pot <- exp(rowSums(pot * rep(instance, each=length(crf$edge.pot[[i]])), dims=2))
+		pot <- exp(rowSums(pot * rep(instance[i,], each=length(crf$edge.pot[[i]])), dims=2))
 	}
 	edge.pot <- lapply(1:crf$n.edges, make.edge.pot.i)
 }

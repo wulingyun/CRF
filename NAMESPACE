@@ -1,5 +1,8 @@
 useDynLib(CRF)
 export(make.crf)
+export(make.features)
+export(make.node.pot)
+export(make.edge.pot)
 export(clamp.crf)
 export(clamp.reset)
 export(sub.crf)
