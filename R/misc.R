@@ -26,7 +26,7 @@ make.crf <- function(adj.matrix, nstates)
 	data
 }
 
-make.features <- function(crf, n.nf, n.ef = n.nf)
+make.features <- function(crf, n.nf = 1, n.ef = n.nf)
 {
 	data <- list()
 	data$n.nf <- n.nf
@@ -38,7 +38,7 @@ make.features <- function(crf, n.nf, n.ef = n.nf)
 	data
 }
 
-make.node.pot <- function(crf, features, instance)
+make.node.pot <- function(crf, features, instance = matrix(1, crf$n.nodes, features$n.nf))
 {
 	map <- features$node.pot > 0
 	pot <- features$node.pot
@@ -46,7 +46,7 @@ make.node.pot <- function(crf, features, instance)
 	node.pot <- exp(rowSums(pot * as.vector(apply(instance, 2, function(i) rep(i, crf$max.state))), dims=2))
 }
 
-make.edge.pot <- function(crf, features, instance)
+make.edge.pot <- function(crf, features, instance = matrix(1, crf$n.edges, features$n.ef))
 {
 	make.edge.pot.i <- function(i)
 	{
@@ -56,6 +56,29 @@ make.edge.pot <- function(crf, features, instance)
 		pot <- exp(rowSums(pot * rep(instance[i,], each=length(crf$edge.pot[[i]])), dims=2))
 	}
 	edge.pot <- lapply(1:crf$n.edges, make.edge.pot.i)
+}
+
+params.freq <- function(index, n.params)
+{
+	index <- index == rep(1:n.params, each=length(index))
+	index <- matrix(index, ncol=n.params)
+	colSums(index)
+}
+
+mrf.suff.stat <- function(crf, features, instances)
+{
+	suff.stat <- numeric(features$n.params)
+	n.instances <- dim(instances)[1]
+	index <- cbind(rep(1:crf$n.nodes, each=n.instances), as.vector(instances), rep(1, length(instances)))
+	index <- features$node.pot[index]
+	suff.stat <- suff.stat + params.freq(index, features$n.params)
+	for (i in 1:crf$n.edges)
+	{
+		index <- cbind(instances[,crf$edges[i,1]], instances[,crf$edges[i,2]], rep(1, n.instances))
+		index <- features$edge.pot[[i]][index]
+		suff.stat <- suff.stat + params.freq(index, features$n.params)
+	}
+	suff.stat
 }
 
 get.potential <- function(crf, configuration)
