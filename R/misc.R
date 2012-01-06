@@ -81,6 +81,13 @@ mrf.suff.stat <- function(crf, features, instances)
 	suff.stat
 }
 
+mrf.nll <- function(crf, features, instances, infer.method=infer.chain, ...)
+{
+	belief <- infer.method(crf, ...)
+	nll <- dim(instances)[1] * belief$logZ - features$params %*% features$suff.stat
+	nll
+}
+
 get.potential <- function(crf, configuration)
 	.Call("Get_Potential", crf, configuration)
 
