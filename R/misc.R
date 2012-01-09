@@ -60,9 +60,12 @@ make.edge.pot <- function(crf, features, instance = matrix(1, crf$n.edges, featu
 
 params.freq <- function(index, n.params)
 {
-	index <- index == rep(1:n.params, each=length(index))
-	index <- matrix(index, ncol=n.params)
-	colSums(index)
+	freq <- numeric(n.params)
+	for (i in 1:length(index))
+	{
+		if (index[i]) freq[index[i]] <- freq[index[i]] + 1
+	}
+	freq
 }
 
 mrf.suff.stat <- function(crf, features, instances)
@@ -83,8 +86,31 @@ mrf.suff.stat <- function(crf, features, instances)
 
 mrf.nll <- function(crf, features, instances, infer.method=infer.chain, ...)
 {
+	nll <- list()
+	n.instances <- dim(instances)[1]
 	belief <- infer.method(crf, ...)
-	nll <- dim(instances)[1] * belief$logZ - features$params %*% features$suff.stat
+	nll$value <- n.instances * belief$logZ - features$params %*% features$suff.stat
+	g <- -features$suff.stat
+	for (n in 1:crf$n.nodes)
+	{
+		for (s in 1:crf$n.states[n])
+		{
+			k <- features$node.pot[n,s,1]
+			if (k) g[k] <- g[k] + n.instances * belief$node.bel[n,s]
+		}
+	}
+	for (e in 1:crf$n.edges)
+	{
+		for (s1 in 1:crf$n.states[crf$edges[e,1]])
+		{
+			for (s2 in 1:crf$n.states[crf$edges[e,2]])
+			{
+				k <- features$edge.pot[[e]][s1,s2,1]
+				if (k) g[k] <- g[k] + n.instances * belief$edge.bel[[e]][s1,s2]
+			}
+		}
+	}
+	nll$gradient <- g
 	nll
 }
 
