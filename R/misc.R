@@ -58,15 +58,8 @@ make.edge.pot <- function(crf, features, instance = matrix(1, crf$n.edges, featu
 	edge.pot <- lapply(1:crf$n.edges, make.edge.pot.i)
 }
 
-params.freq <- function(index, n.params)
-{
-	freq <- numeric(n.params)
-	for (i in 1:length(index))
-	{
-		if (index[i]) freq[index[i]] <- freq[index[i]] + 1
-	}
-	freq
-}
+calc.frequency <- function(v, n)
+	.Call("Calc_Frequency", v, n)
 
 mrf.suff.stat <- function(crf, features, instances)
 {
@@ -74,12 +67,12 @@ mrf.suff.stat <- function(crf, features, instances)
 	n.instances <- dim(instances)[1]
 	index <- cbind(rep(1:crf$n.nodes, each=n.instances), as.vector(instances), rep(1, length(instances)))
 	index <- features$node.pot[index]
-	suff.stat <- suff.stat + params.freq(index, features$n.params)
+	suff.stat <- suff.stat + calc.frequency(index, features$n.params)
 	for (i in 1:crf$n.edges)
 	{
 		index <- cbind(instances[,crf$edges[i,1]], instances[,crf$edges[i,2]], rep(1, n.instances))
 		index <- features$edge.pot[[i]][index]
-		suff.stat <- suff.stat + params.freq(index, features$n.params)
+		suff.stat <- suff.stat + calc.frequency(index, features$n.params)
 	}
 	suff.stat
 }

@@ -40,6 +40,7 @@ extern "C" {
 	SEXP Clamp_NodePot(SEXP _crfClamped);
 	SEXP Get_Potential(SEXP _crf, SEXP _configuration);
 	SEXP Get_LogPotential(SEXP _crf, SEXP _configuration);
+	SEXP Calc_Frequency(SEXP _v, SEXP _n);
 }
 
 class JunctionTree;

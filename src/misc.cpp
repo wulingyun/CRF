@@ -169,3 +169,26 @@ void Remove(int *vector, int &size, int v)
 		}
 	}
 }
+
+/* Calculate Frequency */
+
+SEXP Calc_Frequency(SEXP _v, SEXP _n)
+{
+	PROTECT(_v = AS_INTEGER(_v));
+	PROTECT(_n = AS_INTEGER(_n));
+	int *v = INTEGER_POINTER(_v);
+	int n = INTEGER_POINTER(_n)[0];
+	int m = length(_v);
+
+	SEXP _freq;
+	PROTECT(_freq = NEW_INTEGER(n));
+	int *freq = INTEGER_POINTER(_freq);
+	SetValues(_freq, freq, 0);
+
+	for (int i = 0; i < m; i++)
+		if (v[i] > 0 && v[i] <= n)
+			freq[v[i]-1]++;
+
+	UNPROTECT(3);
+	return(_freq);
+}
