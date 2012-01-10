@@ -77,19 +77,31 @@ mrf.suff.stat <- function(crf, features, instances)
 	suff.stat
 }
 
-mrf.nll <- function(crf, features, instances, infer.method=infer.chain, ...)
+mrf.nll <- function(par, crf, features, instances, infer.method=infer.chain, ...)
 {
-	nll <- list()
 	n.instances <- dim(instances)[1]
+	features$params <- par
+	crf$node.pot <- make.node.pot(crf, features)
+	crf$edge.pot <- make.edge.pot(crf, features)
 	belief <- infer.method(crf, ...)
-	nll$value <- n.instances * belief$logZ - features$params %*% features$suff.stat
-	g <- -features$suff.stat
+	nll <- as.vector(n.instances * belief$logZ - par %*% features$suff.stat)
+	nll
+}
+
+mrf.nll.gradient <- function(par, crf, features, instances, infer.method=infer.chain, ...)
+{
+	n.instances <- dim(instances)[1]
+	features$params <- par
+	crf$node.pot <- make.node.pot(crf, features)
+	crf$edge.pot <- make.edge.pot(crf, features)
+	belief <- infer.method(crf, ...)
+	gradient <- -features$suff.stat
 	for (n in 1:crf$n.nodes)
 	{
 		for (s in 1:crf$n.states[n])
 		{
 			k <- features$node.pot[n,s,1]
-			if (k) g[k] <- g[k] + n.instances * belief$node.bel[n,s]
+			if (k) gradient[k] <- gradient[k] + n.instances * belief$node.bel[n,s]
 		}
 	}
 	for (e in 1:crf$n.edges)
@@ -99,12 +111,11 @@ mrf.nll <- function(crf, features, instances, infer.method=infer.chain, ...)
 			for (s2 in 1:crf$n.states[crf$edges[e,2]])
 			{
 				k <- features$edge.pot[[e]][s1,s2,1]
-				if (k) g[k] <- g[k] + n.instances * belief$edge.bel[[e]][s1,s2]
+				if (k) gradient[k] <- gradient[k] + n.instances * belief$edge.bel[[e]][s1,s2]
 			}
 		}
 	}
-	nll$gradient <- g
-	nll
+	gradient
 }
 
 get.potential <- function(crf, configuration)
