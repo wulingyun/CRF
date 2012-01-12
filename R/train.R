@@ -9,28 +9,11 @@ make.features <- function(crf, n.nf = 1, n.ef = n.nf, n.par = 1)
 	crf
 }
 
-make.node.pot <- function(crf, features = 1)
+update.pot <- function(crf, node.fea = 1, edge.fea = 1)
 {
-	features <- matrix(features, crf$n.nf, crf$n.nodes)
-	index <- crf$node.par > 0
-	node.par <- crf$node.par
-	node.par[index] <- crf$par[node.par[index]]
-	crf$node.pot <- exp(rowSums(node.par * as.vector(apply(features, 1, function(i) rep(i, crf$max.state))), dims=2))
-	crf
-}
-
-make.edge.pot <- function(crf, features = 1)
-{
-	features <- matrix(features, crf$n.ef, crf$n.edges)
-	make.edge.pot.i <- function(i)
-	{
-		index <- crf$edge.par[[i]] > 0
-		edge.par <- crf$edge.par[[i]]
-		edge.par[index] <- crf$par[edge.par[index]]
-		edge.pot <- exp(rowSums(edge.par * rep(features[,i], each=length(crf$edge.pot[[i]])), dims=2))
-	}
-	crf$edge.pot <- lapply(1:crf$n.edges, make.edge.pot.i)
-	crf
+	node.fea <- matrix(node.fea, crf$n.nf, crf$n.nodes)
+	edge.fea <- matrix(edge.fea, crf$n.ef, crf$n.edges)
+	.Call("Update_Pot", crf, node.fea, edge.fea)
 }
 
 calc.frequency <- function(v, n)
@@ -56,8 +39,7 @@ mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
 {
 	n.instances <- dim(instances)[1]
 	crf$par <- par
-	crf <- make.node.pot(crf)
-	crf <- make.edge.pot(crf)
+	update.pot(crf)
 	belief <- infer.method(crf, ...)
 	nll <- as.vector(n.instances * belief$logZ - par %*% crf$suff.stat)
 	nll
@@ -67,8 +49,7 @@ mrf.gradient <- function(par, crf, instances, infer.method = infer.chain, ...)
 {
 	n.instances <- dim(instances)[1]
 	crf$par <- par
-	crf <- make.node.pot(crf)
-	crf <- make.edge.pot(crf)
+	update.pot(crf)
 	belief <- infer.method(crf, ...)
 	gradient <- -crf$suff.stat
 	for (n in 1:crf$n.nodes)
@@ -102,8 +83,7 @@ crf.nll <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.metho
 	nll <- 0
 	for (i in 1:n.instances)
 	{
-		crf <- make.node.pot(crf, node.fea[,,i])
-		crf <- make.edge.pot(crf, edge.fea[,,i])
+		update.pot(crf, node.fea[,,i], edge.fea[,,i])
 		belief <- infer.method(crf, ...)
 		nll <- nll - get.logPotential(crf, instances[i,]) + belief$logZ
 	}
@@ -118,8 +98,7 @@ train.mrf <- function(crf, rain)
 {
 	solution <- optim(crf$par, mrf.nll, mrf.gradient, crf, rain, method = "L-BFGS-B")
 	crf$par <- solution$par
-	crf <- make.node.pot(crf)
-	crf <- make.edge.pot(crf)
+	update.pot(crf)
 	crf
 }
 
