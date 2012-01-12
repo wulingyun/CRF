@@ -37,6 +37,7 @@ extern "C" {
 
 	/* Utils */
 	SEXP Make_AdjInfo(SEXP _crf);
+	SEXP Update_Pot(SEXP _crf, SEXP _nf, SEXP _ef);
 	SEXP Clamp_NodePot(SEXP _crfClamped);
 	SEXP Get_Potential(SEXP _crf, SEXP _configuration);
 	SEXP Get_LogPotential(SEXP _crf, SEXP _configuration);
