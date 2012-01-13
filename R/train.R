@@ -6,6 +6,7 @@ make.features <- function(crf, n.nf = 1, n.ef = n.nf, n.par = 1)
 	crf$edge.par <- lapply(1:crf$n.edges, function(i) array(0, dim=c(crf$n.states[crf$edges[i,1]], crf$n.states[crf$edges[i,2]], n.ef)))
 	crf$n.par <- n.par
 	crf$par <- numeric(crf$n.par)
+	crf$w.par <- numeric(crf$n.par)
 	crf
 }
 
@@ -16,15 +17,12 @@ update.pot <- function(crf, node.fea = 1, edge.fea = 1)
 	.Call("Update_Pot", crf, node.fea, edge.fea)
 }
 
-calc.frequency <- function(v, n)
-	.Call("Calc_Frequency", v, n)
-
-get.suff.stat <- function(crf, instances, node.fea = 1, edge.fea = 1)
+update.par.stat <- function(crf, instances, node.fea = 1, edge.fea = 1)
 {
 	n.instances <- dim(instances)[1]
 	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
 	edge.fea <- array(edge.fea, dim=c(crf$n.ef, crf$n.edges, n.instances))
-	.Call("Get_SuffStat", crf, n.instances, instances, node.fea, edge.fea)
+	.Call("Update_ParStat", crf, n.instances, instances, node.fea, edge.fea)
 }
 
 mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
@@ -33,7 +31,7 @@ mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
 	crf$par <- par
 	update.pot(crf)
 	belief <- infer.method(crf, ...)
-	nll <- as.vector(n.instances * belief$logZ - par %*% crf$suff.stat)
+	nll <- as.vector(n.instances * belief$logZ - par %*% crf$w.par)
 	nll
 }
 
@@ -43,7 +41,7 @@ mrf.gradient <- function(par, crf, instances, infer.method = infer.chain, ...)
 	crf$par <- par
 	update.pot(crf)
 	belief <- infer.method(crf, ...)
-	gradient <- -crf$suff.stat
+	gradient <- -crf$w.par
 	for (n in 1:crf$n.nodes)
 	{
 		for (s in 1:crf$n.states[n])
@@ -82,18 +80,54 @@ crf.nll <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.metho
 	nll
 }
 
-crf.gradient <- function(par, crf, instances, node.fea = array(1, dim=c(crf$n.nf, crf$n.nodes, dim(instances)[1])), edge.fea = array(1, dim=c(crf$n.ef, crf$n.edges, dim(instances)[1])), infer.method = infer.chain, ...)
+crf.gradient <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.method = infer.chain, ...)
 {
+	n.instances <- dim(instances)[1]
+	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
+	edge.fea <- array(edge.fea, dim=c(crf$n.ef, crf$n.edges, n.instances))
+	crf$par <- par
+	gradient <- -crf$w.par
+	for (i in 1:n.instances)
+	{
+		update.pot(crf, node.fea[,,i], edge.fea[,,i])
+		belief <- infer.method(crf, ...)
+		for (n in 1:crf$n.nodes)
+		{
+			for (s in 1:crf$n.states[n])
+			{
+				k <- crf$node.par[n,s,1]
+				if (k) gradient[k] <- gradient[k] + belief$node.bel[n,s]
+			}
+		}
+		for (e in 1:crf$n.edges)
+		{
+			for (s1 in 1:crf$n.states[crf$edges[e,1]])
+			{
+				for (s2 in 1:crf$n.states[crf$edges[e,2]])
+				{
+					k <- crf$edge.par[[e]][s1,s2,1]
+					if (k) gradient[k] <- gradient[k] + belief$edge.bel[[e]][s1,s2]
+				}
+			}
+		}
+	}
+	gradient
 }
 
-train.mrf <- function(crf, rain)
+train.mrf <- function(crf, instances)
 {
-	solution <- optim(crf$par, mrf.nll, mrf.gradient, crf, rain, method = "L-BFGS-B")
+	update.par.stat(crf, instances)
+	solution <- optim(crf$par, mrf.nll, mrf.gradient, crf, instances, method = "L-BFGS-B")
 	crf$par <- solution$par
 	update.pot(crf)
 	crf
 }
 
-train.crf <- function(crf, rain)
+train.crf <- function(crf, instances, node.fea = 1, edge.fea = 1)
 {
+	update.par.stat(crf, instances, node.fea, edge.fea)
+	solution <- optim(crf$par, crf.nll, crf.gradient, crf, instances, node.fea, edge.fea, method = "L-BFGS-B")
+	crf$par <- solution$par
+	update.pot(crf)
+	crf
 }
