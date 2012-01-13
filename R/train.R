@@ -1,9 +1,14 @@
-make.features <- function(crf, n.nf = 1, n.ef = n.nf, n.par = 1)
+make.features <- function(crf, n.nf = 1, n.ef = 1)
 {
 	crf$n.nf <- n.nf
 	crf$n.ef <- n.ef
 	crf$node.par <- array(0, dim=c(crf$n.nodes, crf$max.state, n.nf))
 	crf$edge.par <- lapply(1:crf$n.edges, function(i) array(0, dim=c(crf$n.states[crf$edges[i,1]], crf$n.states[crf$edges[i,2]], n.ef)))
+	crf
+}
+
+make.par <- function(crf, n.par = 1)
+{
 	crf$n.par <- n.par
 	crf$par <- numeric(crf$n.par)
 	crf$w.par <- numeric(crf$n.par)
@@ -95,8 +100,11 @@ crf.gradient <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.
 		{
 			for (s in 1:crf$n.states[n])
 			{
-				k <- crf$node.par[n,s,1]
-				if (k) gradient[k] <- gradient[k] + belief$node.bel[n,s]
+				for (f in 1:crf$n.nf)
+				{
+					k <- crf$node.par[n,s,f]
+					if (k) gradient[k] <- gradient[k] + node.fea[f,n,i] * belief$node.bel[n,s]
+				}
 			}
 		}
 		for (e in 1:crf$n.edges)
@@ -105,8 +113,11 @@ crf.gradient <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.
 			{
 				for (s2 in 1:crf$n.states[crf$edges[e,2]])
 				{
-					k <- crf$edge.par[[e]][s1,s2,1]
-					if (k) gradient[k] <- gradient[k] + belief$edge.bel[[e]][s1,s2]
+					for (f in 1:crf$n.ef)
+					{
+						k <- crf$edge.par[[e]][s1,s2,f]
+						if (k) gradient[k] <- gradient[k] + edge.fea[f,e,i] * belief$edge.bel[[e]][s1,s2]
+					}
 				}
 			}
 		}
@@ -128,6 +139,6 @@ train.crf <- function(crf, instances, node.fea = 1, edge.fea = 1)
 	update.par.stat(crf, instances, node.fea, edge.fea)
 	solution <- optim(crf$par, crf.nll, crf.gradient, crf, instances, node.fea, edge.fea, method = "L-BFGS-B")
 	crf$par <- solution$par
-	update.pot(crf)
+	update.pot(crf, node.fea[,,1], edge.fea[,,1])
 	crf
 }
