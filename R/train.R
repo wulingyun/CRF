@@ -19,20 +19,12 @@ update.pot <- function(crf, node.fea = 1, edge.fea = 1)
 calc.frequency <- function(v, n)
 	.Call("Calc_Frequency", v, n)
 
-mrf.suff.stat <- function(crf, instances)
+get.suff.stat <- function(crf, instances, node.fea = 1, edge.fea = 1)
 {
-	suff.stat <- numeric(crf$n.par)
 	n.instances <- dim(instances)[1]
-	index <- cbind(rep(1:crf$n.nodes, each=n.instances), as.vector(instances), rep(1, length(instances)))
-	index <- crf$node.par[index]
-	suff.stat <- suff.stat + calc.frequency(index, crf$n.par)
-	for (i in 1:crf$n.edges)
-	{
-		index <- cbind(instances[,crf$edges[i,1]], instances[,crf$edges[i,2]], rep(1, n.instances))
-		index <- crf$edge.par[[i]][index]
-		suff.stat <- suff.stat + calc.frequency(index, crf$n.par)
-	}
-	suff.stat
+	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
+	edge.fea <- array(edge.fea, dim=c(crf$n.ef, crf$n.edges, n.instances))
+	.Call("Get_SuffStat", crf, n.instances, instances, node.fea, edge.fea)
 }
 
 mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
