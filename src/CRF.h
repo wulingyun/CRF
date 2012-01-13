@@ -39,6 +39,7 @@ extern "C" {
 	SEXP Make_AdjInfo(SEXP _crf);
 	SEXP Update_Pot(SEXP _crf, SEXP _nf, SEXP _ef);
 	SEXP Clamp_NodePot(SEXP _crfClamped);
+	SEXP Get_SuffStat(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nf, SEXP _ef);
 	SEXP Get_Potential(SEXP _crf, SEXP _configuration);
 	SEXP Get_LogPotential(SEXP _crf, SEXP _configuration);
 	SEXP Calc_Frequency(SEXP _v, SEXP _n);
