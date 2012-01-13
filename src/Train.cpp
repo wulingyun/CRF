@@ -71,7 +71,7 @@ SEXP Update_Pot(SEXP _crf, SEXP _nodeFea, SEXP _edgeFea)
 	return(_crf);
 }
 
-SEXP Get_SuffStat(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea)
+SEXP Update_ParStat(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea)
 {
 	CRF crf(_crf);
 
@@ -84,11 +84,11 @@ SEXP Get_SuffStat(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, S
 	double *nodeFea = NUMERIC_POINTER(AS_NUMERIC(_nodeFea));
 	double *edgeFea = NUMERIC_POINTER(AS_NUMERIC(_edgeFea));
 
-	SEXP _suffstat;
-	double *suffstat;
-	PROTECT(_suffstat = NEW_NUMERIC(nPar));
-	suffstat = NUMERIC_POINTER(_suffstat);
-	SetValues(_suffstat, suffstat, 0.0);
+	SEXP _wPar;
+	double *wPar;
+	PROTECT(_wPar = AS_NUMERIC(GetListElement(_crf, "w.par")));
+	wPar = NUMERIC_POINTER(_wPar);
+	SetValues(_wPar, wPar, 0.0);
 
 	SEXP _nodePar, _edgePar, _temp;
 	int *nodePar, **edgePar;
@@ -113,7 +113,7 @@ SEXP Get_SuffStat(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, S
 				{
 					int p = nodePar[i + crf.nNodes * (k + crf.maxState * j)] - 1;
 					if (p >= 0 && p < nPar)
-						suffstat[p] += f;
+						wPar[p] += f;
 				}
 			}
 		}
@@ -131,12 +131,12 @@ SEXP Get_SuffStat(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, S
 					int k = s1 + crf.nStates[crf.EdgesBegin(i)] * s2;
 					int p = edgePar[i][k + crf.nEdgeStates[i] * j] - 1;
 					if (p >= 0 && p < nPar)
-						suffstat[p] += f;
+						wPar[p] += f;
 				}
 			}
 		}
 
 	UNPROTECT(crf.nEdges + 3);
 
-	return(_suffstat);
+	return(_crf);
 }
