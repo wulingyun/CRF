@@ -141,6 +141,46 @@ SEXP Update_ParStat(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea,
 	return(_crf);
 }
 
+SEXP CRF_NLL(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea, SEXP _infer, SEXP _env)
+{
+	CRF crf(_crf);
+
+	int nInstances = INTEGER_POINTER(AS_INTEGER(_nInstances))[0];
+	int nNodeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.nf")))[0];
+	int nEdgeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.ef")))[0];
+
+	double *instances = NUMERIC_POINTER(AS_NUMERIC(_instances));
+	double *nodeFea = NUMERIC_POINTER(AS_NUMERIC(_nodeFea));
+	double *edgeFea = NUMERIC_POINTER(AS_NUMERIC(_edgeFea));
+
+	SEXP _nll;
+	double *nll;
+	PROTECT(_nll = NEW_NUMERIC(1));
+	nll = NUMERIC_POINTER(_nll);
+	*nll = 0.0;
+
+	int *y = (int *) R_allocVector<int>(crf.nNodes);
+
+	for (int n = 0; n < nInstances; n++)
+	{
+		crf.Update_Pot(nodeFea + nNodeFea*crf.nNodes*n, edgeFea + nEdgeFea*crf.nEdges*n);
+
+		SEXP _belief;
+		PROTECT(_belief = eval(_infer, _env));
+		*nll += NUMERIC_POINTER(AS_NUMERIC(GetListElement(_belief, "logZ")))[0];
+
+		for (int i = 0; i < crf.nNodes; i++)
+			y[i] = instances[n + nInstances * i] - 1;
+		*nll -= crf.Get_LogPotential(y);
+
+		UNPROTECT(1);
+	}
+
+	UNPROTECT(1);
+
+	return(_nll);
+}
+
 SEXP CRF_Gradient(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea, SEXP _infer, SEXP _env)
 {
 	CRF crf(_crf);
