@@ -75,54 +75,7 @@ crf.nll <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.metho
 	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
 	edge.fea <- array(edge.fea, dim=c(crf$n.ef, crf$n.edges, n.instances))
 	crf$par <- par
-	nll <- 0
-	for (i in 1:n.instances)
-	{
-		update.pot(crf, node.fea[,,i], edge.fea[,,i])
-		belief <- infer.method(crf, ...)
-		nll <- nll - get.logPotential(crf, instances[i,]) + belief$logZ
-	}
-	nll
-}
-
-crf.gradient.R <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.method = infer.chain, ...)
-{
-	n.instances <- dim(instances)[1]
-	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
-	edge.fea <- array(edge.fea, dim=c(crf$n.ef, crf$n.edges, n.instances))
-	crf$par <- par
-	gradient <- -crf$w.par
-	for (i in 1:n.instances)
-	{
-		update.pot(crf, node.fea[,,i], edge.fea[,,i])
-		belief <- infer.method(crf, ...)
-		for (n in 1:crf$n.nodes)
-		{
-			for (s in 1:crf$n.states[n])
-			{
-				for (f in 1:crf$n.nf)
-				{
-					k <- crf$node.par[n,s,f]
-					if (k) gradient[k] <- gradient[k] + node.fea[f,n,i] * belief$node.bel[n,s]
-				}
-			}
-		}
-		for (e in 1:crf$n.edges)
-		{
-			for (s1 in 1:crf$n.states[crf$edges[e,1]])
-			{
-				for (s2 in 1:crf$n.states[crf$edges[e,2]])
-				{
-					for (f in 1:crf$n.ef)
-					{
-						k <- crf$edge.par[[e]][s1,s2,f]
-						if (k) gradient[k] <- gradient[k] + edge.fea[f,e,i] * belief$edge.bel[[e]][s1,s2]
-					}
-				}
-			}
-		}
-	}
-	gradient
+	.Call("CRF_NLL", crf, n.instances, instances, node.fea, edge.fea, quote(infer.method(crf, ...)), environment())
 }
 
 crf.gradient <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.method = infer.chain, ...)
