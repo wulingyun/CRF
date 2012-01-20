@@ -39,6 +39,8 @@ extern "C" {
 	SEXP Make_AdjInfo(SEXP _crf);
 	SEXP Update_Pot(SEXP _crf, SEXP _nf, SEXP _ef);
 	SEXP Update_ParStat(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nf, SEXP _ef);
+	SEXP CRF_Gradient(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea, SEXP _infer, SEXP _env);
+
 	SEXP Clamp_NodePot(SEXP _crfClamped);
 	SEXP Get_Potential(SEXP _crf, SEXP _configuration);
 	SEXP Get_LogPotential(SEXP _crf, SEXP _configuration);
@@ -51,6 +53,8 @@ class JunctionTree;
 
 class CRF {
 public:
+	SEXP _crf;
+
 	SEXP _nNodes, _nEdges, _edges, _nStates, _maxState;
 	int nNodes, nEdges, *edges, *nStates, maxState;
 
@@ -103,6 +107,7 @@ public:
 	int &Samples(int i, int n);
 
 	/* Utils */
+	void Update_Pot(double *nf, double *ef);
 	double Get_Potential(int *configuration);
 	double Get_LogPotential(int *configuration);
 	void Normalize_NodeBel();

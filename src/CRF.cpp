@@ -42,8 +42,9 @@ CRF::~CRF()
 	UNPROTECT(numProtect);
 }
 
-void CRF::Set_Data(SEXP _crf)
+void CRF::Set_Data(SEXP _newcrf)
 {
+	_crf = _newcrf;
 	PROTECT(_nNodes = AS_INTEGER(GetListElement(_crf, "n.nodes")));
 	PROTECT(_nEdges = AS_INTEGER(GetListElement(_crf, "n.edges")));
 	PROTECT(_edges = AS_INTEGER(GetListElement(_crf, "edges")));
