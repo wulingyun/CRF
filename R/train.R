@@ -85,7 +85,7 @@ crf.nll <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.metho
 	nll
 }
 
-crf.gradient <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.method = infer.chain, ...)
+crf.gradient.R <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.method = infer.chain, ...)
 {
 	n.instances <- dim(instances)[1]
 	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
@@ -123,6 +123,15 @@ crf.gradient <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.
 		}
 	}
 	gradient
+}
+
+crf.gradient <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.method = infer.chain, ...)
+{
+	n.instances <- dim(instances)[1]
+	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
+	edge.fea <- array(edge.fea, dim=c(crf$n.ef, crf$n.edges, n.instances))
+	crf$par <- par
+	.Call("CRF_Gradient", crf, n.instances, instances, node.fea, edge.fea, quote(infer.method(crf, ...)), environment())
 }
 
 train.mrf <- function(crf, instances)
