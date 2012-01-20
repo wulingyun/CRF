@@ -136,6 +136,9 @@ train.mrf <- function(crf, instances)
 
 train.crf <- function(crf, instances, node.fea = 1, edge.fea = 1)
 {
+	n.instances <- dim(instances)[1]
+	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
+	edge.fea <- array(edge.fea, dim=c(crf$n.ef, crf$n.edges, n.instances))
 	update.par.stat(crf, instances, node.fea, edge.fea)
 	solution <- optim(crf$par, crf.nll, crf.gradient, crf, instances, node.fea, edge.fea, method = "L-BFGS-B")
 	crf$par <- solution$par
