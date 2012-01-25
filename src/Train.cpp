@@ -141,47 +141,7 @@ SEXP Update_ParStat(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea,
 	return(_crf);
 }
 
-SEXP CRF_NLL(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea, SEXP _infer, SEXP _env)
-{
-	CRF crf(_crf);
-
-	int nInstances = INTEGER_POINTER(AS_INTEGER(_nInstances))[0];
-	int nNodeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.nf")))[0];
-	int nEdgeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.ef")))[0];
-
-	double *instances = NUMERIC_POINTER(AS_NUMERIC(_instances));
-	double *nodeFea = NUMERIC_POINTER(AS_NUMERIC(_nodeFea));
-	double *edgeFea = NUMERIC_POINTER(AS_NUMERIC(_edgeFea));
-
-	SEXP _nll;
-	double *nll;
-	PROTECT(_nll = NEW_NUMERIC(1));
-	nll = NUMERIC_POINTER(_nll);
-	*nll = 0.0;
-
-	int *y = (int *) R_allocVector<int>(crf.nNodes);
-
-	for (int n = 0; n < nInstances; n++)
-	{
-		crf.Update_Pot(nodeFea + nNodeFea*crf.nNodes*n, edgeFea + nEdgeFea*crf.nEdges*n);
-
-		SEXP _belief;
-		PROTECT(_belief = eval(_infer, _env));
-		*nll += NUMERIC_POINTER(AS_NUMERIC(GetListElement(_belief, "logZ")))[0];
-
-		for (int i = 0; i < crf.nNodes; i++)
-			y[i] = instances[n + nInstances * i] - 1;
-		*nll -= crf.Get_LogPotential(y);
-
-		UNPROTECT(1);
-	}
-
-	UNPROTECT(1);
-
-	return(_nll);
-}
-
-SEXP CRF_Gradient(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea, SEXP _infer, SEXP _env)
+SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea, SEXP _infer, SEXP _env)
 {
 	CRF crf(_crf);
 
@@ -190,6 +150,7 @@ SEXP CRF_Gradient(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, S
 	int nNodeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.nf")))[0];
 	int nEdgeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.ef")))[0];
 
+	double *par = NUMERIC_POINTER(AS_NUMERIC(_par));
 	double *instances = NUMERIC_POINTER(AS_NUMERIC(_instances));
 	double *nodeFea = NUMERIC_POINTER(AS_NUMERIC(_nodeFea));
 	double *edgeFea = NUMERIC_POINTER(AS_NUMERIC(_edgeFea));
@@ -206,15 +167,30 @@ SEXP CRF_Gradient(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, S
 		edgePar[i] = INTEGER_POINTER(_temp);
 	}
 
-	SEXP _gradient;
-	double *gradient;
-	PROTECT(_gradient = NEW_NUMERIC(nPar));
+	SEXP _crfPar;
+	double *crfPar;
+	PROTECT(_crfPar = AS_NUMERIC(GetListElement(_crf, "par")));
+	crfPar = NUMERIC_POINTER(_crfPar);
+	for (int i = 0; i < nPar; i++)
+		crfPar[i] = par[i];
+
+	SEXP _nll, _gradient;
+	double *nll, *gradient;
+	PROTECT(_nll = AS_NUMERIC(GetListElement(_crf, "nll")));
+	PROTECT(_gradient = AS_NUMERIC(GetListElement(_crf, "gradient")));
+	nll = NUMERIC_POINTER(_nll);
 	gradient = NUMERIC_POINTER(_gradient);
+	*nll = 0.0;
 	SetValues(_gradient, gradient, 0.0);
+
+	int *y = (int *) R_allocVector<int>(crf.nNodes);
 
 	for (int n = 0; n < nInstances; n++)
 	{
 		crf.Update_Pot(nodeFea + nNodeFea*crf.nNodes*n, edgeFea + nEdgeFea*crf.nEdges*n);
+
+		for (int i = 0; i < crf.nNodes; i++)
+			y[i] = instances[n + nInstances * i] - 1;
 
 		SEXP _belief, _nodeBel, _edgeBel, _temp;
 		double *nodeBel, **edgeBel;
@@ -229,9 +205,11 @@ SEXP CRF_Gradient(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, S
 			edgeBel[i] = NUMERIC_POINTER(_temp);
 		}
 
+		*nll += NUMERIC_POINTER(AS_NUMERIC(GetListElement(_belief, "logZ")))[0] - crf.Get_LogPotential(y);
+
 		for (int i = 0; i < crf.nNodes; i++)
 		{
-			int s = instances[n + nInstances * i] - 1;
+			int s = y[i];
 			for (int j = 0; j < nNodeFea; j++)
 			{
 				double f = nodeFea[j + nNodeFea * (i + crf.nNodes * n)];
@@ -255,9 +233,7 @@ SEXP CRF_Gradient(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, S
 
 		for (int i = 0; i < crf.nEdges; i++)
 		{
-			int s1 = instances[n + nInstances * crf.EdgesBegin(i)] - 1;
-			int s2 = instances[n + nInstances * crf.EdgesEnd(i)] - 1;
-			int s = s1 + crf.nStates[crf.EdgesBegin(i)] * s2;
+			int s = y[crf.EdgesBegin(i)] + crf.nStates[crf.EdgesBegin(i)] * y[crf.EdgesEnd(i)];
 			for (int j = 0; j < nEdgeFea; j++)
 			{
 				double f = edgeFea[j + nEdgeFea * (i + crf.nEdges * n)];
@@ -282,7 +258,7 @@ SEXP CRF_Gradient(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, S
 		UNPROTECT(crf.nEdges + 3);
 	}
 
-	UNPROTECT(crf.nEdges + 3);
+	UNPROTECT(crf.nEdges + 5);
 
-	return(_gradient);
+	return(_nll);
 }
