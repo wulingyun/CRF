@@ -38,7 +38,7 @@ extern "C" {
 	/* Utils */
 	SEXP Make_AdjInfo(SEXP _crf);
 	SEXP Update_Pot(SEXP _crf, SEXP _nf, SEXP _ef);
-	SEXP Update_ParStat(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nf, SEXP _ef);
+	SEXP MRF_Stat(SEXP _crf, SEXP _nInstances, SEXP _instances);
 	SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea, SEXP _infer, SEXP _env);
 	SEXP Clamp_NodePot(SEXP _crfClamped);
 	SEXP Get_Potential(SEXP _crf, SEXP _configuration);

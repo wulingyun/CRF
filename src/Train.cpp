@@ -71,24 +71,20 @@ void CRF::Update_Pot(double *nodeFea, double *edgeFea)
 	UNPROTECT(nEdges + 3);
 }
 
-SEXP Update_ParStat(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea)
+SEXP MRF_Stat(SEXP _crf, SEXP _nInstances, SEXP _instances)
 {
 	CRF crf(_crf);
 
 	int nInstances = INTEGER_POINTER(AS_INTEGER(_nInstances))[0];
 	int nPar = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.par")))[0];
-	int nNodeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.nf")))[0];
-	int nEdgeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.ef")))[0];
 
 	double *instances = NUMERIC_POINTER(AS_NUMERIC(_instances));
-	double *nodeFea = NUMERIC_POINTER(AS_NUMERIC(_nodeFea));
-	double *edgeFea = NUMERIC_POINTER(AS_NUMERIC(_edgeFea));
 
-	SEXP _wPar;
-	double *wPar;
-	PROTECT(_wPar = AS_NUMERIC(GetListElement(_crf, "w.par")));
-	wPar = NUMERIC_POINTER(_wPar);
-	SetValues(_wPar, wPar, 0.0);
+	SEXP _stat;
+	double *stat;
+	PROTECT(_stat = NEW_NUMERIC(nPar));
+	stat = NUMERIC_POINTER(_stat);
+	SetValues(_stat, stat, 0.0);
 
 	SEXP _nodePar, _edgePar, _temp;
 	int *nodePar, **edgePar;
@@ -103,42 +99,29 @@ SEXP Update_ParStat(SEXP _crf, SEXP _nInstances, SEXP _instances, SEXP _nodeFea,
 	}
 
 	for (int n = 0; n < nInstances; n++)
+	{
 		for (int i = 0; i < crf.nNodes; i++)
 		{
 			int k = instances[n + nInstances * i] - 1;
-			for (int j = 0; j < nNodeFea; j++)
-			{
-				double f = nodeFea[j + nNodeFea * (i + crf.nNodes * n)];
-				if (f != 0)
-				{
-					int p = nodePar[i + crf.nNodes * (k + crf.maxState * j)] - 1;
-					if (p >= 0 && p < nPar)
-						wPar[p] += f;
-				}
-			}
+			int p = nodePar[i + crf.nNodes * k] - 1;
+			if (p >= 0 && p < nPar)
+				stat[p]++;
 		}
 
-	for (int n = 0; n < nInstances; n++)
 		for (int i = 0; i < crf.nEdges; i++)
 		{
 			int s1 = instances[n + nInstances * crf.EdgesBegin(i)] - 1;
 			int s2 = instances[n + nInstances * crf.EdgesEnd(i)] - 1;
-			for (int j = 0; j < nEdgeFea; j++)
-			{
-				double f = edgeFea[j + nEdgeFea * (i + crf.nEdges * n)];
-				if (f != 0)
-				{
-					int k = s1 + crf.nStates[crf.EdgesBegin(i)] * s2;
-					int p = edgePar[i][k + crf.nEdgeStates[i] * j] - 1;
-					if (p >= 0 && p < nPar)
-						wPar[p] += f;
-				}
-			}
+			int k = s1 + crf.nStates[crf.EdgesBegin(i)] * s2;
+			int p = edgePar[i][k] - 1;
+			if (p >= 0 && p < nPar)
+				stat[p]++;
 		}
+	}
 
 	UNPROTECT(crf.nEdges + 3);
 
-	return(_crf);
+	return(_stat);
 }
 
 SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea, SEXP _infer, SEXP _env)
