@@ -11,9 +11,8 @@ make.par <- function(crf, n.par = 1)
 {
 	crf$n.par <- n.par
 	crf$par <- numeric(crf$n.par)
-	crf$w.par <- numeric(crf$n.par)
+	crf$nll <- numeric(1)
 	crf$gradient <- numeric(crf$n.par)
-	crf$nll <- 0
 	crf
 }
 
@@ -24,12 +23,10 @@ update.pot <- function(crf, node.fea = 1, edge.fea = 1)
 	.Call("Update_Pot", crf, node.fea, edge.fea)
 }
 
-update.par.stat <- function(crf, instances, node.fea = 1, edge.fea = 1)
+mrf.stat <- function(crf, instances)
 {
 	n.instances <- dim(instances)[1]
-	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
-	edge.fea <- array(edge.fea, dim=c(crf$n.ef, crf$n.edges, n.instances))
-	.Call("Update_ParStat", crf, n.instances, instances, node.fea, edge.fea)
+	.Call("MRF_Stat", crf, n.instances, instances)
 }
 
 mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
@@ -38,7 +35,7 @@ mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
 	crf$par <- par
 	update.pot(crf)
 	belief <- infer.method(crf, ...)
-	nll <- as.vector(n.instances * belief$logZ - par %*% crf$w.par)
+	nll <- as.vector(n.instances * belief$logZ - par %*% crf$par.stat)
 	nll
 }
 
@@ -48,7 +45,7 @@ mrf.gradient <- function(par, crf, instances, infer.method = infer.chain, ...)
 	crf$par <- par
 	update.pot(crf)
 	belief <- infer.method(crf, ...)
-	gradient <- -crf$w.par
+	gradient <- -crf$par.stat
 	for (n in 1:crf$n.nodes)
 	{
 		for (s in 1:crf$n.states[n])
@@ -86,7 +83,7 @@ crf.gradient <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.
 
 train.mrf <- function(crf, instances, trace = 0)
 {
-	update.par.stat(crf, instances)
+	crf$par.stat <- mrf.stat(crf, instances)
 	solution <- optim(crf$par, mrf.nll, mrf.gradient, crf, instances, method = "L-BFGS-B", control = list(trace = trace))
 	crf$par <- solution$par
 	update.pot(crf)
