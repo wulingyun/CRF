@@ -29,24 +29,16 @@ mrf.stat <- function(crf, instances)
 mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
 	.Call("MRF_NLL", crf, par, dim(instances)[1], quote(infer.method(crf, ...)), environment())
 
-mrf.gradient <- function(par, crf, instances, infer.method = infer.chain, ...)
-	crf$gradient
+crf.nll <- function(par, crf, instances, node.fea, edge.fea, infer.method = infer.chain, ...)
+	.Call("CRF_NLL", crf, par, dim(instances)[1], instances, node.fea, edge.fea, quote(infer.method(crf, ...)), environment())
 
-crf.nll <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.method = infer.chain, ...)
-{
-	n.instances <- dim(instances)[1]
-	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
-	edge.fea <- array(edge.fea, dim=c(crf$n.ef, crf$n.edges, n.instances))
-	.Call("CRF_NLL", crf, par, n.instances, instances, node.fea, edge.fea, quote(infer.method(crf, ...)), environment())
-}
-
-crf.gradient <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.method = infer.chain, ...)
+gradient <- function(par, crf, ...)
 	crf$gradient
 
 train.mrf <- function(crf, instances, trace = 0)
 {
 	crf$par.stat <- mrf.stat(crf, instances)
-	solution <- optim(crf$par, mrf.nll, mrf.gradient, crf, instances, method = "L-BFGS-B", control = list(trace = trace))
+	solution <- optim(crf$par, mrf.nll, gradient, crf, instances, method = "L-BFGS-B", control = list(trace = trace))
 	crf$par <- solution$par
 	update.pot(crf)
 	crf
@@ -57,7 +49,7 @@ train.crf <- function(crf, instances, node.fea = 1, edge.fea = 1, trace = 0)
 	n.instances <- dim(instances)[1]
 	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
 	edge.fea <- array(edge.fea, dim=c(crf$n.ef, crf$n.edges, n.instances))
-	solution <- optim(crf$par, crf.nll, crf.gradient, crf, instances, node.fea, edge.fea, method = "L-BFGS-B", control = list(trace = trace))
+	solution <- optim(crf$par, crf.nll, gradient, crf, instances, node.fea, edge.fea, method = "L-BFGS-B", control = list(trace = trace))
 	crf$par <- solution$par
 	update.pot(crf, node.fea[,,1], edge.fea[,,1])
 	crf
