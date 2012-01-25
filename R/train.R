@@ -12,6 +12,8 @@ make.par <- function(crf, n.par = 1)
 	crf$n.par <- n.par
 	crf$par <- numeric(crf$n.par)
 	crf$w.par <- numeric(crf$n.par)
+	crf$gradient <- numeric(crf$n.par)
+	crf$nll <- 0
 	crf
 }
 
@@ -74,34 +76,29 @@ crf.nll <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.metho
 	n.instances <- dim(instances)[1]
 	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
 	edge.fea <- array(edge.fea, dim=c(crf$n.ef, crf$n.edges, n.instances))
-	crf$par <- par
-	.Call("CRF_NLL", crf, n.instances, instances, node.fea, edge.fea, quote(infer.method(crf, ...)), environment())
+	.Call("CRF_NLL", crf, par, n.instances, instances, node.fea, edge.fea, quote(infer.method(crf, ...)), environment())
 }
 
 crf.gradient <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.method = infer.chain, ...)
 {
-	n.instances <- dim(instances)[1]
-	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
-	edge.fea <- array(edge.fea, dim=c(crf$n.ef, crf$n.edges, n.instances))
-	crf$par <- par
-	.Call("CRF_Gradient", crf, n.instances, instances, node.fea, edge.fea, quote(infer.method(crf, ...)), environment())
+	crf$gradient
 }
 
-train.mrf <- function(crf, instances)
+train.mrf <- function(crf, instances, trace = 0)
 {
 	update.par.stat(crf, instances)
-	solution <- optim(crf$par, mrf.nll, mrf.gradient, crf, instances, method = "L-BFGS-B")
+	solution <- optim(crf$par, mrf.nll, mrf.gradient, crf, instances, method = "L-BFGS-B", control = list(trace = trace))
 	crf$par <- solution$par
 	update.pot(crf)
 	crf
 }
 
-train.crf <- function(crf, instances, node.fea = 1, edge.fea = 1)
+train.crf <- function(crf, instances, node.fea = 1, edge.fea = 1, trace = 0)
 {
 	n.instances <- dim(instances)[1]
 	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
 	edge.fea <- array(edge.fea, dim=c(crf$n.ef, crf$n.edges, n.instances))
-	solution <- optim(crf$par, crf.nll, crf.gradient, crf, instances, node.fea, edge.fea, method = "L-BFGS-B")
+	solution <- optim(crf$par, crf.nll, crf.gradient, crf, instances, node.fea, edge.fea, method = "L-BFGS-B", control = list(trace = trace))
 	crf$par <- solution$par
 	update.pot(crf, node.fea[,,1], edge.fea[,,1])
 	crf
