@@ -27,43 +27,10 @@ mrf.stat <- function(crf, instances)
 	.Call("MRF_Stat", crf, dim(instances)[1], instances)
 
 mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
-{
-	n.instances <- dim(instances)[1]
-	crf$par <- par
-	update.pot(crf)
-	belief <- infer.method(crf, ...)
-	nll <- as.vector(n.instances * belief$logZ - par %*% crf$par.stat)
-	nll
-}
+	.Call("MRF_NLL", crf, par, dim(instances)[1], quote(infer.method(crf, ...)), environment())
 
 mrf.gradient <- function(par, crf, instances, infer.method = infer.chain, ...)
-{
-	n.instances <- dim(instances)[1]
-	crf$par <- par
-	update.pot(crf)
-	belief <- infer.method(crf, ...)
-	gradient <- -crf$par.stat
-	for (n in 1:crf$n.nodes)
-	{
-		for (s in 1:crf$n.states[n])
-		{
-			k <- crf$node.par[n,s,1]
-			if (k) gradient[k] <- gradient[k] + n.instances * belief$node.bel[n,s]
-		}
-	}
-	for (e in 1:crf$n.edges)
-	{
-		for (s1 in 1:crf$n.states[crf$edges[e,1]])
-		{
-			for (s2 in 1:crf$n.states[crf$edges[e,2]])
-			{
-				k <- crf$edge.par[[e]][s1,s2,1]
-				if (k) gradient[k] <- gradient[k] + n.instances * belief$edge.bel[[e]][s1,s2]
-			}
-		}
-	}
-	gradient
-}
+	crf$gradient
 
 crf.nll <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.method = infer.chain, ...)
 {
