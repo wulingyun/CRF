@@ -24,10 +24,7 @@ update.pot <- function(crf, node.fea = 1, edge.fea = 1)
 }
 
 mrf.stat <- function(crf, instances)
-{
-	n.instances <- dim(instances)[1]
-	.Call("MRF_Stat", crf, n.instances, instances)
-}
+	.Call("MRF_Stat", crf, dim(instances)[1], instances)
 
 mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
 {
@@ -77,9 +74,7 @@ crf.nll <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.metho
 }
 
 crf.gradient <- function(par, crf, instances, node.fea = 1, edge.fea = 1, infer.method = infer.chain, ...)
-{
 	crf$gradient
-}
 
 train.mrf <- function(crf, instances, trace = 0)
 {
