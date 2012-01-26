@@ -17,25 +17,11 @@ SEXP CRF_Update(SEXP _crf, SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _ed
 void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 {
 	int nPar = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.par")))[0];
-	int nNodeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.nf")))[0];
-	int nEdgeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.ef")))[0];
 
 	SEXP _par;
 	double *par;
 	PROTECT(_par = AS_NUMERIC(GetListElement(_crf, "par")));
 	par = NUMERIC_POINTER(_par);
-
-	SEXP _nodePar, _edgePar, _temp;
-	int *nodePar, **edgePar;
-	PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
-	PROTECT(_edgePar = AS_LIST(GetListElement(_crf, "edge.par")));
-	nodePar = INTEGER_POINTER(_nodePar);
-	edgePar = (int **) R_alloc(nEdges, sizeof(int *));
-	for (int i = 0; i < nEdges; i++)
-	{
-		PROTECT(_temp = AS_INTEGER(VECTOR_ELT(_edgePar, i)));
-		edgePar[i] = INTEGER_POINTER(_temp);
-	}
 
 	for (int i = 0; i < nNodes * maxState; i++)
 		nodePot[i] = 0;
@@ -43,9 +29,16 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 		for (int j = 0; j < nEdgeStates[i]; j++)
 			edgePot[i][j] = 0;
 
-	double *nodeFea = NUMERIC_POINTER(AS_NUMERIC(_nodeFea));
+	PROTECT(_nodeFea = AS_NUMERIC(_nodeFea));
+	double *nodeFea = NUMERIC_POINTER(_nodeFea);
 	if (!ISNA(nodeFea[0]))
 	{
+		int nNodeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.nf")))[0];
+
+		SEXP _nodePar;
+		PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
+		int *nodePar = INTEGER_POINTER(_nodePar);
+
 		for (int i = 0; i < nNodes; i++)
 		{
 			for (int j = 0; j < nNodeFea; j++)
@@ -60,11 +53,25 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 					}
 			}
 		}
+		UNPROTECT(1);
 	}
 
-	double *edgeFea = NUMERIC_POINTER(AS_NUMERIC(_edgeFea));
+	PROTECT(_edgeFea = AS_NUMERIC(_edgeFea));
+	double *edgeFea = NUMERIC_POINTER(_edgeFea);
 	if (!ISNA(edgeFea[0]))
 	{
+		int nEdgeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.ef")))[0];
+
+		SEXP _edgePar;
+		PROTECT(_edgePar = AS_LIST(GetListElement(_crf, "edge.par")));
+		int **edgePar = (int **) R_alloc(nEdges, sizeof(int *));
+		for (int i = 0; i < nEdges; i++)
+		{
+			SEXP _temp;
+			PROTECT(_temp = AS_INTEGER(VECTOR_ELT(_edgePar, i)));
+			edgePar[i] = INTEGER_POINTER(_temp);
+		}
+
 		for (int i = 0; i < nEdges; i++)
 		{
 			for (int j = 0; j < nEdgeFea; j++)
@@ -79,13 +86,15 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 					}
 			}
 		}
+		UNPROTECT(nEdges + 1);
 	}
 
 	if (Rf_isNewList(_nodeExt))
 	{
 		for (int i = 0; i < nPar; i++)
 		{
-			_temp = AS_NUMERIC(VECTOR_ELT(_nodeExt, i));
+			SEXP _temp;
+			PROTECT(_temp = AS_NUMERIC(VECTOR_ELT(_nodeExt, i)));
 			double *nodeExt = NUMERIC_POINTER(_temp);
 			if (!ISNA(nodeExt[0]))
 			{
@@ -98,18 +107,22 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 				}
 			}
 		}
+		UNPROTECT(nPar);
 	}
 
 	if (Rf_isNewList(_edgeExt))
 	{
 		for (int i = 0; i < nPar; i++)
 		{
-			_temp = AS_LIST(VECTOR_ELT(_edgeExt, i));
-			if (Rf_isNewList(_temp))
+			SEXP _temp1;
+			PROTECT(_temp1 = AS_LIST(VECTOR_ELT(_edgeExt, i)));
+			if (Rf_isNewList(_temp1))
 			{
 				for (int j = 0; j < nEdges; j++)
 				{
-					double *edgeExt = NUMERIC_POINTER(AS_NUMERIC(VECTOR_ELT(_temp, j)));
+					SEXP _temp2;
+					PROTECT(_temp2 = AS_NUMERIC(VECTOR_ELT(_temp1, j)));
+					double *edgeExt = NUMERIC_POINTER(_temp2);
 					if (!ISNA(edgeExt[0]))
 					{
 						for (int k = 0; k < nEdgeStates[j]; k++)
@@ -118,8 +131,10 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 						}
 					}
 				}
+				UNPROTECT(nEdges);
 			}
 		}
+		UNPROTECT(nPar);
 	}
 
 	for (int i = 0; i < nNodes * maxState; i++)
@@ -128,7 +143,7 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 		for (int j = 0; j < nEdgeStates[i]; j++)
 			edgePot[i][j] = exp(edgePot[i][j]);
 
-	UNPROTECT(nEdges + 3);
+	UNPROTECT(3);
 }
 
 void CRF::Update_Pot()
