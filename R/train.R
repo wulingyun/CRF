@@ -16,12 +16,11 @@ make.par <- function(crf, n.par = 1)
 	crf
 }
 
-update.pot <- function(crf, node.fea = 1, edge.fea = 1)
-{
-	node.fea <- matrix(node.fea, crf$n.nf, crf$n.nodes)
-	edge.fea <- matrix(edge.fea, crf$n.ef, crf$n.edges)
-	.Call("Update_Pot", crf, node.fea, edge.fea)
-}
+mrf.update <- function(crf)
+	.Call("MRF_Update", crf)
+
+crf.update <- function(crf, node.fea = NA, edge.fea = NA, node.ext = NA, edge.ext = NA)
+	.Call("CRF_Update", crf, node.fea, edge.fea, node.ext, edge.ext)
 
 mrf.stat <- function(crf, instances)
 	.Call("MRF_Stat", crf, dim(instances)[1], instances)
@@ -29,8 +28,8 @@ mrf.stat <- function(crf, instances)
 mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
 	.Call("MRF_NLL", crf, par, dim(instances)[1], quote(infer.method(crf, ...)), environment())
 
-crf.nll <- function(par, crf, instances, node.fea, edge.fea, infer.method = infer.chain, ...)
-	.Call("CRF_NLL", crf, par, dim(instances)[1], instances, node.fea, edge.fea, quote(infer.method(crf, ...)), environment())
+crf.nll <- function(par, crf, instances, node.fea = NA, edge.fea = NA, node.ext = NA, edge.ext = NA, infer.method = infer.chain, ...)
+	.Call("CRF_NLL", crf, par, dim(instances)[1], instances, node.fea, edge.fea, node.ext, edge.ext, quote(infer.method(crf, ...)), environment())
 
 gradient <- function(par, crf, ...)
 	crf$gradient
@@ -40,17 +39,14 @@ train.mrf <- function(crf, instances, trace = 0)
 	crf$par.stat <- mrf.stat(crf, instances)
 	solution <- optim(crf$par, mrf.nll, gradient, crf, instances, method = "L-BFGS-B", control = list(trace = trace))
 	crf$par <- solution$par
-	update.pot(crf)
+	mrf.update(crf)
 	crf
 }
 
-train.crf <- function(crf, instances, node.fea = 1, edge.fea = 1, trace = 0)
+train.crf <- function(crf, instances, node.fea = NA, edge.fea = NA, node.ext = NA, edge.ext = NA, trace = 0)
 {
-	n.instances <- dim(instances)[1]
-	node.fea <- array(node.fea, dim=c(crf$n.nf, crf$n.nodes, n.instances))
-	edge.fea <- array(edge.fea, dim=c(crf$n.ef, crf$n.edges, n.instances))
-	solution <- optim(crf$par, crf.nll, gradient, crf, instances, node.fea, edge.fea, method = "L-BFGS-B", control = list(trace = trace))
+	solution <- optim(crf$par, crf.nll, gradient, crf, instances, node.fea, edge.fea, node.ext, edge.ext, method = "L-BFGS-B", control = list(trace = trace))
 	crf$par <- solution$par
-	update.pot(crf, node.fea[,,1], edge.fea[,,1])
+	crf.update(crf, node.fea[[1]], edge.fea[[1]], node.ext[[1]], edge.ext[[1]])
 	crf
 }
