@@ -31,7 +31,7 @@ nll <- crf.nll(crf$par, crf, rain, node.fea, edge.fea)
 crf$nll
 crf$gradient
 
-crf <- train.crf(crf, rain)
+crf <- train.crf(crf, rain, node.fea, edge.fea)
 crf$par
 crf$node.pot[1,]
 crf$edge.pot[[1]]
