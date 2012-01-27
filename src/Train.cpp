@@ -198,48 +198,46 @@ SEXP MRF_Stat(SEXP _crf, SEXP _instances)
 	int nInstances = INTEGER_POINTER(GET_DIM(_instances))[0];
 	int nPar = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.par")))[0];
 
-	double *instances = NUMERIC_POINTER(AS_NUMERIC(_instances));
-
-	SEXP _stat;
-	double *stat;
-	PROTECT(_stat = NEW_NUMERIC(nPar));
-	stat = NUMERIC_POINTER(_stat);
-	SetValues(_stat, stat, 0.0);
+	PROTECT(_instances = AS_NUMERIC(_instances));
+	double *instances = NUMERIC_POINTER(_instances);
 
 	SEXP _nodePar, _edgePar, _temp;
-	int *nodePar, **edgePar;
 	PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
 	PROTECT(_edgePar = AS_LIST(GetListElement(_crf, "edge.par")));
-	nodePar = INTEGER_POINTER(_nodePar);
-	edgePar = (int **) R_alloc(crf.nEdges, sizeof(int *));
+	int *nodePar = INTEGER_POINTER(_nodePar);
+	int **edgePar = (int **) R_alloc(crf.nEdges, sizeof(int *));
 	for (int i = 0; i < crf.nEdges; i++)
 	{
 		PROTECT(_temp = AS_INTEGER(VECTOR_ELT(_edgePar, i)));
 		edgePar[i] = INTEGER_POINTER(_temp);
 	}
 
+	SEXP _stat;
+	PROTECT(_stat = NEW_NUMERIC(nPar));
+	double *stat = NUMERIC_POINTER(_stat);
+	SetValues(_stat, stat, 0.0);
+
+	int *y = (int *) R_allocVector<int>(crf.nNodes);
+
 	for (int n = 0; n < nInstances; n++)
 	{
 		for (int i = 0; i < crf.nNodes; i++)
 		{
-			int k = instances[n + nInstances * i] - 1;
-			int p = nodePar[i + crf.nNodes * k] - 1;
+			y[i] = instances[n + nInstances * i] - 1;
+			int p = nodePar[i + crf.nNodes * y[i]] - 1;
 			if (p >= 0 && p < nPar)
 				stat[p]++;
 		}
 
 		for (int i = 0; i < crf.nEdges; i++)
 		{
-			int s1 = instances[n + nInstances * crf.EdgesBegin(i)] - 1;
-			int s2 = instances[n + nInstances * crf.EdgesEnd(i)] - 1;
-			int k = s1 + crf.nStates[crf.EdgesBegin(i)] * s2;
-			int p = edgePar[i][k] - 1;
+			int p = edgePar[i][y[crf.EdgesBegin(i)] + crf.nStates[crf.EdgesBegin(i)] * y[crf.EdgesEnd(i)]] - 1;
 			if (p >= 0 && p < nPar)
 				stat[p]++;
 		}
 	}
 
-	UNPROTECT(crf.nEdges + 3);
+	UNPROTECT(crf.nEdges + 4);
 
 	return(_stat);
 }
@@ -251,52 +249,28 @@ SEXP MRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _infer, SEXP _env)
 	int nInstances = INTEGER_POINTER(GET_DIM(_instances))[0];
 	int nPar = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.par")))[0];
 
-	double *par = NUMERIC_POINTER(AS_NUMERIC(_par));
-
-	SEXP _nodePar, _edgePar, _temp;
-	int *nodePar, **edgePar;
-	PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
-	PROTECT(_edgePar = AS_LIST(GetListElement(_crf, "edge.par")));
-	nodePar = INTEGER_POINTER(_nodePar);
-	edgePar = (int **) R_alloc(crf.nEdges, sizeof(int *));
-	for (int i = 0; i < crf.nEdges; i++)
-	{
-		PROTECT(_temp = AS_INTEGER(VECTOR_ELT(_edgePar, i)));
-		edgePar[i] = INTEGER_POINTER(_temp);
-	}
-
-	SEXP _crfPar, _parStat;
-	double *crfPar, *parStat;
-	PROTECT(_crfPar = AS_NUMERIC(GetListElement(_crf, "par")));
-	PROTECT(_parStat = AS_NUMERIC(GetListElement(_crf, "par.stat")));
-	crfPar = NUMERIC_POINTER(_crfPar);
-	parStat = NUMERIC_POINTER(_parStat);
+	PROTECT(_par = AS_NUMERIC(_par));
+	double *par = NUMERIC_POINTER(_par);
+	double *crfPar = NUMERIC_POINTER(GetListElement(_crf, "par"));
 	for (int i = 0; i < nPar; i++)
 		crfPar[i] = par[i];
 
-	SEXP _nll, _gradient;
-	double *nll, *gradient;
-	PROTECT(_nll = AS_NUMERIC(GetListElement(_crf, "nll")));
-	PROTECT(_gradient = AS_NUMERIC(GetListElement(_crf, "gradient")));
-	nll = NUMERIC_POINTER(_nll);
-	gradient = NUMERIC_POINTER(_gradient);
+	SEXP _parStat;
+	PROTECT(_parStat = AS_NUMERIC(GetListElement(_crf, "par.stat")));
+	double *parStat = NUMERIC_POINTER(_parStat);
+
+	SEXP _nll = GetListElement(_crf, "nll");
+	double *nll = NUMERIC_POINTER(_nll);
 	*nll = 0.0;
-	SetValues(_gradient, gradient, 0.0);
+
+	double *gradient = NUMERIC_POINTER(GetListElement(_crf, "gradient"));
+	for (int i = 0; i < nPar; i++)
+		gradient[i] = 0.0;
 
 	crf.Update_Pot();
 
-	SEXP _belief, _nodeBel, _edgeBel;
-	double *nodeBel, **edgeBel;
+	SEXP _belief;
 	PROTECT(_belief = eval(_infer, _env));
-	PROTECT(_nodeBel = AS_NUMERIC(GetListElement(_belief, "node.bel")));
-	PROTECT(_edgeBel = AS_LIST(GetListElement(_belief, "edge.bel")));
-	nodeBel = NUMERIC_POINTER(_nodeBel);
-	edgeBel = (double **) R_alloc(crf.nEdges, sizeof(double *));
-	for (int i = 0; i < crf.nEdges; i++)
-	{
-		PROTECT(_temp = AS_NUMERIC(VECTOR_ELT(_edgeBel, i)));
-		edgeBel[i] = NUMERIC_POINTER(_temp);
-	}
 
 	*nll = NUMERIC_POINTER(AS_NUMERIC(GetListElement(_belief, "logZ")))[0] * nInstances;
 	for (int i = 0; i < nPar; i++)
@@ -305,6 +279,11 @@ SEXP MRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _infer, SEXP _env)
 		gradient[i] = -parStat[i];
 	}
 
+	SEXP _nodePar, _nodeBel;
+	PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
+	PROTECT(_nodeBel = AS_NUMERIC(GetListElement(_belief, "node.bel")));
+	int *nodePar = INTEGER_POINTER(_nodePar);
+	double *nodeBel = NUMERIC_POINTER(_nodeBel);
 	for (int i = 0; i < crf.nNodes; i++)
 	{
 		for (int k = 0; k < crf.nStates[i]; k++)
@@ -317,19 +296,26 @@ SEXP MRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _infer, SEXP _env)
 		}
 	}
 
+	SEXP _edgePar = GetListElement(_crf, "edge.par");
+	SEXP _edgeBel = GetListElement(_belief, "edge.bel");
 	for (int i = 0; i < crf.nEdges; i++)
 	{
+		SEXP _edgeParN, _edgeBelN;
+		PROTECT(_edgeParN = AS_INTEGER(VECTOR_ELT(_edgePar, i)));
+		PROTECT(_edgeBelN = AS_NUMERIC(VECTOR_ELT(_edgeBel, i)));
+		int *edgePar = INTEGER_POINTER(_edgeParN);
+		double *edgeBel = NUMERIC_POINTER(_edgeBelN);
 		for (int k = 0; k < crf.nEdgeStates[i]; k++)
 		{
-			int p = edgePar[i][k] - 1;
+			int p = edgePar[k] - 1;
 			if (p >= 0 && p < nPar)
 			{
-				gradient[p] += edgeBel[i][k] * nInstances;
+				gradient[p] += edgeBel[k] * nInstances;
 			}
 		}
 	}
 
-	UNPROTECT(crf.nEdges * 2 + 9);
+	UNPROTECT(crf.nEdges * 2 + 5);
 
 	return(_nll);
 }
