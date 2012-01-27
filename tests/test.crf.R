@@ -38,6 +38,45 @@ crf$edge.pot[[1]]
 
 ##################################################
 
+crf <- make.features(crf, 0, 0)
+crf <- make.par(crf, 4)
+
+node.ext <- list()
+edge.ext <- list()
+
+node.ext[[1]] <- list()
+node.ext[[1]][[1]] <- matrix(0, crf$n.nodes, crf$max.state)
+node.ext[[1]][[1]][,1] <- 1
+node.ext[[1]][2:crf$n.par] <- NaN
+
+edge.ext[[1]] <- list()
+edge.ext[[1]][[1]] <- NaN
+edge.ext[[1]][[2]] <- list()
+edge.ext[[1]][[2]][[1]] <- matrix(0, 2, 2)
+edge.ext[[1]][[2]][[1]][1,1] <- 1
+edge.ext[[1]][[2]][2:crf$n.edges] <- edge.ext[[1]][[2]][1]
+edge.ext[[1]][[3]] <- list()
+edge.ext[[1]][[3]][[1]] <- matrix(0, 2, 2)
+edge.ext[[1]][[3]][[1]][1,2] <- 1
+edge.ext[[1]][[3]][2:crf$n.edges] <- edge.ext[[1]][[3]][1]
+edge.ext[[1]][[4]] <- list()
+edge.ext[[1]][[4]][[1]] <- matrix(0, 2, 2)
+edge.ext[[1]][[4]][[1]][2,1] <- 1
+edge.ext[[1]][[4]][2:crf$n.edges] <- edge.ext[[1]][[4]][1]
+node.ext[2:dim(rain)[1]] <- node.ext[1]
+edge.ext[2:dim(rain)[1]] <- edge.ext[1]
+
+nll <- crf.nll(crf$par, crf, rain, NaN, NaN, node.ext, edge.ext)
+crf$nll
+crf$gradient
+
+crf <- train.crf(crf, rain, NaN, NaN, node.ext, edge.ext)
+crf$par
+crf$node.pot[1,]
+crf$edge.pot[[1]]
+
+##################################################
+
 crf <- make.features(crf, 13)
 crf <- make.par(crf, 16)
 
