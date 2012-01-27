@@ -30,7 +30,7 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 
 	PROTECT(_nodeFea = AS_NUMERIC(_nodeFea));
 	double *nodeFea = NUMERIC_POINTER(_nodeFea);
-	if (!ISNA(nodeFea[0]))
+	if (!ISNAN(nodeFea[0]))
 	{
 		int nNodeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.nf")))[0];
 		SEXP _nodePar;
@@ -55,7 +55,7 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 
 	PROTECT(_edgeFea = AS_NUMERIC(_edgeFea));
 	double *edgeFea = NUMERIC_POINTER(_edgeFea);
-	if (!ISNA(edgeFea[0]))
+	if (!ISNAN(edgeFea[0]))
 	{
 		int nEdgeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.ef")))[0];
 		SEXP _edgePar = GetListElement(_crf, "edge.par");
@@ -86,7 +86,7 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 			SEXP _nodeExtI;
 			PROTECT(_nodeExtI = AS_NUMERIC(VECTOR_ELT(_nodeExt, i)));
 			double *nodeExt = NUMERIC_POINTER(_nodeExtI);
-			if (!ISNA(nodeExt[0]))
+			if (!ISNAN(nodeExt[0]))
 			{
 				for (int j = 0; j < nNodes; j++)
 				{
@@ -112,7 +112,7 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 					SEXP _edgeExtII;
 					PROTECT(_edgeExtII = AS_NUMERIC(VECTOR_ELT(_edgeExtI, j)));
 					double *edgeExt = NUMERIC_POINTER(_edgeExtII);
-					if (!ISNA(edgeExt[0]))
+					if (!ISNAN(edgeExt[0]))
 					{
 						for (int k = 0; k < nEdgeStates[j]; k++)
 						{
@@ -392,7 +392,7 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 
 		PROTECT(_nodeFeaN = AS_NUMERIC(_nodeFeaN));
 		double *nodeFea = NUMERIC_POINTER(_nodeFeaN);
-		if (!ISNA(nodeFea[0]))
+		if (!ISNAN(nodeFea[0]))
 		{
 			for (int i = 0; i < crf.nNodes; i++)
 			{
@@ -421,7 +421,7 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 
 		PROTECT(_edgeFeaN = AS_NUMERIC(_edgeFeaN));
 		double *edgeFea = NUMERIC_POINTER(_edgeFeaN);
-		if (!ISNA(edgeFea[0]))
+		if (!ISNAN(edgeFea[0]))
 		{
 			for (int i = 0; i < crf.nEdges; i++)
 			{
@@ -455,7 +455,7 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 				SEXP _nodeExtI;
 				PROTECT(_nodeExtI = AS_NUMERIC(VECTOR_ELT(_nodeExtN, i)));
 				double *nodeExt = NUMERIC_POINTER(_nodeExtI);
-				if (!ISNA(nodeExt[0]))
+				if (!ISNAN(nodeExt[0]))
 				{
 					for (int j = 0; j < crf.nNodes; j++)
 					{
@@ -487,9 +487,9 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 						SEXP _edgeExtII;
 						PROTECT(_edgeExtII = AS_NUMERIC(VECTOR_ELT(_edgeExtI, j)));
 						double *edgeExt = NUMERIC_POINTER(_edgeExtII);
-						if (!ISNA(edgeExt[0]))
+						if (!ISNAN(edgeExt[0]))
 						{
-							int s = y[crf.EdgesBegin(i)] + crf.nStates[crf.EdgesBegin(i)] * y[crf.EdgesEnd(i)];
+							int s = y[crf.EdgesBegin(j)] + crf.nStates[crf.EdgesBegin(j)] * y[crf.EdgesEnd(j)];
 							for (int k = 0; k < crf.nEdgeStates[j]; k++)
 							{
 								double f = edgeExt[k];
