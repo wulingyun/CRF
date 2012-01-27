@@ -191,11 +191,11 @@ void CRF::Update_Pot()
 	UNPROTECT(nEdges + 3);
 }
 
-SEXP MRF_Stat(SEXP _crf, SEXP _nInstances, SEXP _instances)
+SEXP MRF_Stat(SEXP _crf, SEXP _instances)
 {
 	CRF crf(_crf);
 
-	int nInstances = INTEGER_POINTER(AS_INTEGER(_nInstances))[0];
+	int nInstances = INTEGER_POINTER(GET_DIM(_instances))[0];
 	int nPar = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.par")))[0];
 
 	double *instances = NUMERIC_POINTER(AS_NUMERIC(_instances));
@@ -244,11 +244,11 @@ SEXP MRF_Stat(SEXP _crf, SEXP _nInstances, SEXP _instances)
 	return(_stat);
 }
 
-SEXP MRF_NLL(SEXP _crf, SEXP _par, SEXP _nInstances, SEXP _infer, SEXP _env)
+SEXP MRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _infer, SEXP _env)
 {
 	CRF crf(_crf);
 
-	int nInstances = INTEGER_POINTER(AS_INTEGER(_nInstances))[0];
+	int nInstances = INTEGER_POINTER(GET_DIM(_instances))[0];
 	int nPar = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.par")))[0];
 
 	double *par = NUMERIC_POINTER(AS_NUMERIC(_par));
@@ -334,11 +334,11 @@ SEXP MRF_NLL(SEXP _crf, SEXP _par, SEXP _nInstances, SEXP _infer, SEXP _env)
 	return(_nll);
 }
 
-SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _nInstances, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt, SEXP _infer, SEXP _env)
+SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt, SEXP _infer, SEXP _env)
 {
 	CRF crf(_crf);
 
-	int nInstances = INTEGER_POINTER(AS_INTEGER(_nInstances))[0];
+	int nInstances = INTEGER_POINTER(GET_DIM(_instances))[0];
 	int nPar = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.par")))[0];
 	int nNodeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.nf")))[0];
 	int nEdgeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.ef")))[0];
