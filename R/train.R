@@ -2,8 +2,12 @@ make.features <- function(crf, n.nf = 1, n.ef = 1)
 {
 	crf$n.nf <- n.nf
 	crf$n.ef <- n.ef
-	crf$node.par <- array(0, dim=c(crf$n.nodes, crf$max.state, n.nf))
-	crf$edge.par <- lapply(1:crf$n.edges, function(i) array(0, dim=c(crf$n.states[crf$edges[i,1]], crf$n.states[crf$edges[i,2]], n.ef)))
+	crf$node.par <- list()
+	if (n.nf > 0) crf$node.par[[1]] <- matrix(0, crf$n.nodes, crf$max.state)
+	if (n.nf > 1) crf$node.par[2:n.nf] <- crf$node.par[1]
+	crf$edge.par <- list()
+	if (n.ef > 0) crf$edge.par[[1]] <- lapply(1:crf$n.edges, function(i) matrix(0, crf$n.states[crf$edges[i,1]], crf$n.states[crf$edges[i,2]]))
+	if (n.ef > 1) crf$edge.par[2:n.ef] <- crf$edge.par[1]
 	crf
 }
 
