@@ -19,9 +19,8 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 	int nPar = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.par")))[0];
 
 	SEXP _par;
-	double *par;
 	PROTECT(_par = AS_NUMERIC(GetListElement(_crf, "par")));
-	par = NUMERIC_POINTER(_par);
+	double *par = NUMERIC_POINTER(_par);
 
 	for (int i = 0; i < nNodes * maxState; i++)
 		nodePot[i] = 0;
@@ -64,23 +63,18 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 
 		SEXP _edgePar;
 		PROTECT(_edgePar = AS_LIST(GetListElement(_crf, "edge.par")));
-		int **edgePar = (int **) R_alloc(nEdges, sizeof(int *));
 		for (int i = 0; i < nEdges; i++)
 		{
 			SEXP _temp;
 			PROTECT(_temp = AS_INTEGER(VECTOR_ELT(_edgePar, i)));
-			edgePar[i] = INTEGER_POINTER(_temp);
-		}
-
-		for (int i = 0; i < nEdges; i++)
-		{
+			int *edgePar = INTEGER_POINTER(_temp);
 			for (int j = 0; j < nEdgeFea; j++)
 			{
 				double f = edgeFea[j + nEdgeFea * i];
 				if (f != 0)
 					for (int k = 0; k < nEdgeStates[i]; k++)
 					{
-						int p = edgePar[i][k + nEdgeStates[i] * j] - 1;
+						int p = edgePar[k + nEdgeStates[i] * j] - 1;
 						if (p >= 0 && p < nPar)
 							edgePot[i][k] += f * par[p];
 					}
@@ -151,21 +145,8 @@ void CRF::Update_Pot()
 	int nPar = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.par")))[0];
 
 	SEXP _par;
-	double *par;
 	PROTECT(_par = AS_NUMERIC(GetListElement(_crf, "par")));
-	par = NUMERIC_POINTER(_par);
-
-	SEXP _nodePar, _edgePar, _temp;
-	int *nodePar, **edgePar;
-	PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
-	PROTECT(_edgePar = AS_LIST(GetListElement(_crf, "edge.par")));
-	nodePar = INTEGER_POINTER(_nodePar);
-	edgePar = (int **) R_alloc(nEdges, sizeof(int *));
-	for (int i = 0; i < nEdges; i++)
-	{
-		PROTECT(_temp = AS_INTEGER(VECTOR_ELT(_edgePar, i)));
-		edgePar[i] = INTEGER_POINTER(_temp);
-	}
+	double *par = NUMERIC_POINTER(_par);
 
 	for (int i = 0; i < nNodes * maxState; i++)
 		nodePot[i] = 0;
@@ -173,6 +154,9 @@ void CRF::Update_Pot()
 		for (int j = 0; j < nEdgeStates[i]; j++)
 			edgePot[i][j] = 0;
 
+	SEXP _nodePar;
+	PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
+	int *nodePar = INTEGER_POINTER(_nodePar);
 	for (int i = 0; i < nNodes; i++)
 	{
 		for (int k = 0; k < nStates[i]; k++)
@@ -183,11 +167,16 @@ void CRF::Update_Pot()
 		}
 	}
 
+	SEXP _edgePar;
+	PROTECT(_edgePar = AS_LIST(GetListElement(_crf, "edge.par")));
 	for (int i = 0; i < nEdges; i++)
 	{
+		SEXP _temp;
+		PROTECT(_temp = AS_INTEGER(VECTOR_ELT(_edgePar, i)));
+		int *edgePar = INTEGER_POINTER(_temp);
 		for (int k = 0; k < nEdgeStates[i]; k++)
 		{
-			int p = edgePar[i][k] - 1;
+			int p = edgePar[k] - 1;
 			if (p >= 0 && p < nPar)
 				edgePot[i][k] += par[p];
 		}
