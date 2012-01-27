@@ -23,13 +23,13 @@ crf.update <- function(crf, node.fea = NA, edge.fea = NA, node.ext = NA, edge.ex
 	.Call("CRF_Update", crf, node.fea, edge.fea, node.ext, edge.ext)
 
 mrf.stat <- function(crf, instances)
-	.Call("MRF_Stat", crf, dim(instances)[1], instances)
+	.Call("MRF_Stat", crf, instances)
 
 mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
-	.Call("MRF_NLL", crf, par, dim(instances)[1], quote(infer.method(crf, ...)), environment())
+	.Call("MRF_NLL", crf, par, instances, quote(infer.method(crf, ...)), environment())
 
 crf.nll <- function(par, crf, instances, node.fea = NA, edge.fea = NA, node.ext = NA, edge.ext = NA, infer.method = infer.chain, ...)
-	.Call("CRF_NLL", crf, par, dim(instances)[1], instances, node.fea, edge.fea, node.ext, edge.ext, quote(infer.method(crf, ...)), environment())
+	.Call("CRF_NLL", crf, par, instances, node.fea, edge.fea, node.ext, edge.ext, quote(infer.method(crf, ...)), environment())
 
 gradient <- function(par, crf, ...)
 	crf$gradient
