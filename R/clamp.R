@@ -25,9 +25,9 @@ clamp.crf <- function(crf, clamped)
 	data$n.states <- crf$n.states[data$node.id]
 	data$max.state <- max(data$n.states)
 
-	data$node.pot <- crf$node.pot[data$node.id]
+	data$node.pot <- crf$node.pot[data$node.id, 1:data$max.state]
 	data$edge.pot <- crf$edge.pot[data$edge.id]
-	data$node.pot <- .Call("Clamp_NodePot", data)
+	.Call("Clamp_Reset", data)
 
 	class(data) <- c("CRF.clamped", "CRF")
 	data
@@ -42,7 +42,7 @@ clamp.reset <- function(crf, clamped)
 	if (any(clamped > crf$original$n.states | clamped < 0))
 		stop("'clamped' has invalid clamped value(s)!")
 	crf$clamped <- clamped
-	crf$node.pot <- .Call("Clamp_NodePot", crf)
+	.Call("Clamp_Reset", crf)
 	crf
 }
 

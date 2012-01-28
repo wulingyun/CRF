@@ -1,9 +1,10 @@
 #include "CRF.h"
 
-SEXP Clamp_NodePot(SEXP _crf)
+SEXP Clamp_Reset(SEXP _crf)
 {
 	CRFclamped crf(_crf);
-	return(crf._nodePot);
+	crf.Reset_NodePot();
+	return(_crf);
 }
 
 CRFclamped::CRFclamped(SEXP _crf)
@@ -21,24 +22,10 @@ CRFclamped::CRFclamped(SEXP _crf)
 	edgeId = INTEGER_POINTER(_edgeId);
 	edgeMap = INTEGER_POINTER(_edgeMap);
 
-	SEXP _clamped0;
-	int *clamped0;
-	PROTECT(_clamped0 = AS_INTEGER(GetVar(_crf, "clamped")));
-	clamped0 = INTEGER_POINTER(_clamped0);
-
-	PROTECT(_clamped = NEW_INTEGER(original.nNodes));
+	PROTECT(_clamped = AS_INTEGER(GetVar(_crf, "clamped")));
 	clamped = INTEGER_POINTER(_clamped);
-	for (int i = 0; i < original.nNodes; i++)
-		clamped[i] = clamped0[i];
 
-	PROTECT(_nodePot = NEW_NUMERIC(nNodes * maxState));
-	SetDim2(_nodePot, nNodes, maxState);
-	nodePot = NUMERIC_POINTER(_nodePot);
-	SetValues(_nodePot, nodePot, 0.0);
-
-	Reset_NodePot();
-
-	numProtect += 7;
+	numProtect += 5;
 }
 
 void CRFclamped::Reset_NodePot()
@@ -72,4 +59,6 @@ void CRFclamped::Reset_NodePot()
 			}
 		}
 	}
+
+	SetVar(_crf, "node.pot", _nodePot);
 }

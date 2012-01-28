@@ -42,7 +42,7 @@ extern "C" {
 	SEXP MRF_Stat(SEXP _crf, SEXP _instances);
 	SEXP MRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _infer, SEXP _env);
 	SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt, SEXP _infer, SEXP _env);
-	SEXP Clamp_NodePot(SEXP _crfClamped);
+	SEXP Clamp_Reset(SEXP _crfClamped);
 	SEXP Get_Potential(SEXP _crf, SEXP _configuration);
 	SEXP Get_LogPotential(SEXP _crf, SEXP _configuration);
 	SEXP Calc_Frequency(SEXP _v, SEXP _n);
