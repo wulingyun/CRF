@@ -33,27 +33,24 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 	if (!ISNAN(nodeFea[0]))
 	{
 		int nNodeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.nf")))[0];
-		SEXP _nodePar = GetListElement(_crf, "node.par");
-		for (int i = 0; i < nNodeFea; i++)
+		SEXP _nodePar;
+		PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
+		int *nodePar = INTEGER_POINTER(_nodePar);
+		for (int i = 0; i < nNodes; i++)
 		{
-			SEXP _nodeParI;
-			PROTECT(_nodeParI = AS_INTEGER(VECTOR_ELT(_nodePar, i)));
-			int *nodePar = INTEGER_POINTER(_nodeParI);
-			for (int j = 0; j < nNodes; j++)
+			for (int j = 0; j < nNodeFea; j++)
 			{
-				double f = nodeFea[i + nNodeFea * j];
+				double f = nodeFea[j + nNodeFea * i];
 				if (f != 0)
-				{
-					for (int k = 0; k < nStates[j]; k++)
+					for (int k = 0; k < nStates[i]; k++)
 					{
-						int p = nodePar[j + nNodes * k] - 1;
+						int p = nodePar[i + nNodes * (k + maxState * j)] - 1;
 						if (p >= 0 && p < nPar)
-							nodePot[j + nNodes * k] += f * par[p];
+							nodePot[i + nNodes * k] += f * par[p];
 					}
-				}
 			}
-			UNPROTECT(1);
 		}
+		UNPROTECT(1);
 	}
 
 	PROTECT(_edgeFea = AS_NUMERIC(_edgeFea));
@@ -62,27 +59,24 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 	{
 		int nEdgeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.ef")))[0];
 		SEXP _edgePar = GetListElement(_crf, "edge.par");
-		for (int i = 0; i < nEdgeFea; i++)
+		for (int i = 0; i < nEdges; i++)
 		{
-			SEXP _edgeParI = VECTOR_ELT(_edgePar, i);
-			for (int j = 0; j < nEdges; j++)
+			SEXP _edgeParI;
+			PROTECT(_edgeParI = AS_INTEGER(VECTOR_ELT(_edgePar, i)));
+			int *edgePar = INTEGER_POINTER(_edgeParI);
+			for (int j = 0; j < nEdgeFea; j++)
 			{
-				double f = edgeFea[i + nEdgeFea * j];
+				double f = edgeFea[j + nEdgeFea * i];
 				if (f != 0)
-				{
-					SEXP _edgeParII;
-					PROTECT(_edgeParII = AS_INTEGER(VECTOR_ELT(_edgeParI, j)));
-					int *edgePar = INTEGER_POINTER(_edgeParII);
-					for (int k = 0; k < nEdgeStates[j]; k++)
+					for (int k = 0; k < nEdgeStates[i]; k++)
 					{
-						int p = edgePar[k] - 1;
+						int p = edgePar[k + nEdgeStates[i] * j] - 1;
 						if (p >= 0 && p < nPar)
-							edgePot[j][k] += f * par[p];
+							edgePot[i][k] += f * par[p];
 					}
-					UNPROTECT(1);
-				}
 			}
 		}
+		UNPROTECT(nEdges);
 	}
 
 	if (Rf_isNewList(_nodeExt))
@@ -102,8 +96,8 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 					}
 				}
 			}
-			UNPROTECT(1);
 		}
+		UNPROTECT(nPar);
 	}
 
 	if (Rf_isNewList(_edgeExt))
@@ -125,8 +119,8 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 							edgePot[j][k] += edgeExt[k] * par[i];
 						}
 					}
-					UNPROTECT(1);
 				}
+				UNPROTECT(nEdges);
 			}
 		}
 	}
@@ -155,7 +149,7 @@ void CRF::Update_Pot()
 			edgePot[i][j] = 0;
 
 	SEXP _nodePar;
-	PROTECT(_nodePar = AS_INTEGER(VECTOR_ELT(GetListElement(_crf, "node.par"), 0)));
+	PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
 	int *nodePar = INTEGER_POINTER(_nodePar);
 	for (int i = 0; i < nNodes; i++)
 	{
@@ -167,7 +161,7 @@ void CRF::Update_Pot()
 		}
 	}
 
-	SEXP _edgePar = VECTOR_ELT(GetListElement(_crf, "edge.par"), 0);
+	SEXP _edgePar = GetListElement(_crf, "edge.par");
 	for (int i = 0; i < nEdges; i++)
 	{
 		SEXP _edgeParI;
@@ -179,7 +173,6 @@ void CRF::Update_Pot()
 			if (p >= 0 && p < nPar)
 				edgePot[i][k] += par[p];
 		}
-		UNPROTECT(1);
 	}
 
 	for (int i = 0; i < nNodes * maxState; i++)
@@ -188,7 +181,7 @@ void CRF::Update_Pot()
 		for (int j = 0; j < nEdgeStates[i]; j++)
 			edgePot[i][j] = exp(edgePot[i][j]);
 
-	UNPROTECT(2);
+	UNPROTECT(nEdges + 2);
 }
 
 SEXP MRF_Stat(SEXP _crf, SEXP _instances)
@@ -202,10 +195,10 @@ SEXP MRF_Stat(SEXP _crf, SEXP _instances)
 	double *instances = NUMERIC_POINTER(_instances);
 
 	SEXP _nodePar;
-	PROTECT(_nodePar = AS_INTEGER(VECTOR_ELT(GetListElement(_crf, "node.par"), 0)));
+	PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
 	int *nodePar = INTEGER_POINTER(_nodePar);
 
-	SEXP _edgePar = VECTOR_ELT(GetListElement(_crf, "edge.par"), 0);
+	SEXP _edgePar = GetListElement(_crf, "edge.par");
 	int **edgePar = (int **) R_alloc(crf.nEdges, sizeof(int *));
 	for (int i = 0; i < crf.nEdges; i++)
 	{
@@ -282,7 +275,7 @@ SEXP MRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _infer, SEXP _env)
 	}
 
 	SEXP _nodePar, _nodeBel;
-	PROTECT(_nodePar = AS_INTEGER(VECTOR_ELT(GetListElement(_crf, "node.par"), 0)));
+	PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
 	PROTECT(_nodeBel = AS_NUMERIC(GetListElement(_belief, "node.bel")));
 	int *nodePar = INTEGER_POINTER(_nodePar);
 	double *nodeBel = NUMERIC_POINTER(_nodeBel);
@@ -298,7 +291,7 @@ SEXP MRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _infer, SEXP _env)
 		}
 	}
 
-	SEXP _edgePar = VECTOR_ELT(GetListElement(_crf, "edge.par"), 0);
+	SEXP _edgePar = GetListElement(_crf, "edge.par");
 	SEXP _edgeBel = GetListElement(_belief, "edge.bel");
 	for (int i = 0; i < crf.nEdges; i++)
 	{
@@ -315,10 +308,9 @@ SEXP MRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _infer, SEXP _env)
 				gradient[p] += edgeBel[k] * nInstances;
 			}
 		}
-		UNPROTECT(2);
 	}
 
-	UNPROTECT(5);
+	UNPROTECT(crf.nEdges * 2 + 5);
 
 	return(_nll);
 }
@@ -341,26 +333,17 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 	PROTECT(_instances = AS_NUMERIC(_instances));
 	double *instances = NUMERIC_POINTER(_instances);
 
-	SEXP _nodePar = GetListElement(_crf, "node.par");
-	int **nodePar = (int **) R_allocVector<int *>(nNodeFea);
-	for (int i = 0; i < nNodeFea; i++)
-	{
-		SEXP _nodeParI;
-		PROTECT(_nodeParI = AS_INTEGER(VECTOR_ELT(_nodePar, i)));
-		nodePar[i] = INTEGER_POINTER(_nodeParI);
-	}
+	SEXP _nodePar;
+	PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
+	int *nodePar = INTEGER_POINTER(_nodePar);
 
 	SEXP _edgePar = GetListElement(_crf, "edge.par");
-	int ***edgePar = (int ***) R_allocArray<int *>(nEdgeFea, crf.nEdges);
-	for (int i = 0; i < nEdgeFea; i++)
+	int **edgePar = (int **) R_alloc(crf.nEdges, sizeof(int *));
+	for (int i = 0; i < crf.nEdges; i++)
 	{
-		SEXP _edgeParI = VECTOR_ELT(_edgePar, i);
-		for (int j = 0; j < crf.nEdges; j++)
-		{
-			SEXP _edgeParII;
-			PROTECT(_edgeParII = AS_INTEGER(VECTOR_ELT(_edgeParI, j)));
-			edgePar[i][j] = INTEGER_POINTER(_edgeParII);
-		}
+		SEXP _edgeParI;
+		PROTECT(_edgeParI = AS_INTEGER(VECTOR_ELT(_edgePar, i)));
+		edgePar[i] = INTEGER_POINTER(_edgeParI);
 	}
 
 	SEXP _nll = GetListElement(_crf, "nll");
@@ -411,24 +394,24 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 		double *nodeFea = NUMERIC_POINTER(_nodeFeaN);
 		if (!ISNAN(nodeFea[0]))
 		{
-			for (int i = 0; i < nNodeFea; i++)
+			for (int i = 0; i < crf.nNodes; i++)
 			{
-				for (int j = 0; j < crf.nNodes; j++)
+				int s = y[i];
+				for (int j = 0; j < nNodeFea; j++)
 				{
-					int s = y[j];
-					double f = nodeFea[i + nNodeFea * j];
+					double f = nodeFea[j + nNodeFea * i];
 					if (f != 0)
 					{
-						for (int k = 0; k < crf.nStates[j]; k++)
+						for (int k = 0; k < crf.nStates[i]; k++)
 						{
-							int p = nodePar[i][j + crf.nNodes * k] - 1;
+							int p = nodePar[i + crf.nNodes * (k + crf.maxState * j)] - 1;
 							if (p >= 0 && p < nPar)
 							{
 								if (k == s)
 								{
 									gradient[p] -= f;
 								}
-								gradient[p] += f * nodeBel[j + crf.nNodes * k];
+								gradient[p] += f * nodeBel[i + crf.nNodes * k];
 							}
 						}
 					}
@@ -440,24 +423,24 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 		double *edgeFea = NUMERIC_POINTER(_edgeFeaN);
 		if (!ISNAN(edgeFea[0]))
 		{
-			for (int i = 0; i < nEdgeFea; i++)
+			for (int i = 0; i < crf.nEdges; i++)
 			{
-				for (int j = 0; j < crf.nEdges; j++)
+				int s = y[crf.EdgesBegin(i)] + crf.nStates[crf.EdgesBegin(i)] * y[crf.EdgesEnd(i)];
+				for (int j = 0; j < nEdgeFea; j++)
 				{
-					int s = y[crf.EdgesBegin(j)] + crf.nStates[crf.EdgesBegin(j)] * y[crf.EdgesEnd(j)];
-					double f = edgeFea[i + nEdgeFea * j];
+					double f = edgeFea[j + nEdgeFea * i];
 					if (f != 0)
 					{
-						for (int k = 0; k < crf.nEdgeStates[j]; k++)
+						for (int k = 0; k < crf.nEdgeStates[i]; k++)
 						{
-							int p = edgePar[i][j][k] - 1;
+							int p = edgePar[i][k + crf.nEdgeStates[i] * j] - 1;
 							if (p >= 0 && p < nPar)
 							{
 								if (k == s)
 								{
 									gradient[p] -= f;
 								}
-								gradient[p] += f * edgeBel[j][k];
+								gradient[p] += f * edgeBel[i][k];
 							}
 						}
 					}
@@ -488,8 +471,8 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 						}
 					}
 				}
-				UNPROTECT(1);
 			}
+			UNPROTECT(nPar);
 		}
 
 		if (Rf_isNewList(_edgeExt))
@@ -517,8 +500,8 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 								gradient[i] += f * edgeBel[j][k];
 							}
 						}
-						UNPROTECT(1);
 					}
+					UNPROTECT(crf.nEdges);
 				}
 			}
 		}
@@ -526,7 +509,7 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 		UNPROTECT(crf.nEdges + 4);
 	}
 
-	UNPROTECT(crf.nEdges * nEdgeFea + nNodeFea + 2);
+	UNPROTECT(crf.nEdges + 3);
 
 	return(_nll);
 }

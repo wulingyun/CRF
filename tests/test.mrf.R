@@ -16,11 +16,11 @@ crf <- make.crf(adj, 2)
 crf <- make.features(crf)
 crf <- make.par(crf, 2)
 
-crf$node.par[[1]][,1] <- 1
+crf$node.par[,1,] <- 1
 for (i in 1:crf$n.edges)
 {
-	crf$edge.par[[1]][[i]][1,1] <- 2
-	crf$edge.par[[1]][[i]][2,2] <- 2
+	crf$edge.par[[i]][1,1,] <- 2
+	crf$edge.par[[i]][2,2,] <- 2
 }
 
 crf$par.stat <- mrf.stat(crf, rain)
@@ -40,10 +40,10 @@ crf <- make.par(crf, 4)
 
 for (i in 1:crf$n.edges)
 {
-	crf$edge.par[[1]][[i]][1,1] <- 2
-	crf$edge.par[[1]][[i]][1,2] <- 3
-	crf$edge.par[[1]][[i]][2,1] <- 4
-	crf$edge.par[[1]][[i]][2,2] <- 0
+	crf$edge.par[[i]][1,1,] <- 2
+	crf$edge.par[[i]][1,2,] <- 3
+	crf$edge.par[[i]][2,1,] <- 4
+	crf$edge.par[[i]][2,2,] <- 0
 }
 
 crf <- train.mrf(crf, rain)
@@ -55,8 +55,8 @@ crf$edge.pot[[1]]
 
 crf <- make.par(crf, 5)
 
-crf$node.par[[1]][1,1] <- 5
-crf$node.par[[1]][crf$n.nodes,1] <- 5
+crf$node.par[1,1,] <- 5
+crf$node.par[crf$n.nodes,1,] <- 5
 
 crf <- train.mrf(crf, rain)
 crf$par
