@@ -5,9 +5,9 @@ SEXP Make_AdjInfo(SEXP _crf)
 	SEXP _nNodes, _nEdges, _edges;
 	int nNodes, nEdges, *edges;
 
-	PROTECT(_nNodes = AS_INTEGER(GetListElement(_crf, "n.nodes")));
-	PROTECT(_nEdges = AS_INTEGER(GetListElement(_crf, "n.edges")));
-	PROTECT(_edges = AS_INTEGER(GetListElement(_crf, "edges")));
+	PROTECT(_nNodes = AS_INTEGER(GetVar(_crf, "n.nodes")));
+	PROTECT(_nEdges = AS_INTEGER(GetVar(_crf, "n.edges")));
+	PROTECT(_edges = AS_INTEGER(GetVar(_crf, "edges")));
 	nNodes = INTEGER_POINTER(_nNodes)[0];
 	nEdges = INTEGER_POINTER(_nEdges)[0];
 	edges = INTEGER_POINTER(_edges);
@@ -60,13 +60,11 @@ SEXP Make_AdjInfo(SEXP _crf)
 		SET_VECTOR_ELT(_adjEdges, i, _temp2);
 	}
 
-	SEXP _adjInfo;
-	PROTECT(_adjInfo = NEW_LIST(3));
-	SetListElement(_adjInfo, 0, "n.adj", _nAdj);
-	SetListElement(_adjInfo, 1, "adj.nodes", _adjNodes);
-	SetListElement(_adjInfo, 2, "adj.edges", _adjEdges);
+	SetVar(_crf, "n.adj", _nAdj);
+	SetVar(_crf, "adj.nodes", _adjNodes);
+	SetVar(_crf, "adj.edges", _adjEdges);
 
-	UNPROTECT(7 + nNodes * 2);
+	UNPROTECT(6 + nNodes * 2);
 
-	return(_adjInfo);
+	return(_crf);
 }

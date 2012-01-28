@@ -16,10 +16,10 @@ SEXP CRF_Update(SEXP _crf, SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _ed
 
 void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 {
-	int nPar = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.par")))[0];
+	int nPar = INTEGER_POINTER(AS_INTEGER(GetVar(_crf, "n.par")))[0];
 
 	SEXP _par;
-	PROTECT(_par = AS_NUMERIC(GetListElement(_crf, "par")));
+	PROTECT(_par = AS_NUMERIC(GetVar(_crf, "par")));
 	double *par = NUMERIC_POINTER(_par);
 
 	for (int i = 0; i < nNodes * maxState; i++)
@@ -32,9 +32,9 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 	double *nodeFea = NUMERIC_POINTER(_nodeFea);
 	if (!ISNAN(nodeFea[0]))
 	{
-		int nNodeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.nf")))[0];
+		int nNodeFea = INTEGER_POINTER(AS_INTEGER(GetVar(_crf, "n.nf")))[0];
 		SEXP _nodePar;
-		PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
+		PROTECT(_nodePar = AS_INTEGER(GetVar(_crf, "node.par")));
 		int *nodePar = INTEGER_POINTER(_nodePar);
 		for (int i = 0; i < nNodes; i++)
 		{
@@ -57,8 +57,8 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 	double *edgeFea = NUMERIC_POINTER(_edgeFea);
 	if (!ISNAN(edgeFea[0]))
 	{
-		int nEdgeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.ef")))[0];
-		SEXP _edgePar = GetListElement(_crf, "edge.par");
+		int nEdgeFea = INTEGER_POINTER(AS_INTEGER(GetVar(_crf, "n.ef")))[0];
+		SEXP _edgePar = GetVar(_crf, "edge.par");
 		for (int i = 0; i < nEdges; i++)
 		{
 			SEXP _edgeParI;
@@ -136,10 +136,10 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 
 void CRF::Update_Pot()
 {
-	int nPar = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.par")))[0];
+	int nPar = INTEGER_POINTER(AS_INTEGER(GetVar(_crf, "n.par")))[0];
 
 	SEXP _par;
-	PROTECT(_par = AS_NUMERIC(GetListElement(_crf, "par")));
+	PROTECT(_par = AS_NUMERIC(GetVar(_crf, "par")));
 	double *par = NUMERIC_POINTER(_par);
 
 	for (int i = 0; i < nNodes * maxState; i++)
@@ -149,7 +149,7 @@ void CRF::Update_Pot()
 			edgePot[i][j] = 0;
 
 	SEXP _nodePar;
-	PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
+	PROTECT(_nodePar = AS_INTEGER(GetVar(_crf, "node.par")));
 	int *nodePar = INTEGER_POINTER(_nodePar);
 	for (int i = 0; i < nNodes; i++)
 	{
@@ -161,7 +161,7 @@ void CRF::Update_Pot()
 		}
 	}
 
-	SEXP _edgePar = GetListElement(_crf, "edge.par");
+	SEXP _edgePar = GetVar(_crf, "edge.par");
 	for (int i = 0; i < nEdges; i++)
 	{
 		SEXP _edgeParI;
@@ -189,16 +189,16 @@ SEXP MRF_Stat(SEXP _crf, SEXP _instances)
 	CRF crf(_crf);
 
 	int nInstances = INTEGER_POINTER(GET_DIM(_instances))[0];
-	int nPar = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.par")))[0];
+	int nPar = INTEGER_POINTER(AS_INTEGER(GetVar(_crf, "n.par")))[0];
 
 	PROTECT(_instances = AS_NUMERIC(_instances));
 	double *instances = NUMERIC_POINTER(_instances);
 
 	SEXP _nodePar;
-	PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
+	PROTECT(_nodePar = AS_INTEGER(GetVar(_crf, "node.par")));
 	int *nodePar = INTEGER_POINTER(_nodePar);
 
-	SEXP _edgePar = GetListElement(_crf, "edge.par");
+	SEXP _edgePar = GetVar(_crf, "edge.par");
 	int **edgePar = (int **) R_alloc(crf.nEdges, sizeof(int *));
 	for (int i = 0; i < crf.nEdges; i++)
 	{
@@ -242,23 +242,23 @@ SEXP MRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _infer, SEXP _env)
 	CRF crf(_crf);
 
 	int nInstances = INTEGER_POINTER(GET_DIM(_instances))[0];
-	int nPar = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.par")))[0];
+	int nPar = INTEGER_POINTER(AS_INTEGER(GetVar(_crf, "n.par")))[0];
 
 	PROTECT(_par = AS_NUMERIC(_par));
 	double *par = NUMERIC_POINTER(_par);
-	double *crfPar = NUMERIC_POINTER(GetListElement(_crf, "par"));
+	double *crfPar = NUMERIC_POINTER(GetVar(_crf, "par"));
 	for (int i = 0; i < nPar; i++)
 		crfPar[i] = par[i];
 
 	SEXP _parStat;
-	PROTECT(_parStat = AS_NUMERIC(GetListElement(_crf, "par.stat")));
+	PROTECT(_parStat = AS_NUMERIC(GetVar(_crf, "par.stat")));
 	double *parStat = NUMERIC_POINTER(_parStat);
 
-	SEXP _nll = GetListElement(_crf, "nll");
+	SEXP _nll = GetVar(_crf, "nll");
 	double *nll = NUMERIC_POINTER(_nll);
 	*nll = 0.0;
 
-	double *gradient = NUMERIC_POINTER(GetListElement(_crf, "gradient"));
+	double *gradient = NUMERIC_POINTER(GetVar(_crf, "gradient"));
 	for (int i = 0; i < nPar; i++)
 		gradient[i] = 0.0;
 
@@ -275,7 +275,7 @@ SEXP MRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _infer, SEXP _env)
 	}
 
 	SEXP _nodePar, _nodeBel;
-	PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
+	PROTECT(_nodePar = AS_INTEGER(GetVar(_crf, "node.par")));
 	PROTECT(_nodeBel = AS_NUMERIC(GetListElement(_belief, "node.bel")));
 	int *nodePar = INTEGER_POINTER(_nodePar);
 	double *nodeBel = NUMERIC_POINTER(_nodeBel);
@@ -291,7 +291,7 @@ SEXP MRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _infer, SEXP _env)
 		}
 	}
 
-	SEXP _edgePar = GetListElement(_crf, "edge.par");
+	SEXP _edgePar = GetVar(_crf, "edge.par");
 	SEXP _edgeBel = GetListElement(_belief, "edge.bel");
 	for (int i = 0; i < crf.nEdges; i++)
 	{
@@ -320,13 +320,13 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 	CRF crf(_crf);
 
 	int nInstances = INTEGER_POINTER(GET_DIM(_instances))[0];
-	int nPar = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.par")))[0];
-	int nNodeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.nf")))[0];
-	int nEdgeFea = INTEGER_POINTER(AS_INTEGER(GetListElement(_crf, "n.ef")))[0];
+	int nPar = INTEGER_POINTER(AS_INTEGER(GetVar(_crf, "n.par")))[0];
+	int nNodeFea = INTEGER_POINTER(AS_INTEGER(GetVar(_crf, "n.nf")))[0];
+	int nEdgeFea = INTEGER_POINTER(AS_INTEGER(GetVar(_crf, "n.ef")))[0];
 
 	PROTECT(_par = AS_NUMERIC(_par));
 	double *par = NUMERIC_POINTER(_par);
-	double *crfPar = NUMERIC_POINTER(GetListElement(_crf, "par"));
+	double *crfPar = NUMERIC_POINTER(GetVar(_crf, "par"));
 	for (int i = 0; i < nPar; i++)
 		crfPar[i] = par[i];
 
@@ -334,10 +334,10 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 	double *instances = NUMERIC_POINTER(_instances);
 
 	SEXP _nodePar;
-	PROTECT(_nodePar = AS_INTEGER(GetListElement(_crf, "node.par")));
+	PROTECT(_nodePar = AS_INTEGER(GetVar(_crf, "node.par")));
 	int *nodePar = INTEGER_POINTER(_nodePar);
 
-	SEXP _edgePar = GetListElement(_crf, "edge.par");
+	SEXP _edgePar = GetVar(_crf, "edge.par");
 	int **edgePar = (int **) R_alloc(crf.nEdges, sizeof(int *));
 	for (int i = 0; i < crf.nEdges; i++)
 	{
@@ -346,11 +346,11 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 		edgePar[i] = INTEGER_POINTER(_edgeParI);
 	}
 
-	SEXP _nll = GetListElement(_crf, "nll");
+	SEXP _nll = GetVar(_crf, "nll");
 	double *nll = NUMERIC_POINTER(_nll);
 	*nll = 0.0;
 
-	double *gradient = NUMERIC_POINTER(GetListElement(_crf, "gradient"));
+	double *gradient = NUMERIC_POINTER(GetVar(_crf, "gradient"));
 	for (int i = 0; i < nPar; i++)
 		gradient[i] = 0.0;
 

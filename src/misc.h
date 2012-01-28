@@ -2,6 +2,7 @@
 #include <Rdefines.h>
 
 /* initialize the list */
+
 template <class T>
 inline void SetValues(SEXP r, T *c, T v)
 {
@@ -9,18 +10,36 @@ inline void SetValues(SEXP r, T *c, T v)
 		c[i] = v;
 };
 
+/* get the variable */
+
+inline SEXP GetVar(SEXP env, const char *name)
+{
+	return findVar(install(name), env);
+};
+
+/* get the variable */
+
+inline void SetVar(SEXP env, const char *name, SEXP var)
+{
+	defineVar(install(name), var, env);
+};
+
 /* get/set the list element */
+
 SEXP GetListElement(SEXP list, const char *tag);
 void SetListElement(SEXP list, int i, const char *tag, SEXP value);
 
 /* set dim of array */
+
 void SetDim2(SEXP array, int x1, int x2);
 void SetDim3(SEXP array, int x1, int x2, int x3);
 
 /* sample from discrete distribution */
+
 int SampleFrom(int n, double *prob);
 
 /* minimum weight spanning tree using Kruskal algorithm */
+
 int MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs, int node_index_from = 1);
 
 /* utils for ascending ordered vector */
@@ -30,6 +49,7 @@ void Insert(int *vector, int &size, int v);
 void Remove(int *vector, int &size, int v);
 
 /* swap variables */
+
 template <class T>
 inline void swap(T &a, T &b)
 {
