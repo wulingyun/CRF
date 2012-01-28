@@ -1,6 +1,6 @@
 make.crf <- function(adj.matrix, nstates)
 {
-	data <- list()
+	data <- new.env()
 	if (!is.matrix(adj.matrix) || dim(adj.matrix)[1] != dim(adj.matrix)[2])
 		stop("'adj.matrix' should be a square matrix")
 	data$n.nodes <- dim(adj.matrix)[1]
@@ -11,10 +11,7 @@ make.crf <- function(adj.matrix, nstates)
 	data$edges <- matrix(e[order(e[,1], e[,2]),], ncol=2)
 	data$n.edges <- nrow(data$edges)
 
-	adj.info <- .Call("Make_AdjInfo", data)
-	data$n.adj <- adj.info$n.adj
-	data$adj.nodes <- adj.info$adj.nodes
-	data$adj.edges <- adj.info$adj.edges
+	.Call("Make_AdjInfo", data)
 
 	data$n.states <- rep(nstates, length.out=data$n.nodes)
 	data$max.state <- max(nstates)

@@ -9,13 +9,13 @@ SEXP Clamp_NodePot(SEXP _crf)
 CRFclamped::CRFclamped(SEXP _crf)
 : CRF(_crf)
 {
-	PROTECT(_original = AS_LIST(GetListElement(_crf, "original")));
+	PROTECT(_original = AS_LIST(GetVar(_crf, "original")));
 	original.Set_Data(_original);
 
-	PROTECT(_nodeId = AS_INTEGER(GetListElement(_crf, "node.id")));
-	PROTECT(_nodeMap = AS_INTEGER(GetListElement(_crf, "node.map")));
-	PROTECT(_edgeId = AS_INTEGER(GetListElement(_crf, "edge.id")));
-	PROTECT(_edgeMap = AS_INTEGER(GetListElement(_crf, "edge.map")));
+	PROTECT(_nodeId = AS_INTEGER(GetVar(_crf, "node.id")));
+	PROTECT(_nodeMap = AS_INTEGER(GetVar(_crf, "node.map")));
+	PROTECT(_edgeId = AS_INTEGER(GetVar(_crf, "edge.id")));
+	PROTECT(_edgeMap = AS_INTEGER(GetVar(_crf, "edge.map")));
 	nodeId = INTEGER_POINTER(_nodeId);
 	nodeMap = INTEGER_POINTER(_nodeMap);
 	edgeId = INTEGER_POINTER(_edgeId);
@@ -23,7 +23,7 @@ CRFclamped::CRFclamped(SEXP _crf)
 
 	SEXP _clamped0;
 	int *clamped0;
-	PROTECT(_clamped0 = AS_INTEGER(GetListElement(_crf, "clamped")));
+	PROTECT(_clamped0 = AS_INTEGER(GetVar(_crf, "clamped")));
 	clamped0 = INTEGER_POINTER(_clamped0);
 
 	PROTECT(_clamped = NEW_INTEGER(original.nNodes));
