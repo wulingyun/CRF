@@ -1,6 +1,6 @@
 clamp.crf <- function(crf, clamped)
 {
-	data <- list()
+	data <- new.env()
 	if (!is.vector(clamped) || length(clamped) != crf$n.nodes)
 		stop("'clamped' should be a vector of length ", crf$n.nodes, "!")
 	if (any(clamped > crf$n.states | clamped < 0))
@@ -20,14 +20,12 @@ clamp.crf <- function(crf, clamped)
 	data$edge.map <- rep(0, crf$n.edges)
 	data$edge.map[data$edge.id] <- 1:data$n.edges
 
-	adj.info <- .Call("Make_AdjInfo", data)
-	data$n.adj <- adj.info$n.adj
-	data$adj.nodes <- adj.info$adj.nodes
-	data$adj.edges <- adj.info$adj.edges
+	.Call("Make_AdjInfo", data)
 
 	data$n.states <- crf$n.states[data$node.id]
 	data$max.state <- max(data$n.states)
 
+	data$node.pot <- crf$node.pot[data$node.id]
 	data$edge.pot <- crf$edge.pot[data$edge.id]
 	data$node.pot <- .Call("Clamp_NodePot", data)
 
@@ -50,7 +48,7 @@ clamp.reset <- function(crf, clamped)
 
 sub.crf <- function(crf, subset)
 {
-	data <- list()
+	data <- new.env()
 	data$original <- crf
 
 	data$node.id <- intersect(1:crf$n.nodes, unique(subset))

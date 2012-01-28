@@ -9,7 +9,7 @@ SEXP Clamp_NodePot(SEXP _crf)
 CRFclamped::CRFclamped(SEXP _crf)
 : CRF(_crf)
 {
-	PROTECT(_original = AS_LIST(GetVar(_crf, "original")));
+	_original = GetVar(_crf, "original");
 	original.Set_Data(_original);
 
 	PROTECT(_nodeId = AS_INTEGER(GetVar(_crf, "node.id")));
@@ -38,7 +38,7 @@ CRFclamped::CRFclamped(SEXP _crf)
 
 	Reset_NodePot();
 
-	numProtect += 8;
+	numProtect += 7;
 }
 
 void CRFclamped::Reset_NodePot()
