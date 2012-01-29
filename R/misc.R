@@ -23,6 +23,13 @@ make.crf <- function(adj.matrix, nstates)
 	data
 }
 
+duplicate <- function(crf)
+{
+	data <- new.env()
+	for (i in ls(envir=crf)) assign(i, get(i, envir=crf), envir=data)
+	data
+}
+
 get.potential <- function(crf, configuration)
 	.Call("Get_Potential", crf, configuration)
 
