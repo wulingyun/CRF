@@ -1,6 +1,6 @@
 Package: CRF
-Version: 0.3-1
-Date: 2012-02-24
+Version: 0.3-2
+Date: 2013-08-07
 Title: CRF - Conditional Random Fields
 Author: Ling-Yun Wu <wulingyun@gmail.com>
 Author@R: c(person("Ling-Yun", "Wu", email = "wulingyun@gmail.com"))
