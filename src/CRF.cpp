@@ -1,5 +1,48 @@
 #include "CRF.h"
 
+const R_CallMethodDef callMethods[] = {
+  {"Decode_Exact", (DL_FUNC) &Decode_Exact, 1},
+  {"Decode_Chain", (DL_FUNC) &Decode_Chain, 1},
+  {"Decode_Tree", (DL_FUNC) &Decode_Tree, 1},
+  {"Decode_Cutset", (DL_FUNC) &Decode_Cutset, 3},
+  {"Decode_Junction", (DL_FUNC) &Decode_Junction, 1},
+  {"Decode_Sample", (DL_FUNC) &Decode_Sample, 2},
+  {"Decode_LBP", (DL_FUNC) &Decode_LBP, 4},
+  {"Decode_TRBP", (DL_FUNC) &Decode_TRBP, 4},
+  {"Decode_Greedy", (DL_FUNC) &Decode_Greedy, 3},
+  {"Decode_ICM", (DL_FUNC) &Decode_ICM, 3},
+  {"Infer_Exact", (DL_FUNC) &Infer_Exact, 1},
+  {"Infer_Chain", (DL_FUNC) &Infer_Chain, 1},
+  {"Infer_Tree", (DL_FUNC) &Infer_Tree, 1},
+  {"Infer_Cutset", (DL_FUNC) &Infer_Cutset, 2},
+  {"Infer_Junction", (DL_FUNC) &Infer_Junction, 1},
+  {"Infer_Sample", (DL_FUNC) &Infer_Sample, 2},
+  {"Infer_LBP", (DL_FUNC) &Infer_LBP, 4},
+  {"Infer_TRBP", (DL_FUNC) &Infer_TRBP, 4},
+  {"Sample_Exact", (DL_FUNC) &Sample_Exact, 2},
+  {"Sample_Chain", (DL_FUNC) &Sample_Chain, 2},
+  {"Sample_Tree", (DL_FUNC) &Sample_Tree, 2},
+  {"Sample_Cutset", (DL_FUNC) &Sample_Cutset, 3},
+  {"Sample_Junction", (DL_FUNC) &Sample_Junction, 2},
+  {"Sample_Gibbs", (DL_FUNC) &Sample_Gibbs, 4},
+  {"Make_AdjInfo", (DL_FUNC) &Make_AdjInfo, 1},
+  {"MRF_Update", (DL_FUNC) &MRF_Update, 1},
+  {"CRF_Update", (DL_FUNC) &CRF_Update, 5},
+  {"MRF_Stat", (DL_FUNC) &MRF_Stat, 2},
+  {"MRF_NLL", (DL_FUNC) &MRF_NLL, 5},
+  {"CRF_NLL", (DL_FUNC) &CRF_NLL, 9},
+  {"Clamp_Reset", (DL_FUNC) &Clamp_Reset, 1},
+  {"Get_Potential", (DL_FUNC) &Get_Potential, 2},
+  {"Get_LogPotential", (DL_FUNC) &Get_LogPotential, 2},
+  {"Calc_Frequency", (DL_FUNC) &Calc_Frequency, 2},
+  {NULL, NULL, 0}
+};
+
+void R_init_CRF(DllInfo *info)
+{
+  R_registerRoutines(info, NULL, callMethods, NULL, NULL);
+}
+
 CRF::CRF()
 {
 	nNodes = 0;

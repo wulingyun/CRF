@@ -48,14 +48,14 @@ clamp.crf <- function(crf, clamped)
 	data$edge.map <- rep(0, crf$n.edges)
 	data$edge.map[data$edge.id] <- 1:data$n.edges
 
-	.Call("Make_AdjInfo", data)
+	.Call(Make_AdjInfo, data)
 
 	data$n.states <- crf$n.states[data$node.id]
 	data$max.state <- max(data$n.states)
 
 	data$node.pot <- crf$node.pot[data$node.id, 1:data$max.state]
 	data$edge.pot <- crf$edge.pot[data$edge.id]
-	.Call("Clamp_Reset", data)
+	.Call(Clamp_Reset, data)
 
 	class(data) <- c("CRF.clamped", "CRF")
 	data
@@ -94,7 +94,7 @@ clamp.reset <- function(crf, clamped)
 	if (any(clamped > crf$original$n.states | clamped < 0))
 		stop("'clamped' has invalid clamped value(s)!")
 	crf$clamped <- clamped
-	.Call("Clamp_Reset", crf)
+	.Call(Clamp_Reset, crf)
 	crf
 }
 
@@ -143,7 +143,7 @@ sub.crf <- function(crf, subset)
 	data$edge.map <- rep(0, crf$n.edges)
 	data$edge.map[data$edge.id] <- 1:data$n.edges
 
-	adj.info <- .Call("Make_AdjInfo", data)
+	adj.info <- .Call(Make_AdjInfo, data)
 	data$n.adj <- adj.info$n.adj
 	data$adj.nodes <- adj.info$adj.nodes
 	data$adj.edges <- adj.info$adj.edges

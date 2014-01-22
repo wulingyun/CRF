@@ -75,7 +75,7 @@ make.crf <- function(adj.matrix, nstates)
 	data$edges <- matrix(e[order(e[,1], e[,2]),], ncol=2)
 	data$n.edges <- nrow(data$edges)
 
-	.Call("Make_AdjInfo", data)
+	.Call(Make_AdjInfo, data)
 
 	data$n.states <- rep(nstates, length.out=data$n.nodes)
 	data$max.state <- max(nstates)
@@ -123,7 +123,7 @@ duplicate <- function(crf)
 #' @seealso \code{\link{get.logPotential}}
 #' @export
 get.potential <- function(crf, configuration)
-	.Call("Get_Potential", crf, configuration)
+	.Call(Get_Potential, crf, configuration)
 
 
 
@@ -140,4 +140,4 @@ get.potential <- function(crf, configuration)
 #' @seealso \code{\link{get.potential}}
 #' @export
 get.logPotential <- function(crf, configuration)
-	.Call("Get_LogPotential", crf, configuration)
+	.Call(Get_LogPotential, crf, configuration)

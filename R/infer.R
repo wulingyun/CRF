@@ -18,7 +18,7 @@
 #' 
 #' @export
 infer.exact <- function(crf)
-	.Call("Infer_Exact", crf)
+	.Call(Infer_Exact, crf)
 
 
 
@@ -42,7 +42,7 @@ infer.exact <- function(crf)
 #' 
 #' @export
 infer.chain <- function(crf)
-	.Call("Infer_Chain", crf)
+	.Call(Infer_Chain, crf)
 
 
 
@@ -66,7 +66,7 @@ infer.chain <- function(crf)
 #' 
 #' @export
 infer.tree <- function(crf)
-	.Call("Infer_Tree", crf)
+	.Call(Infer_Tree, crf)
 
 
 
@@ -142,7 +142,7 @@ infer.cutset <- function(crf, cutset, engine = "default")
 	clamped <- rep(0, crf$n.nodes)
 	clamped[cutset] <- 1
 	newcrf <- clamp.crf(crf, clamped)
-	.Call("Infer_Cutset", newcrf, engine.id[engine])
+	.Call(Infer_Cutset, newcrf, engine.id[engine])
 }
 
 
@@ -167,7 +167,7 @@ infer.cutset <- function(crf, cutset, engine = "default")
 #' 
 #' @export
 infer.junction <- function(crf)
-	.Call("Infer_Junction", crf)
+	.Call(Infer_Junction, crf)
 
 
 
@@ -193,7 +193,7 @@ infer.junction <- function(crf)
 #' 
 #' @export
 infer.sample <- function(crf, sample.method, ...)
-	.Call("Infer_Sample", crf, sample.method(crf, ...))
+	.Call(Infer_Sample, crf, sample.method(crf, ...))
 
 
 
@@ -220,7 +220,7 @@ infer.sample <- function(crf, sample.method, ...)
 #' 
 #' @export
 infer.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
-	.Call("Infer_LBP", crf, max.iter, cutoff, verbose)
+	.Call(Infer_LBP, crf, max.iter, cutoff, verbose)
 
 
 
@@ -247,4 +247,4 @@ infer.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 #' 
 #' @export
 infer.trbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
-	.Call("Infer_TRBP", crf, max.iter, cutoff, verbose)
+	.Call(Infer_TRBP, crf, max.iter, cutoff, verbose)
