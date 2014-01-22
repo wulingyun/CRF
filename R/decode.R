@@ -1,12 +1,81 @@
+#' Decoding method for small graphs
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Exact decoding for small graphs with brute-force search 
+#' 
+#' @param crf
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.exact(small.crf)
+#'
+#' @export 
 decode.exact <- function(crf)
 	.Call("Decode_Exact", crf)
 
+
+
+#' Decoding method for chain-structured graphs
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Exact decoding for chain-structured graphs with the Viterbi algorithm.
+#' 
+#' @param crf
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.chain(small.crf)
+#'
+#' @export 
 decode.chain <- function(crf)
 	.Call("Decode_Chain", crf)
 
+
+
+#' Decoding method for tree- and forest-structured graphs
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Exact decoding for tree- and forest-structured graphs with max-product belief propagation 
+#' 
+#' @param crf
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.tree(small.crf)
+#'
+#' @export 
 decode.tree <- function(crf)
 	.Call("Decode_Tree", crf)
 
+
+
+#' Conditional decoding method
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Conditional decoding (takes another decoding method as input) 
+#' 
+#' @param crf
+#' @param clamped
+#' @param decode.method
+#' @param ...
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.conditional(small.crf, c(0,1,0,0), decode.exact)
+#'
+#' @export 
 decode.conditional <- function(crf, clamped, decode.method, ...)
 {
 	newcrf <- clamp.crf(crf, clamped)
@@ -15,6 +84,26 @@ decode.conditional <- function(crf, clamped, decode.method, ...)
 	decode
 }
 
+
+
+#' Decoding method for graphs with a small cutset
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Exact decoding for graphs with a small cutset using cutset conditioning 
+#' 
+#' @param crf
+#' @param cutset
+#' @param engine The underlying engine for cutset decoding, possible values are "default", "none", "exact", "chain", and "tree".
+#' @param start
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.cutset(small.crf, c(2))
+#'
+#' @export 
 decode.cutset <- function(crf, cutset, engine = "default", start = apply(crf$node.pot, 1, which.max))
 {
 	engine.id <- c("default"=-1, "none"=0, "exact"=1, "chain"=2, "tree"=3);
@@ -24,27 +113,182 @@ decode.cutset <- function(crf, cutset, engine = "default", start = apply(crf$nod
 	.Call("Decode_Cutset", newcrf, engine.id[engine], start)
 }
 
+
+
+#' Decoding method for low-treewidth graphs
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Exact decoding for low-treewidth graphs using junction trees 
+#' 
+#' @param crf
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.junction(small.crf)
+#'
+#' @export 
 decode.junction <- function(crf)
 	.Call("Decode_Junction", crf);
 
+
+
+#' Decoding method using sampling
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Approximate decoding using sampling (takes a sampling method as input) 
+#' 
+#' @param crf
+#' @param sample.method
+#' @param ...
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.sample(small.crf, sample.exact, 10000)
+#'
+#' @export 
 decode.sample <- function(crf, sample.method, ...)
 	.Call("Decode_Sample", crf, sample.method(crf, ...))
 
+
+
+#' Decoding method using inference
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Approximate decoding using inference (takes an inference method as input) 
+#' 
+#' @param crf
+#' @param infer.method
+#' @param ...
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.marginal(small.crf, infer.exact)
+#'
+#' @export 
 decode.marginal <- function(crf, infer.method, ...)
 	apply(infer.method(crf, ...)$node.bel, 1, which.max)
 
+
+
+#' Decoding method using loopy belief propagation
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Approximate decoding using max-product loopy belief propagation 
+#' 
+#' @param crf
+#' @param max.iter
+#' @param cutoff
+#' @param verbose
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.lbp(small.crf)
+#'
+#' @export 
 decode.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 	.Call("Decode_LBP", crf, max.iter, cutoff, verbose)
 
+
+
+#' Decoding method using tree-reweighted belief propagation
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Approximate decoding using max-product tree-reweighted belief propagtion 
+#' 
+#' @param crf
+#' @param max.iter
+#' @param cutoff
+#' @param verbose
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.trbp(small.crf)
+#'
+#' @export 
 decode.trbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 	.Call("Decode_TRBP", crf, max.iter, cutoff, verbose)
 
+
+
+#' Decoding method using greedy algorithm
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Approximate decoding with greedy algorithm 
+#' 
+#' @param crf
+#' @param restart
+#' @param start
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.greedy(small.crf)
+#'
+#' @export 
 decode.greedy <- function(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
 	.Call("Decode_Greedy", crf, restart, start)
 
+
+
+#' Decoding method using iterated conditional modes algorithm
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Approximate decoding with the iterated conditional modes algorithm 
+#' 
+#' @param crf
+#' @param restart
+#' @param start
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.icm(small.crf)
+#'
+#' @export 
 decode.icm <- function(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
 	.Call("Decode_ICM", crf, restart, start)
 
+
+
+#' Decoding method using block iterated conditional modes algorithm
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Approximate decoding with the block iterated conditional modes algorithm 
+#' 
+#' @param crf
+#' @param blocks
+#' @param decode.method
+#' @param restart
+#' @param start
+#' @param ...
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.block(small.crf, list(c(1,3), c(2,4)))
+#'
+#' @export 
 decode.block <- function(crf, blocks, decode.method = decode.tree, restart = 0, start = apply(crf$node.pot, 1, which.max), ...)
 {
 	y <- integer(crf$n.nodes)
@@ -97,6 +341,24 @@ decode.block <- function(crf, blocks, decode.method = decode.tree, restart = 0, 
 	decode
 }
 
+
+
+#' Decoding method using integer linear programming
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Exact decoding with an integer linear programming formulation and approximate using LP relaxation
+#' 
+#' @param crf
+#' @param lp.rounding Boolean variable to indicate whether LP rounding is need.
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.ilp(small.crf)
+#'
+#' @export 
 decode.ilp <- function(crf, lp.rounding = FALSE)
 {
 	vmap.nodes <- matrix(nrow=crf$n.nodes, ncol=2)

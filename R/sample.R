@@ -1,12 +1,89 @@
+#' Sampling method for small graphs
+#' 
+#' Generating samples from the distribution
+#' 
+#' Exact sampling for small graphs with brute-force inverse cumulative distribution 
+#' 
+#' @param crf
+#' @param size
+#' @return This function will return a matrix with \code{size} rows and \code{crf$n.nodes} columns,
+#'   in which each row is a sampled configuration.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' s <- sample.exact(small.crf, 100)
+#' 
+#' @export
 sample.exact <- function(crf, size)
 	.Call("Sample_Exact", crf, size)
 
+
+
+#' Sampling method for chain-structured graphs
+#' 
+#' Generating samples from the distribution
+#' 
+#' Exact sampling for chain-structured graphs with the forward-filter backward-sample algorithm 
+#' 
+#' @param crf
+#' @param size
+#' @return This function will return a matrix with \code{size} rows and \code{crf$n.nodes} columns,
+#'   in which each row is a sampled configuration.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' s <- sample.chain(small.crf, 100)
+#' 
+#' @export
 sample.chain <- function(crf, size)
 	.Call("Sample_Chain", crf, size)
 
+
+
+#' Sampling method for tree- and forest-structured graphs
+#' 
+#' Generating samples from the distribution
+#' 
+#' Exact sampling for tree- and forest-structured graphs with sum-product belief propagation and backward-sampling 
+#' 
+#' @param crf
+#' @param size
+#' @return This function will return a matrix with \code{size} rows and \code{crf$n.nodes} columns,
+#'   in which each row is a sampled configuration.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' s <- sample.tree(small.crf, 100)
+#' 
+#' @export
 sample.tree <- function(crf, size)
 	.Call("Sample_Tree", crf, size)
 
+
+
+#' Conditional sampling method
+#' 
+#' Generating samples from the distribution
+#' 
+#' Conditional sampling (takes another sampling method as input) 
+#' 
+#' @param crf
+#' @param size
+#' @param clamped
+#' @param sample.method
+#' @param ...
+#' @return This function will return a matrix with \code{size} rows and \code{crf$n.nodes} columns,
+#'   in which each row is a sampled configuration.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' s <- sample.conditional(small.crf, 100, c(0,1,0,0), sample.exact)
+#' 
+#' @export
 sample.conditional <- function(crf, size, clamped, sample.method, ...)
 {
 	newcrf <- clamp.crf(crf, clamped)
@@ -16,6 +93,27 @@ sample.conditional <- function(crf, size, clamped, sample.method, ...)
 	samples
 }
 
+
+
+#' Sampling method for graphs with a small cutset
+#' 
+#' Generating samples from the distribution
+#' 
+#' Exact sampling for graphs with a small cutset using cutset conditioning 
+#' 
+#' @param crf
+#' @param size
+#' @param cutset
+#' @param engine The underlying engine for cutset sampling, possible values are "default", "none", "exact", "chain", and "tree".
+#' @return This function will return a matrix with \code{size} rows and \code{crf$n.nodes} columns,
+#'   in which each row is a sampled configuration.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' s <- sample.cutset(small.crf, 100, c(2))
+#' 
+#' @export
 sample.cutset <- function(crf, size, cutset, engine = "default")
 {
 	engine.id <- c("default"=-1, "none"=0, "exact"=1, "chain"=2, "tree"=3);
@@ -25,8 +123,48 @@ sample.cutset <- function(crf, size, cutset, engine = "default")
 	.Call("Sample_Cutset", newcrf, size, engine.id[engine])
 }
 
+
+
+#' Sampling method for low-treewidth graphs
+#' 
+#' Generating samples from the distribution
+#' 
+#' Exact sampling for low-treewidth graphs using junction trees 
+#' 
+#' @param crf
+#' @param size
+#' @return This function will return a matrix with \code{size} rows and \code{crf$n.nodes} columns,
+#'   in which each row is a sampled configuration.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' s <- sample.junction(small.crf, 100)
+#' 
+#' @export
 sample.junction <- function(crf, size)
 	.Call("Sample_Junction", crf, size)
 
+
+
+#' Sampling method using single-site Gibbs sampler
+#' 
+#' Generating samples from the distribution
+#' 
+#' Approximate sampling using a single-site Gibbs sampler
+#' 
+#' @param crf
+#' @param size
+#' @param burn.in
+#' @param start
+#' @return This function will return a matrix with \code{size} rows and \code{crf$n.nodes} columns,
+#'   in which each row is a sampled configuration.
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' s <- sample.gibbs(small.crf, 100)
+#' 
+#' @export
 sample.gibbs <- function(crf, size, burn.in = 1000, start = apply(crf$node.pot, 1, which.max))
 	.Call("Sample_Gibbs", crf, size, burn.in, start)
