@@ -14,7 +14,7 @@
 #'
 #' @export 
 decode.exact <- function(crf)
-	.Call("Decode_Exact", crf)
+	.Call(Decode_Exact, crf)
 
 
 
@@ -34,7 +34,7 @@ decode.exact <- function(crf)
 #'
 #' @export 
 decode.chain <- function(crf)
-	.Call("Decode_Chain", crf)
+	.Call(Decode_Chain, crf)
 
 
 
@@ -54,7 +54,7 @@ decode.chain <- function(crf)
 #'
 #' @export 
 decode.tree <- function(crf)
-	.Call("Decode_Tree", crf)
+	.Call(Decode_Tree, crf)
 
 
 
@@ -110,7 +110,7 @@ decode.cutset <- function(crf, cutset, engine = "default", start = apply(crf$nod
 	clamped <- rep(0, crf$n.nodes)
 	clamped[cutset] <- 1
 	newcrf <- clamp.crf(crf, clamped)
-	.Call("Decode_Cutset", newcrf, engine.id[engine], start)
+	.Call(Decode_Cutset, newcrf, engine.id[engine], start)
 }
 
 
@@ -131,7 +131,7 @@ decode.cutset <- function(crf, cutset, engine = "default", start = apply(crf$nod
 #'
 #' @export 
 decode.junction <- function(crf)
-	.Call("Decode_Junction", crf);
+	.Call(Decode_Junction, crf);
 
 
 
@@ -153,7 +153,7 @@ decode.junction <- function(crf)
 #'
 #' @export 
 decode.sample <- function(crf, sample.method, ...)
-	.Call("Decode_Sample", crf, sample.method(crf, ...))
+	.Call(Decode_Sample, crf, sample.method(crf, ...))
 
 
 
@@ -198,7 +198,7 @@ decode.marginal <- function(crf, infer.method, ...)
 #'
 #' @export 
 decode.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
-	.Call("Decode_LBP", crf, max.iter, cutoff, verbose)
+	.Call(Decode_LBP, crf, max.iter, cutoff, verbose)
 
 
 
@@ -221,7 +221,7 @@ decode.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 #'
 #' @export 
 decode.trbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
-	.Call("Decode_TRBP", crf, max.iter, cutoff, verbose)
+	.Call(Decode_TRBP, crf, max.iter, cutoff, verbose)
 
 
 
@@ -243,7 +243,7 @@ decode.trbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 #'
 #' @export 
 decode.greedy <- function(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
-	.Call("Decode_Greedy", crf, restart, start)
+	.Call(Decode_Greedy, crf, restart, start)
 
 
 
@@ -265,7 +265,7 @@ decode.greedy <- function(crf, restart = 0, start = apply(crf$node.pot, 1, which
 #'
 #' @export 
 decode.icm <- function(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
-	.Call("Decode_ICM", crf, restart, start)
+	.Call(Decode_ICM, crf, restart, start)
 
 
 

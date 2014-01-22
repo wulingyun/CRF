@@ -16,7 +16,7 @@
 #' 
 #' @export
 sample.exact <- function(crf, size)
-	.Call("Sample_Exact", crf, size)
+	.Call(Sample_Exact, crf, size)
 
 
 
@@ -38,7 +38,7 @@ sample.exact <- function(crf, size)
 #' 
 #' @export
 sample.chain <- function(crf, size)
-	.Call("Sample_Chain", crf, size)
+	.Call(Sample_Chain, crf, size)
 
 
 
@@ -60,7 +60,7 @@ sample.chain <- function(crf, size)
 #' 
 #' @export
 sample.tree <- function(crf, size)
-	.Call("Sample_Tree", crf, size)
+	.Call(Sample_Tree, crf, size)
 
 
 
@@ -120,7 +120,7 @@ sample.cutset <- function(crf, size, cutset, engine = "default")
 	clamped <- rep(0, crf$n.nodes)
 	clamped[cutset] <- 1
 	newcrf <- clamp.crf(crf, clamped)
-	.Call("Sample_Cutset", newcrf, size, engine.id[engine])
+	.Call(Sample_Cutset, newcrf, size, engine.id[engine])
 }
 
 
@@ -143,7 +143,7 @@ sample.cutset <- function(crf, size, cutset, engine = "default")
 #' 
 #' @export
 sample.junction <- function(crf, size)
-	.Call("Sample_Junction", crf, size)
+	.Call(Sample_Junction, crf, size)
 
 
 
@@ -167,4 +167,4 @@ sample.junction <- function(crf, size)
 #' 
 #' @export
 sample.gibbs <- function(crf, size, burn.in = 1000, start = apply(crf$node.pot, 1, which.max))
-	.Call("Sample_Gibbs", crf, size, burn.in, start)
+	.Call(Sample_Gibbs, crf, size, burn.in, start)

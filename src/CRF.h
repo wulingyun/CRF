@@ -1,10 +1,14 @@
 #include <R.h>
 #include <Rdefines.h>
+#include <R_ext/Rdynload.h>
 #include "misc.h"
 
 /* Interfaces to R */
 
 extern "C" {
+  /* DLL Init */
+  void R_init_CRF(DllInfo *info);
+
 	/* Decoding */
 	SEXP Decode_Exact(SEXP _crf);
 	SEXP Decode_Chain(SEXP _crf);
