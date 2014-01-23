@@ -1,0 +1,29 @@
+\name{sample.chain}
+\alias{sample.chain}
+\title{Sampling method for chain-structured graphs}
+\usage{
+sample.chain(crf, size)
+}
+\arguments{
+  \item{crf}{}
+
+  \item{size}{}
+}
+\value{
+This function will return a matrix with \code{size} rows
+and \code{crf$n.nodes} columns, in which each row is a
+sampled configuration.
+}
+\description{
+Generating samples from the distribution
+}
+\details{
+Exact sampling for chain-structured graphs with the
+forward-filter backward-sample algorithm
+}
+\examples{
+library(CRF)
+data(Small)
+s <- sample.chain(small.crf, 100)
+}
+

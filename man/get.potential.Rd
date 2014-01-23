@@ -1,0 +1,27 @@
+\name{get.potential}
+\alias{get.potential}
+\title{Calculate the potential of CRF}
+\usage{
+get.potential(crf, configuration)
+}
+\arguments{
+  \item{crf}{The CRF}
+
+  \item{configuration}{The vector of states of nodes}
+}
+\value{
+The function will return the potential of CRF with given
+configuration
+}
+\description{
+Calculate the potential of a CRF with given configuration
+}
+\details{
+The function will calculate the potential of a CRF with
+given configuration, i.e., the assigned states of nodes in
+the CRF.
+}
+\seealso{
+\code{\link{get.logPotential}}
+}
+

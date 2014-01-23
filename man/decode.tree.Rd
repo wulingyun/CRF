@@ -1,0 +1,26 @@
+\name{decode.tree}
+\alias{decode.tree}
+\title{Decoding method for tree- and forest-structured graphs}
+\usage{
+decode.tree(crf)
+}
+\arguments{
+  \item{crf}{}
+}
+\value{
+This function will return the most likely configuration,
+which is a vector of length \code{crf$n.nodes}.
+}
+\description{
+Computing the most likely configuration for CRF
+}
+\details{
+Exact decoding for tree- and forest-structured graphs with
+max-product belief propagation
+}
+\examples{
+library(CRF)
+data(Small)
+d <- decode.tree(small.crf)
+}
+
