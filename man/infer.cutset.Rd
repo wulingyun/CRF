@@ -1,0 +1,39 @@
+\name{infer.cutset}
+\alias{infer.cutset}
+\title{Inference method for graphs with a small cutset}
+\usage{
+infer.cutset(crf, cutset, engine = "default")
+}
+\arguments{
+  \item{crf}{}
+
+  \item{cutset}{}
+
+  \item{engine}{The underlying engine for cutset decoding,
+  possible values are "default", "none", "exact", "chain",
+  and "tree".}
+}
+\value{
+This function will return a list with components:
+\item{node.bel}{Node belief. It is a matrix with
+\code{crf$n.nodes} rows and \code{crf$max.state} columns.}
+\item{edge.bel}{Edge belief. It is a list of matrices. The
+size of list is \code{crf$n.edges} and the matrix \code{i}
+has \code{crf$n.states[crf$edges[i,1]]} rows and
+\code{crf$n.states[crf$edges[i,2]]} columns.}
+\item{logZ}{The logarithmic value of CRF normalization
+factor Z.}
+}
+\description{
+Computing the partition function and marginal probabilities
+}
+\details{
+Exact inference for graphs with a small cutset using cutset
+conditioning
+}
+\examples{
+library(CRF)
+data(Small)
+i <- infer.cutset(small.crf, c(2))
+}
+

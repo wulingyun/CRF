@@ -1,0 +1,26 @@
+\name{decode.junction}
+\alias{decode.junction}
+\title{Decoding method for low-treewidth graphs}
+\usage{
+decode.junction(crf)
+}
+\arguments{
+  \item{crf}{}
+}
+\value{
+This function will return the most likely configuration,
+which is a vector of length \code{crf$n.nodes}.
+}
+\description{
+Computing the most likely configuration for CRF
+}
+\details{
+Exact decoding for low-treewidth graphs using junction
+trees
+}
+\examples{
+library(CRF)
+data(Small)
+d <- decode.junction(small.crf)
+}
+

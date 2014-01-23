@@ -1,0 +1,29 @@
+\name{decode.ilp}
+\alias{decode.ilp}
+\title{Decoding method using integer linear programming}
+\usage{
+decode.ilp(crf, lp.rounding = FALSE)
+}
+\arguments{
+  \item{crf}{}
+
+  \item{lp.rounding}{Boolean variable to indicate whether
+  LP rounding is need.}
+}
+\value{
+This function will return the most likely configuration,
+which is a vector of length \code{crf$n.nodes}.
+}
+\description{
+Computing the most likely configuration for CRF
+}
+\details{
+Exact decoding with an integer linear programming
+formulation and approximate using LP relaxation
+}
+\examples{
+library(CRF)
+data(Small)
+d <- decode.ilp(small.crf)
+}
+

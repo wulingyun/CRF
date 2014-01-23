@@ -1,0 +1,33 @@
+\name{infer.chain}
+\alias{infer.chain}
+\title{Inference method for chain-structured graphs}
+\usage{
+infer.chain(crf)
+}
+\arguments{
+  \item{crf}{}
+}
+\value{
+This function will return a list with components:
+\item{node.bel}{Node belief. It is a matrix with
+\code{crf$n.nodes} rows and \code{crf$max.state} columns.}
+\item{edge.bel}{Edge belief. It is a list of matrices. The
+size of list is \code{crf$n.edges} and the matrix \code{i}
+has \code{crf$n.states[crf$edges[i,1]]} rows and
+\code{crf$n.states[crf$edges[i,2]]} columns.}
+\item{logZ}{The logarithmic value of CRF normalization
+factor Z.}
+}
+\description{
+Computing the partition function and marginal probabilities
+}
+\details{
+Exact inference for chain-structured graphs with the
+forward-backward algorithm
+}
+\examples{
+library(CRF)
+data(Small)
+i <- infer.chain(small.crf)
+}
+

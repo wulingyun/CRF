@@ -1,0 +1,29 @@
+\name{sample.tree}
+\alias{sample.tree}
+\title{Sampling method for tree- and forest-structured graphs}
+\usage{
+sample.tree(crf, size)
+}
+\arguments{
+  \item{crf}{}
+
+  \item{size}{}
+}
+\value{
+This function will return a matrix with \code{size} rows
+and \code{crf$n.nodes} columns, in which each row is a
+sampled configuration.
+}
+\description{
+Generating samples from the distribution
+}
+\details{
+Exact sampling for tree- and forest-structured graphs with
+sum-product belief propagation and backward-sampling
+}
+\examples{
+library(CRF)
+data(Small)
+s <- sample.tree(small.crf, 100)
+}
+
