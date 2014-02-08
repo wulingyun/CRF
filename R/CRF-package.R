@@ -27,7 +27,7 @@
 #'   \item \code{\link{decode.icm}} Approximate decoding with the iterated conditional modes algorithm 
 #'   \item \code{\link{decode.block}} Approximate decoding with the block iterated conditional modes algorithm 
 #'   \item \code{\link{decode.ilp}} Exact decoding with an integer linear programming formulation and approximate using LP relaxation 
-#'   }
+#' }
 #' 
 #' Inference: Computing the partition function and marginal probabilities
 #' \itemize{ 
@@ -40,7 +40,7 @@
 #'   \item \code{\link{infer.sample}} Approximate inference using sampling (takes a sampling method as input) 
 #'   \item \code{\link{infer.lbp}} Approximate inference using sum-product loopy belief propagation 
 #'   \item \code{\link{infer.trbp}} Approximate inference using sum-product tree-reweighted belief propagation 
-#'   }
+#' }
 #' 
 #' Sampling: Generating samples from the distribution 
 #' \itemize{ 
@@ -51,21 +51,27 @@
 #'   \item \code{\link{sample.cutset}} Exact sampling for graphs with a small cutset using cutset conditioning 
 #'   \item \code{\link{sample.junction}} Exact sampling for low-treewidth graphs using junction trees 
 #'   \item \code{\link{sample.gibbs}} Approximate sampling using a single-site Gibbs sampler 
-#'   }
+#' }
 #' 
 #' Training: Given data, computing the most likely estimates of the parameters
+#' \itemize{
+#'   \item \code{\link{train.crf}} Train CRF model
+#'   \item \code{\link{train.mrf}} Train MRF model
+#' }
 #' 
 #' @name CRF-package
 #' @aliases CRF-package CRF
 #' @docType package
+#' @keywords package
 #' @author Ling-Yun Wu \email{wulingyun@@gmail.com}
 #' @seealso \code{\link{make.crf}}
-#' @references \itemize{ 
-#'   \item J. Lafferty, A. McCallum, and F. Pereira. Conditional random fields: Probabilistic models for segmenting and labeling
-#'     sequence data. In \emph{the proceedings of International Conference on Machine Learning (ICML)}, pp. 282-289, 2001.  
-#'   \item Mark Schmidt. UGM: A Matlab toolbox for probabilistic undirected graphical models.
-#'     \url{http://www.cs.ubc.ca/~schmidtm/Software/UGM.html} }
-#' @keywords package
+#' 
+#' @references J. Lafferty, A. McCallum, and F. Pereira. Conditional random fields:
+#' Probabilistic models for segmenting and labeling sequence data. In \emph{the 
+#' proceedings of International Conference on Machine Learning (ICML)}, pp. 282-289, 2001.  
+#' @references Mark Schmidt. UGM: A Matlab toolbox for probabilistic undirected 
+#' graphical models. \url{http://www.cs.ubc.ca/~schmidtm/Software/UGM.html}
+#' 
 #' @examples
 #' 
 #' library(CRF)
