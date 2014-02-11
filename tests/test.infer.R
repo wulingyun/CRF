@@ -1,5 +1,19 @@
 library(CRF)
-data(TestFunc)
+
+test.infer <- function(name, infer.method, crf, answer, cutoff=1e-8, ...)
+{
+  cat("  ", name, ": Inferring ... ", sep="")
+  belief <- infer.method(crf, ...)
+  
+  node.error <- sapply(1:crf$n.nodes, function(i) max(abs(belief$node.bel[i,] - answer$node.bel[i,])))
+  edge.error <- sapply(1:crf$n.edges, function(i) max(abs(belief$edge.bel[[i]] - answer$edge.bel[[i]])))
+  if (max(abs(c(node.error, edge.error, belief$logZ - answer$logZ))) < cutoff) {
+    cat("Passed.\n")
+  } else {
+    cat("Failed ***\n")
+    warning(name, ": Inference is incorrect!")
+  }
+}
 
 cat("Testing dataset Small ...\n")
 data(Small)
