@@ -20,6 +20,6 @@ Exact decoding for small graphs with brute-force search
 \examples{
 library(CRF)
 data(Small)
-d <- decode.exact(small.crf)
+d <- decode.exact(Small$crf)
 }
 

@@ -1,6 +1,8 @@
 library(CRF)
 
 data(Rain)
+rain <- Rain$rain
+months <- Rain$months
 
 p.rain <- sum(rain == 2) / length(rain)
 nll <- log(p.rain) * sum(rain == 2) + log(1-p.rain) * sum(rain == 1)

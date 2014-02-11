@@ -34,6 +34,6 @@ input)
 \examples{
 library(CRF)
 data(Small)
-i <- infer.conditional(small.crf, c(0,1,0,0), infer.exact)
+i <- infer.conditional(Small$crf, c(0,1,0,0), infer.exact)
 }
 

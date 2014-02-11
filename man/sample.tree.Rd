@@ -24,6 +24,6 @@ sum-product belief propagation and backward-sampling
 \examples{
 library(CRF)
 data(Small)
-s <- sample.tree(small.crf, 100)
+s <- sample.tree(Small$crf, 100)
 }
 

@@ -32,6 +32,6 @@ modes algorithm
 \examples{
 library(CRF)
 data(Small)
-d <- decode.block(small.crf, list(c(1,3), c(2,4)))
+d <- decode.block(Small$crf, list(c(1,3), c(2,4)))
 }
 

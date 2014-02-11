@@ -21,6 +21,6 @@ algorithm.
 \examples{
 library(CRF)
 data(Small)
-d <- decode.chain(small.crf)
+d <- decode.chain(Small$crf)
 }
 

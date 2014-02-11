@@ -30,6 +30,6 @@ conditioning
 \examples{
 library(CRF)
 data(Small)
-s <- sample.cutset(small.crf, 100, c(2))
+s <- sample.cutset(Small$crf, 100, c(2))
 }
 

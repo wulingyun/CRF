@@ -25,6 +25,6 @@ method as input)
 \examples{
 library(CRF)
 data(Small)
-d <- decode.marginal(small.crf, infer.exact)
+d <- decode.marginal(Small$crf, infer.exact)
 }
 

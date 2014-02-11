@@ -26,7 +26,7 @@ the conditional potentials based on the clamped vector.
 \examples{
 library(CRF)
 data(Small)
-crf <- clamp.crf(small.crf, c(0, 0, 1, 1))
+crf <- clamp.crf(Small$crf, c(0, 0, 1, 1))
 clamp.reset(crf, c(0,0,2,2))
 }
 \seealso{

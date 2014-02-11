@@ -22,7 +22,7 @@
 #' 
 #' library(CRF)
 #' data(Small)
-#' crf <- clamp.crf(small.crf, c(0, 0, 1, 1))
+#' crf <- clamp.crf(Small$crf, c(0, 0, 1, 1))
 #' 
 #' 
 #' @export
@@ -80,7 +80,7 @@ clamp.crf <- function(crf, clamped)
 #' 
 #' library(CRF)
 #' data(Small)
-#' crf <- clamp.crf(small.crf, c(0, 0, 1, 1))
+#' crf <- clamp.crf(Small$crf, c(0, 0, 1, 1))
 #' clamp.reset(crf, c(0,0,2,2))
 #' 
 #' 
@@ -123,7 +123,7 @@ clamp.reset <- function(crf, clamped)
 #' 
 #' library(CRF)
 #' data(Small)
-#' crf <- sub.crf(small.crf, c(2, 3))
+#' crf <- sub.crf(Small$crf, c(2, 3))
 #' 
 #' 
 #' @export

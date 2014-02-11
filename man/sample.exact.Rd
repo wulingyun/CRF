@@ -24,6 +24,6 @@ cumulative distribution
 \examples{
 library(CRF)
 data(Small)
-s <- sample.exact(small.crf, 100)
+s <- sample.exact(Small$crf, 100)
 }
 

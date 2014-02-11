@@ -24,6 +24,6 @@ trees
 \examples{
 library(CRF)
 data(Small)
-s <- sample.junction(small.crf, 100)
+s <- sample.junction(Small$crf, 100)
 }
 

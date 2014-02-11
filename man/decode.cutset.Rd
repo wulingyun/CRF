@@ -30,6 +30,6 @@ conditioning
 \examples{
 library(CRF)
 data(Small)
-d <- decode.cutset(small.crf, c(2))
+d <- decode.cutset(Small$crf, c(2))
 }
 

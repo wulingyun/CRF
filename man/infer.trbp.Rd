@@ -34,6 +34,6 @@ belief propagation
 \examples{
 library(CRF)
 data(Small)
-i <- infer.trbp(small.crf)
+i <- infer.trbp(Small$crf)
 }
 

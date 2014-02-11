@@ -34,7 +34,7 @@ on the clamped vector.
 \examples{
 library(CRF)
 data(Small)
-crf <- clamp.crf(small.crf, c(0, 0, 1, 1))
+crf <- clamp.crf(Small$crf, c(0, 0, 1, 1))
 }
 \seealso{
 \code{\link{make.crf}}, \code{\link{sub.crf}},

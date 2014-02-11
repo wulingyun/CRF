@@ -27,6 +27,6 @@ input)
 \examples{
 library(CRF)
 data(Small)
-d <- decode.conditional(small.crf, c(0,1,0,0), decode.exact)
+d <- decode.conditional(Small$crf, c(0,1,0,0), decode.exact)
 }
 

@@ -28,6 +28,6 @@ forward-backward algorithm
 \examples{
 library(CRF)
 data(Small)
-i <- infer.chain(small.crf)
+i <- infer.chain(Small$crf)
 }
 

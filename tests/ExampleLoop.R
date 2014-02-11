@@ -39,6 +39,7 @@ structure(list(decode = c(1L, 1L, 1L, 1L), node.bel = structure(c(0.485633270321
 "edge.bel", "logZ"))
 
 
-loop.crf <- crf
-loop.answer <- answer
-save(loop.crf, loop.answer, file="Loop.RData")
+Loop <- list()
+Loop$crf <- crf
+Loop$answer <- answer
+save(Loop, file="Loop.RData")

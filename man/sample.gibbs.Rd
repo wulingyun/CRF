@@ -28,6 +28,6 @@ Approximate sampling using a single-site Gibbs sampler
 \examples{
 library(CRF)
 data(Small)
-s <- sample.gibbs(small.crf, 100)
+s <- sample.gibbs(Small$crf, 100)
 }
 

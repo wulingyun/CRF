@@ -24,6 +24,6 @@ forward-filter backward-sample algorithm
 \examples{
 library(CRF)
 data(Small)
-s <- sample.chain(small.crf, 100)
+s <- sample.chain(Small$crf, 100)
 }
 

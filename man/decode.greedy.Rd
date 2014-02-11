@@ -24,6 +24,6 @@ Approximate decoding with greedy algorithm
 \examples{
 library(CRF)
 data(Small)
-d <- decode.greedy(small.crf)
+d <- decode.greedy(Small$crf)
 }
 

@@ -34,6 +34,6 @@ conditioning
 \examples{
 library(CRF)
 data(Small)
-i <- infer.cutset(small.crf, c(2))
+i <- infer.cutset(Small$crf, c(2))
 }
 

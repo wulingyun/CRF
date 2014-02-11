@@ -27,6 +27,6 @@ belief propagtion
 \examples{
 library(CRF)
 data(Small)
-d <- decode.trbp(small.crf)
+d <- decode.trbp(Small$crf)
 }
 

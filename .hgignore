@@ -1,4 +1,7 @@
-glob:src-i386/*
-glob:src-x64/*
-glob:*.bak
-glob:.svn/*
+syntax: glob
+src-i386/*
+src-x64/*
+.svn/*
+*.bak
+*.so
+*.o
