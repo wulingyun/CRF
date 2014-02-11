@@ -28,6 +28,6 @@ sum-product belief propagation
 \examples{
 library(CRF)
 data(Small)
-i <- infer.tree(small.crf)
+i <- infer.tree(Small$crf)
 }
 

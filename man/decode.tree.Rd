@@ -21,6 +21,6 @@ max-product belief propagation
 \examples{
 library(CRF)
 data(Small)
-d <- decode.tree(small.crf)
+d <- decode.tree(Small$crf)
 }
 

@@ -95,9 +95,9 @@ model }
 \examples{
 library(CRF)
 data(Small)
-decode.exact(small.crf)
-infer.exact(small.crf)
-sample.exact(small.crf, 100)
+decode.exact(Small$crf)
+infer.exact(Small$crf)
+sample.exact(Small$crf, 100)
 }
 \author{
 Ling-Yun Wu \email{wulingyun@gmail.com}

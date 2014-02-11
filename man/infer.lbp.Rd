@@ -34,6 +34,6 @@ propagation
 \examples{
 library(CRF)
 data(Small)
-i <- infer.lbp(small.crf)
+i <- infer.lbp(Small$crf)
 }
 

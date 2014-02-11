@@ -21,6 +21,6 @@ trees
 \examples{
 library(CRF)
 data(Small)
-d <- decode.junction(small.crf)
+d <- decode.junction(Small$crf)
 }
 

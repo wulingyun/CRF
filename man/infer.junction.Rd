@@ -28,6 +28,6 @@ trees
 \examples{
 library(CRF)
 data(Small)
-i <- infer.junction(small.crf)
+i <- infer.junction(Small$crf)
 }
 

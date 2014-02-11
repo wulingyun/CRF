@@ -35,6 +35,7 @@ structure(list(decode = c(2L, 1L, 1L, 1L), node.bel = structure(c(0.359630606860
 "node.bel", "edge.bel", "logZ"))
 
 
-small.crf <- crf
-small.answer <- answer
-save(small.crf, small.answer, file="Small.RData")
+Small <- list()
+Small$crf <- crf
+Small$answer <- answer
+save(Small, file="Small.RData")

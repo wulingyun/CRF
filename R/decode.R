@@ -10,7 +10,7 @@
 #' 
 #' library(CRF)
 #' data(Small)
-#' d <- decode.exact(small.crf)
+#' d <- decode.exact(Small$crf)
 #'
 #' @export 
 decode.exact <- function(crf)
@@ -30,7 +30,7 @@ decode.exact <- function(crf)
 #' 
 #' library(CRF)
 #' data(Small)
-#' d <- decode.chain(small.crf)
+#' d <- decode.chain(Small$crf)
 #'
 #' @export 
 decode.chain <- function(crf)
@@ -50,7 +50,7 @@ decode.chain <- function(crf)
 #' 
 #' library(CRF)
 #' data(Small)
-#' d <- decode.tree(small.crf)
+#' d <- decode.tree(Small$crf)
 #'
 #' @export 
 decode.tree <- function(crf)
@@ -73,7 +73,7 @@ decode.tree <- function(crf)
 #' 
 #' library(CRF)
 #' data(Small)
-#' d <- decode.conditional(small.crf, c(0,1,0,0), decode.exact)
+#' d <- decode.conditional(Small$crf, c(0,1,0,0), decode.exact)
 #'
 #' @export 
 decode.conditional <- function(crf, clamped, decode.method, ...)
@@ -101,7 +101,7 @@ decode.conditional <- function(crf, clamped, decode.method, ...)
 #' 
 #' library(CRF)
 #' data(Small)
-#' d <- decode.cutset(small.crf, c(2))
+#' d <- decode.cutset(Small$crf, c(2))
 #'
 #' @export 
 decode.cutset <- function(crf, cutset, engine = "default", start = apply(crf$node.pot, 1, which.max))
@@ -127,7 +127,7 @@ decode.cutset <- function(crf, cutset, engine = "default", start = apply(crf$nod
 #' 
 #' library(CRF)
 #' data(Small)
-#' d <- decode.junction(small.crf)
+#' d <- decode.junction(Small$crf)
 #'
 #' @export 
 decode.junction <- function(crf)
@@ -149,7 +149,7 @@ decode.junction <- function(crf)
 #' 
 #' library(CRF)
 #' data(Small)
-#' d <- decode.sample(small.crf, sample.exact, 10000)
+#' d <- decode.sample(Small$crf, sample.exact, 10000)
 #'
 #' @export 
 decode.sample <- function(crf, sample.method, ...)
@@ -171,7 +171,7 @@ decode.sample <- function(crf, sample.method, ...)
 #' 
 #' library(CRF)
 #' data(Small)
-#' d <- decode.marginal(small.crf, infer.exact)
+#' d <- decode.marginal(Small$crf, infer.exact)
 #'
 #' @export 
 decode.marginal <- function(crf, infer.method, ...)
@@ -194,7 +194,7 @@ decode.marginal <- function(crf, infer.method, ...)
 #' 
 #' library(CRF)
 #' data(Small)
-#' d <- decode.lbp(small.crf)
+#' d <- decode.lbp(Small$crf)
 #'
 #' @export 
 decode.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
@@ -217,7 +217,7 @@ decode.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 #' 
 #' library(CRF)
 #' data(Small)
-#' d <- decode.trbp(small.crf)
+#' d <- decode.trbp(Small$crf)
 #'
 #' @export 
 decode.trbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
@@ -239,7 +239,7 @@ decode.trbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 #' 
 #' library(CRF)
 #' data(Small)
-#' d <- decode.greedy(small.crf)
+#' d <- decode.greedy(Small$crf)
 #'
 #' @export 
 decode.greedy <- function(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
@@ -261,7 +261,7 @@ decode.greedy <- function(crf, restart = 0, start = apply(crf$node.pot, 1, which
 #' 
 #' library(CRF)
 #' data(Small)
-#' d <- decode.icm(small.crf)
+#' d <- decode.icm(Small$crf)
 #'
 #' @export 
 decode.icm <- function(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
@@ -286,7 +286,7 @@ decode.icm <- function(crf, restart = 0, start = apply(crf$node.pot, 1, which.ma
 #' 
 #' library(CRF)
 #' data(Small)
-#' d <- decode.block(small.crf, list(c(1,3), c(2,4)))
+#' d <- decode.block(Small$crf, list(c(1,3), c(2,4)))
 #'
 #' @export 
 decode.block <- function(crf, blocks, decode.method = decode.tree, restart = 0, start = apply(crf$node.pot, 1, which.max), ...)
@@ -356,7 +356,7 @@ decode.block <- function(crf, blocks, decode.method = decode.tree, restart = 0, 
 #' 
 #' library(CRF)
 #' data(Small)
-#' d <- decode.ilp(small.crf)
+#' d <- decode.ilp(Small$crf)
 #'
 #' @export 
 decode.ilp <- function(crf, lp.rounding = FALSE)

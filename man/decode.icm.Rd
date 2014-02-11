@@ -25,6 +25,6 @@ algorithm
 \examples{
 library(CRF)
 data(Small)
-d <- decode.icm(small.crf)
+d <- decode.icm(Small$crf)
 }
 

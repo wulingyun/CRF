@@ -723,6 +723,7 @@ structure(list(decode = c(2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L, 2L,
 "node.bel", "edge.bel", "logZ"))
 
 
-chain.crf <- crf
-chain.answer <- answer
-save(chain.crf, chain.answer, file="Chain.RData")
+Chain <- list()
+Chain$crf <- crf
+Chain$answer <- answer
+save(Chain, file="Chain.RData")

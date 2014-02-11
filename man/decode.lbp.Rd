@@ -27,6 +27,6 @@ propagation
 \examples{
 library(CRF)
 data(Small)
-d <- decode.lbp(small.crf)
+d <- decode.lbp(Small$crf)
 }
 

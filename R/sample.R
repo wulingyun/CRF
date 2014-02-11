@@ -12,7 +12,7 @@
 #' 
 #' library(CRF)
 #' data(Small)
-#' s <- sample.exact(small.crf, 100)
+#' s <- sample.exact(Small$crf, 100)
 #' 
 #' @export
 sample.exact <- function(crf, size)
@@ -34,7 +34,7 @@ sample.exact <- function(crf, size)
 #' 
 #' library(CRF)
 #' data(Small)
-#' s <- sample.chain(small.crf, 100)
+#' s <- sample.chain(Small$crf, 100)
 #' 
 #' @export
 sample.chain <- function(crf, size)
@@ -56,7 +56,7 @@ sample.chain <- function(crf, size)
 #' 
 #' library(CRF)
 #' data(Small)
-#' s <- sample.tree(small.crf, 100)
+#' s <- sample.tree(Small$crf, 100)
 #' 
 #' @export
 sample.tree <- function(crf, size)
@@ -81,7 +81,7 @@ sample.tree <- function(crf, size)
 #' 
 #' library(CRF)
 #' data(Small)
-#' s <- sample.conditional(small.crf, 100, c(0,1,0,0), sample.exact)
+#' s <- sample.conditional(Small$crf, 100, c(0,1,0,0), sample.exact)
 #' 
 #' @export
 sample.conditional <- function(crf, size, clamped, sample.method, ...)
@@ -111,7 +111,7 @@ sample.conditional <- function(crf, size, clamped, sample.method, ...)
 #' 
 #' library(CRF)
 #' data(Small)
-#' s <- sample.cutset(small.crf, 100, c(2))
+#' s <- sample.cutset(Small$crf, 100, c(2))
 #' 
 #' @export
 sample.cutset <- function(crf, size, cutset, engine = "default")
@@ -139,7 +139,7 @@ sample.cutset <- function(crf, size, cutset, engine = "default")
 #' 
 #' library(CRF)
 #' data(Small)
-#' s <- sample.junction(small.crf, 100)
+#' s <- sample.junction(Small$crf, 100)
 #' 
 #' @export
 sample.junction <- function(crf, size)
@@ -163,7 +163,7 @@ sample.junction <- function(crf, size)
 #' 
 #' library(CRF)
 #' data(Small)
-#' s <- sample.gibbs(small.crf, 100)
+#' s <- sample.gibbs(Small$crf, 100)
 #' 
 #' @export
 sample.gibbs <- function(crf, size, burn.in = 1000, start = apply(crf$node.pot, 1, which.max))

@@ -24,6 +24,6 @@ formulation and approximate using LP relaxation
 \examples{
 library(CRF)
 data(Small)
-d <- decode.ilp(small.crf)
+d <- decode.ilp(Small$crf)
 }
 

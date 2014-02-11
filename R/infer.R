@@ -14,7 +14,7 @@
 #' 
 #' library(CRF)
 #' data(Small)
-#' i <- infer.exact(small.crf)
+#' i <- infer.exact(Small$crf)
 #' 
 #' @export
 infer.exact <- function(crf)
@@ -38,7 +38,7 @@ infer.exact <- function(crf)
 #' 
 #' library(CRF)
 #' data(Small)
-#' i <- infer.chain(small.crf)
+#' i <- infer.chain(Small$crf)
 #' 
 #' @export
 infer.chain <- function(crf)
@@ -62,7 +62,7 @@ infer.chain <- function(crf)
 #' 
 #' library(CRF)
 #' data(Small)
-#' i <- infer.tree(small.crf)
+#' i <- infer.tree(Small$crf)
 #' 
 #' @export
 infer.tree <- function(crf)
@@ -89,7 +89,7 @@ infer.tree <- function(crf)
 #' 
 #' library(CRF)
 #' data(Small)
-#' i <- infer.conditional(small.crf, c(0,1,0,0), infer.exact)
+#' i <- infer.conditional(Small$crf, c(0,1,0,0), infer.exact)
 #' 
 #' @export
 infer.conditional <- function(crf, clamped, infer.method, ...)
@@ -133,7 +133,7 @@ infer.conditional <- function(crf, clamped, infer.method, ...)
 #' 
 #' library(CRF)
 #' data(Small)
-#' i <- infer.cutset(small.crf, c(2))
+#' i <- infer.cutset(Small$crf, c(2))
 #' 
 #' @export
 infer.cutset <- function(crf, cutset, engine = "default")
@@ -163,7 +163,7 @@ infer.cutset <- function(crf, cutset, engine = "default")
 #' 
 #' library(CRF)
 #' data(Small)
-#' i <- infer.junction(small.crf)
+#' i <- infer.junction(Small$crf)
 #' 
 #' @export
 infer.junction <- function(crf)
@@ -189,7 +189,7 @@ infer.junction <- function(crf)
 #' 
 #' library(CRF)
 #' data(Small)
-#' i <- infer.sample(small.crf, sample.exact, 10000)
+#' i <- infer.sample(Small$crf, sample.exact, 10000)
 #' 
 #' @export
 infer.sample <- function(crf, sample.method, ...)
@@ -216,7 +216,7 @@ infer.sample <- function(crf, sample.method, ...)
 #' 
 #' library(CRF)
 #' data(Small)
-#' i <- infer.lbp(small.crf)
+#' i <- infer.lbp(Small$crf)
 #' 
 #' @export
 infer.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
@@ -243,7 +243,7 @@ infer.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 #' 
 #' library(CRF)
 #' data(Small)
-#' i <- infer.trbp(small.crf)
+#' i <- infer.trbp(Small$crf)
 #' 
 #' @export
 infer.trbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)

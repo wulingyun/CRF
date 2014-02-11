@@ -1203,6 +1203,8 @@ structure(list(decode = c(1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L, 1L,
     0.000654736320572), .Dim = c(4L, 4L))), logZ = 1.4210854715202e-14), .Names = c("decode", 
 "node.bel", "edge.bel", "logZ"))
 
-tree.crf <- crf
-tree.answer <- answer
-save(tree.crf, tree.answer, file="Tree.RData")
+
+Tree <- list()
+Tree$crf <- crf
+Tree$answer <- answer
+save(Tree, file="Tree.RData")

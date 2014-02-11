@@ -32,6 +32,6 @@ method as input)
 \examples{
 library(CRF)
 data(Small)
-i <- infer.sample(small.crf, sample.exact, 10000)
+i <- infer.sample(Small$crf, sample.exact, 10000)
 }
 
