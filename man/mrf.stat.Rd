@@ -5,9 +5,9 @@
 mrf.stat(crf, instances)
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
-  \item{instances}{}
+  \item{instances}{The training data matrix of MRF model}
 }
 \value{
 This function will return the value of MRF sufficient
@@ -17,6 +17,13 @@ statistics.
 Calculate the sufficient statistics of MRF model
 }
 \details{
-Calculate the sufficient statistics of MRF model
+This function calculates the sufficient statistics of MRF
+model. This function much be called before the first
+calling to \code{\link{mrf.nll}}. In the training data
+matrix \code{instances}, each row is an instance and each
+column corresponds a node in CRF.
+}
+\seealso{
+\code{\link{mrf.nll}}, \code{\link{train.mrf}}
 }
 

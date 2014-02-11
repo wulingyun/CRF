@@ -2,18 +2,18 @@
 #' 
 #' Generate CRF from the adjacent matrix
 #' 
-#' The function will generate a empty CRF structure from a given adjacent
+#' The function will generate an empty CRF from a given adjacent
 #' matrix. If the length of \code{nstates} is less than \code{n.nodes}, it will
 #' be used repeatly. All node and edge potentials are initilized as 1.
 #' 
-#' Since the CRF data are often very huge, CRF is implemented by using environment.
-#' Therefore, normal assignment will only copy the pointer instead of real data.
-#' The vairables using normal assignment will refer to the exactly same CRF data.
+#' Since the CRF data are often very huge, CRF is implemented as an environment.
+#' The assignment of environments will only copy the addresses instead of real data,
+#' therefore the variables using normal assignment will refer to the exactly same CRF.
 #' For complete duplication of the data, please use \code{\link{duplicate}}. 
 #' 
 #' @param adj.matrix The adjacent matrix of CRF network
 #' @param nstates The state numbers of nodes
-#' @return The function will return a CRF, which is an environment with
+#' @return The function will return a new CRF, which is an environment with
 #' components: 
 #'   \item{n.nodes}{The number of nodes.} 
 #'   \item{n.edges}{The number of edges.} 
@@ -32,7 +32,9 @@
 #'   \item{edge.pot}{The edge potentials. It is a list of \code{n.edges} matrixes. Each matrix
 #'     \code{edge.pot[[i]]}, with dimension \code{(n.states[edges[i,1]],
 #'     n.states[edges[i,2]])}, denotes the edge potentials of the i-th edge.}
+#'
 #' @seealso \code{\link{duplicate}}, \code{\link{clamp.crf}}, \code{\link{sub.crf}}
+#'
 #' @examples
 #' 
 #' library(CRF)
@@ -93,13 +95,15 @@ make.crf <- function(adj.matrix, nstates)
 #' 
 #' Duplicate an existing CRF
 #' 
-#' The function will duplicate an existing CRF. Since CRF is implemented by using environment,
-#' normal assignment will only copy the pointer instead of the real data. The function will
-#' really copy all data of an existing CRF to a new CRF.
+#' This function will duplicate an existing CRF. Since CRF is implemented as an
+#' environment, normal assignment will only copy the pointer instead of the 
+#' real data. This function will generate a new CRF and really copy all data.
 #' 
 #' @param crf The existing CRF
 #' @return The function will return a new CRF with copied data
+#'
 #' @seealso \code{\link{make.crf}}
+#'
 #' @export
 duplicate <- function(crf)
 {
@@ -120,7 +124,9 @@ duplicate <- function(crf)
 #' @param crf The CRF
 #' @param configuration The vector of states of nodes
 #' @return The function will return the potential of CRF with given configuration
+#'
 #' @seealso \code{\link{get.logPotential}}
+#'
 #' @export
 get.potential <- function(crf, configuration)
 	.Call(Get_Potential, crf, configuration)
@@ -137,7 +143,9 @@ get.potential <- function(crf, configuration)
 #' @param crf The CRF
 #' @param configuration The vector of states of nodes
 #' @return The function will return the log-potential of CRF with given configuration
+#'
 #' @seealso \code{\link{get.potential}}
+#'
 #' @export
 get.logPotential <- function(crf, configuration)
 	.Call(Get_LogPotential, crf, configuration)

@@ -6,23 +6,26 @@ crf.nll(par, crf, instances, node.fea = NaN, edge.fea = NaN,
   node.ext = NaN, edge.ext = NaN, infer.method = infer.chain, ...)
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
-  \item{par}{}
+  \item{par}{The parameter vector of CRF}
 
-  \item{instances}{}
+  \item{instances}{The training data matrix of CRF model}
 
-  \item{node.fea}{}
+  \item{node.fea}{The list of node features}
 
-  \item{edge.fea}{}
+  \item{edge.fea}{The list of edge features}
 
-  \item{node.ext}{}
+  \item{node.ext}{The list of extended information of node
+  features}
 
-  \item{edge.ext}{}
+  \item{edge.ext}{The list of extended information of edge
+  features}
 
-  \item{infer.method}{}
+  \item{infer.method}{The inference method used to compute
+  the likelihood}
 
-  \item{...}{}
+  \item{...}{Other parameters need by the inference method}
 }
 \value{
 This function will return the value of CRF negative
@@ -32,6 +35,18 @@ log-likelihood.
 Calculate the negative log likelihood of CRF model
 }
 \details{
-Calculate the negative log likelihood of CRF model
+This function calculates the negative log likelihood of CRF
+model as well as the gradient. This function is intended to
+be called by optimization algorithm in training process.
+
+In the training data matrix \code{instances}, each row is
+an instance and each column corresponds a node in CRF. The
+variables \code{node.fea}, \code{edge.fea},
+\code{node.ext}, \code{edge.ext} are lists of length equal
+to the number of instances, and their elements are defined
+as in \code{\link{crf.update}} respectively.
+}
+\seealso{
+\code{\link{crf.update}}, \code{\link{train.crf}}
 }
 

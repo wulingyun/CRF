@@ -5,18 +5,25 @@
 make.par(crf, n.par = 1)
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
-  \item{n.par}{}
+  \item{n.par}{The number of parameters}
 }
 \value{
-This function will return the same CRF.
+This function will directly modify the CRF and return the
+same CRF.
 }
 \description{
 Make the data structure of parameters
 }
 \details{
-Make the data structure of parameters need for modeling and
-training
+This function makes the data structure of parameters need
+for modeling and training CRF. The parameters are stored in
+\code{par}, which is a numeric vector of length
+\code{n.par}.
+}
+\seealso{
+\code{\link{crf.update}}, \code{\link{make.features}},
+\code{\link{make.crf}}
 }
 
