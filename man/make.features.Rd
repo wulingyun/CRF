@@ -5,20 +5,45 @@
 make.features(crf, n.nf = 1, n.ef = 1)
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
-  \item{n.nf}{}
+  \item{n.nf}{The number of node features}
 
-  \item{n.ef}{}
+  \item{n.ef}{The number of edge features}
 }
 \value{
-This function will return the same CRF.
+This function will directly modify the CRF and return the
+same CRF.
 }
 \description{
 Make the data structure of features
 }
 \details{
-Make the data structure of features need for modeling and
-training
+This function makes the data structure of features need for
+modeling and training CRF.
+
+The parameters \code{n.nf} and \code{n.ef} specify the
+number of node and edge features, respectively.
+
+The objects \code{node.par} and \code{edge.par} define the
+corresponding parameters used with each feature.
+\code{node.par} is a 3-dimensional arrays, and element
+\code{node.par[n,i,f]} is the index of parameter associated
+with the corresponding node potential \code{node.pot[n,i]}
+and node feature \code{f}. \code{edge.par} is a list of
+3-dimensional arrays, and element
+\code{edge.par[[e]][i,j,f]} is the index of parameter
+associated with the corresponding edge potential
+\code{edge.pot[[e]][i,j]} and edge feature \code{f}. The
+value 0 is used to indicate the corresponding node or edge
+potential does not depend on that feature.
+
+For detail of calculation of node and edge potentials from
+features and parameters, please see
+\code{\link{crf.update}}.
+}
+\seealso{
+\code{\link{crf.update}}, \code{\link{make.par}},
+\code{\link{make.crf}}
 }
 

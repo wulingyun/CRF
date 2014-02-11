@@ -2,17 +2,22 @@
 \alias{train.mrf}
 \title{Train MRF model}
 \usage{
-train.mrf(crf, instances, trace = 0)
+train.mrf(crf, instances, nll = mrf.nll, trace = 0)
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
-  \item{instances}{}
+  \item{instances}{The training data matrix of CRF model}
 
-  \item{trace}{}
+  \item{nll}{The function to calculate negative log
+  likelihood}
+
+  \item{trace}{Non-negative integer to control the tracing
+  informtion of the optimization process}
 }
 \value{
-This function will return the same CRF.
+This function will directly modify the CRF and return the
+same CRF.
 }
 \description{
 Train the MRF model to estimate the parameters
@@ -20,5 +25,12 @@ Train the MRF model to estimate the parameters
 \details{
 This function trains the Markov Random Fields (MRF) model,
 which is a simple variant of CRF model.
+
+In the training data matrix \code{instances}, each row is
+an instance and each column corresponds a node in CRF.
+}
+\seealso{
+\code{\link{mrf.update}}, \code{\link{mrf.stat}},
+\code{\link{mrf.nll}}, \code{\link{make.crf}}
 }
 

@@ -14,11 +14,10 @@ The function will return a new CRF with copied data
 Duplicate an existing CRF
 }
 \details{
-The function will duplicate an existing CRF. Since CRF is
-implemented by using environment, normal assignment will
-only copy the pointer instead of the real data. The
-function will really copy all data of an existing CRF to a
-new CRF.
+This function will duplicate an existing CRF. Since CRF is
+implemented as an environment, normal assignment will only
+copy the pointer instead of the real data. This function
+will generate a new CRF and really copy all data.
 }
 \seealso{
 \code{\link{make.crf}}

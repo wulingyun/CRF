@@ -10,7 +10,7 @@ make.crf(adj.matrix, nstates)
   \item{nstates}{The state numbers of nodes}
 }
 \value{
-The function will return a CRF, which is an environment
+The function will return a new CRF, which is an environment
 with components: \item{n.nodes}{The number of nodes.}
 \item{n.edges}{The number of edges.} \item{n.states}{The
 number of states for each node. It is a vector of length
@@ -39,16 +39,16 @@ denotes the edge potentials of the i-th edge.}
 Generate CRF from the adjacent matrix
 }
 \details{
-The function will generate a empty CRF structure from a
-given adjacent matrix. If the length of \code{nstates} is
-less than \code{n.nodes}, it will be used repeatly. All
-node and edge potentials are initilized as 1.
+The function will generate an empty CRF from a given
+adjacent matrix. If the length of \code{nstates} is less
+than \code{n.nodes}, it will be used repeatly. All node and
+edge potentials are initilized as 1.
 
 Since the CRF data are often very huge, CRF is implemented
-by using environment. Therefore, normal assignment will
-only copy the pointer instead of real data. The vairables
-using normal assignment will refer to the exactly same CRF
-data. For complete duplication of the data, please use
+as an environment. The assignment of environments will only
+copy the addresses instead of real data, therefore the
+variables using normal assignment will refer to the exactly
+same CRF. For complete duplication of the data, please use
 \code{\link{duplicate}}.
 }
 \examples{
