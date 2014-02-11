@@ -1,0 +1,24 @@
+\docType{data}
+\name{Rain}
+\alias{Rain}
+\title{Rain data}
+\format{A list containing two elements:
+\itemize{
+  \item \code{rain} A matrix of 28 columns containing raining data (1: rain, 2: sunny).
+    Each row is an instance of 28 days for one month.
+  \item \code{months} A vector containing the months of each instance.
+}}
+\usage{
+data(Rain)
+}
+\description{
+This data set gives an example of rain data used to train
+CRF and MRF models
+}
+\references{
+Mark Schmidt. UGM: Matlab code for undirected graphical
+models.
+\url{http://www.di.ens.fr/~mschmidt/Software/UGM.html}
+}
+\keyword{datasets}
+
