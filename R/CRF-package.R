@@ -69,8 +69,8 @@
 #' @references J. Lafferty, A. McCallum, and F. Pereira. Conditional random fields:
 #' Probabilistic models for segmenting and labeling sequence data. In \emph{the 
 #' proceedings of International Conference on Machine Learning (ICML)}, pp. 282-289, 2001.  
-#' @references Mark Schmidt. UGM: A Matlab toolbox for probabilistic undirected 
-#' graphical models. \url{http://www.cs.ubc.ca/~schmidtm/Software/UGM.html}
+#' @references Mark Schmidt. UGM: Matlab code for undirected graphical models.
+#' \url{http://www.di.ens.fr/~mschmidt/Software/UGM.html}
 #' 
 #' @examples
 #' 
@@ -83,3 +83,160 @@
 #' @useDynLib CRF, .registration = TRUE
 #' 
 NULL
+
+
+
+#' Small CRF example
+#' 
+#' This data set gives a small CRF example
+#' 
+#' @format A list containing two elements:
+#' \itemize{
+#'   \item \code{crf} The CRF
+#'   \item \code{answer} A list of 4 elements:
+#'   \itemize{
+#'     \item \code{decode} The most likely configuration
+#'     \item \code{node.bel} The node belief
+#'     \item \code{edge.bel} The edge belief
+#'     \item \code{logZ} The logarithmic value of CRF normalization factor Z
+#'   }
+#' }
+#' 
+#' @name Small
+#' @aliases Small
+#' @docType data
+#' @keywords datasets
+#' @usage data(Small)
+#' 
+NULL
+
+
+
+#' Chain CRF example
+#' 
+#' This data set gives a chain CRF example
+#' 
+#' @format A list containing two elements:
+#' \itemize{
+#'   \item \code{crf} The CRF
+#'   \item \code{answer} A list of 4 elements:
+#'   \itemize{
+#'     \item \code{decode} The most likely configuration
+#'     \item \code{node.bel} The node belief
+#'     \item \code{edge.bel} The edge belief
+#'     \item \code{logZ} The logarithmic value of CRF normalization factor Z
+#'   }
+#' }
+#' 
+#' @name Chain
+#' @aliases Chain
+#' @docType data
+#' @keywords datasets
+#' @usage data(Chain)
+#' 
+NULL
+
+
+
+#' Tree CRF example
+#' 
+#' This data set gives a tree CRF example
+#' 
+#' @format A list containing two elements:
+#' \itemize{
+#'   \item \code{crf} The CRF
+#'   \item \code{answer} A list of 4 elements:
+#'   \itemize{
+#'     \item \code{decode} The most likely configuration
+#'     \item \code{node.bel} The node belief
+#'     \item \code{edge.bel} The edge belief
+#'     \item \code{logZ} The logarithmic value of CRF normalization factor Z
+#'   }
+#' }
+#' 
+#' @name Tree
+#' @aliases Tree
+#' @docType data
+#' @keywords datasets
+#' @usage data(Tree)
+#' 
+NULL
+
+
+
+#' Loop CRF example
+#' 
+#' This data set gives a loop CRF example
+#' 
+#' @format A list containing two elements:
+#' \itemize{
+#'   \item \code{crf} The CRF
+#'   \item \code{answer} A list of 4 elements:
+#'   \itemize{
+#'     \item \code{decode} The most likely configuration
+#'     \item \code{node.bel} The node belief
+#'     \item \code{edge.bel} The edge belief
+#'     \item \code{logZ} The logarithmic value of CRF normalization factor Z
+#'   }
+#' }
+#' 
+#' @name Loop
+#' @aliases Loop
+#' @docType data
+#' @keywords datasets
+#' @usage data(Loop)
+#' 
+NULL
+
+
+
+#' Clique CRF example
+#' 
+#' This data set gives a clique CRF example
+#' 
+#' @format A list containing two elements:
+#' \itemize{
+#'   \item \code{crf} The CRF
+#'   \item \code{answer} A list of 4 elements:
+#'   \itemize{
+#'     \item \code{decode} The most likely configuration
+#'     \item \code{node.bel} The node belief
+#'     \item \code{edge.bel} The edge belief
+#'     \item \code{logZ} The logarithmic value of CRF normalization factor Z
+#'   }
+#' }
+#' 
+#' @name Clique
+#' @aliases Clique
+#' @docType data
+#' @keywords datasets
+#' @usage data(Clique)
+#' 
+NULL
+
+
+
+#' Rain data
+#' 
+#' This data set gives an example of rain data used to train CRF and MRF models
+#' 
+#' @format A list containing two elements:
+#' \itemize{
+#'   \item \code{rain} A matrix of 28 columns containing raining data (1: rain, 2: sunny).
+#'     Each row is an instance of 28 days for one month.
+#'   \item \code{months} A vector containing the months of each instance.
+#' }
+#' 
+#' @name Rain
+#' @aliases Rain
+#' @docType data
+#' @keywords datasets
+#' @usage data(Rain)
+#' 
+#' @references Mark Schmidt. UGM: Matlab code for undirected graphical models.
+#' \url{http://www.di.ens.fr/~mschmidt/Software/UGM.html}
+#' 
+NULL
+
+
+
