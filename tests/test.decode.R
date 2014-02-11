@@ -1,5 +1,17 @@
 library(CRF)
-data(TestFunc)
+
+test.decode <- function(name, decode.method, crf, answer, ...)
+{
+  cat("  ", name, ": Decoding ... ", sep="")
+  decode <- decode.method(crf, ...)
+  
+  if (all(decode == answer$decode)) {
+    cat("Passed.\n")
+  } else {
+    cat("Failed ***\n")
+    warning(name, ": Decoding is incorrect!")
+  }
+}
 
 cat("Testing dataset Small ...\n")
 data(Small)
