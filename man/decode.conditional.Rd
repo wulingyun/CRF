@@ -5,13 +5,15 @@
 decode.conditional(crf, clamped, decode.method, ...)
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
-  \item{clamped}{}
+  \item{clamped}{The vector of fixed values for clamped
+  nodes, 0 for unfixed nodes}
 
-  \item{decode.method}{}
+  \item{decode.method}{The decoding method to solve clamped
+  CRF}
 
-  \item{...}{}
+  \item{...}{The parameters for \code{decode.method}}
 }
 \value{
 This function will return the most likely configuration,

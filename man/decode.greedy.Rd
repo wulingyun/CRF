@@ -5,11 +5,13 @@
 decode.greedy(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
-  \item{restart}{}
+  \item{restart}{Non-negative integer to control how many
+  restart iterations are repeated}
 
-  \item{start}{}
+  \item{start}{An initial configuration, a good start will
+  significantly reduce the seraching time}
 }
 \value{
 This function will return the most likely configuration,

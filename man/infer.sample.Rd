@@ -5,11 +5,11 @@
 infer.sample(crf, sample.method, ...)
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
-  \item{sample.method}{}
+  \item{sample.method}{The sampling method}
 
-  \item{...}{}
+  \item{...}{The parameters for \code{sample.method}}
 }
 \value{
 This function will return a list with components:
