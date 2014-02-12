@@ -6,17 +6,21 @@ decode.block(crf, blocks, decode.method = decode.tree, restart = 0,
   start = apply(crf$node.pot, 1, which.max), ...)
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
-  \item{blocks}{}
+  \item{blocks}{A list of vectors, each vector containing
+  the nodes in a block}
 
-  \item{decode.method}{}
+  \item{decode.method}{The decoding method to solve the
+  clamped CRF}
 
-  \item{restart}{}
+  \item{restart}{Non-negative integer to control how many
+  restart iterations are repeated}
 
-  \item{start}{}
+  \item{start}{An initial configuration, a good start will
+  significantly reduce the seraching time}
 
-  \item{...}{}
+  \item{...}{The parameters for \code{decode.method}}
 }
 \value{
 This function will return the most likely configuration,

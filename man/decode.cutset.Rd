@@ -6,15 +6,16 @@ decode.cutset(crf, cutset, engine = "default", start = apply(crf$node.pot,
   1, which.max))
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
-  \item{cutset}{}
+  \item{cutset}{A vector of nodes in the cutset}
 
   \item{engine}{The underlying engine for cutset decoding,
   possible values are "default", "none", "exact", "chain",
   and "tree".}
 
-  \item{start}{}
+  \item{start}{An initial configuration, a good start will
+  significantly reduce the seraching time}
 }
 \value{
 This function will return the most likely configuration,

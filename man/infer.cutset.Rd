@@ -5,9 +5,9 @@
 infer.cutset(crf, cutset, engine = "default")
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
-  \item{cutset}{}
+  \item{cutset}{A vector of nodes in the cutset}
 
   \item{engine}{The underlying engine for cutset decoding,
   possible values are "default", "none", "exact", "chain",

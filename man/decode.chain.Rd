@@ -5,7 +5,7 @@
 decode.chain(crf)
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 }
 \value{
 This function will return the most likely configuration,

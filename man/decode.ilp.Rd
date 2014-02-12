@@ -5,7 +5,7 @@
 decode.ilp(crf, lp.rounding = FALSE)
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
   \item{lp.rounding}{Boolean variable to indicate whether
   LP rounding is need.}

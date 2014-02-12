@@ -5,15 +5,17 @@
 sample.conditional(crf, size, clamped, sample.method, ...)
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
-  \item{size}{}
+  \item{size}{The sample size}
 
-  \item{clamped}{}
+  \item{clamped}{The vector of fixed values for clamped
+  nodes, 0 for unfixed nodes}
 
-  \item{sample.method}{}
+  \item{sample.method}{The sampling method to solve the
+  clamped CRF}
 
-  \item{...}{}
+  \item{...}{The parameters for \code{sample.method}}
 }
 \value{
 This function will return a matrix with \code{size} rows

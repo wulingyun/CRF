@@ -5,13 +5,16 @@
 infer.trbp(crf, max.iter = 10000, cutoff = 1e-04, verbose = 0)
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
-  \item{max.iter}{}
+  \item{max.iter}{The maximum allowed iterations of
+  termination criteria}
 
-  \item{cutoff}{}
+  \item{cutoff}{The convergence cutoff of termination
+  criteria}
 
-  \item{verbose}{}
+  \item{verbose}{Non-negative integer to control the
+  tracing informtion in algorithm}
 }
 \value{
 This function will return a list with components:

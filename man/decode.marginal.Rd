@@ -5,11 +5,11 @@
 decode.marginal(crf, infer.method, ...)
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 
-  \item{infer.method}{}
+  \item{infer.method}{The inference method}
 
-  \item{...}{}
+  \item{...}{The parameters for \code{infer.method}}
 }
 \value{
 This function will return the most likely configuration,

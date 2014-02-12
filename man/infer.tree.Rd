@@ -5,7 +5,7 @@
 infer.tree(crf)
 }
 \arguments{
-  \item{crf}{}
+  \item{crf}{The CRF}
 }
 \value{
 This function will return a list with components:
