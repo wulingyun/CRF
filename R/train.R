@@ -1,6 +1,6 @@
 #' Make CRF features
 #' 
-#' Make the data structure of features
+#' Make the data structure of CRF features
 #' 
 #' This function makes the data structure of features need for modeling and training CRF.
 #'
@@ -41,7 +41,7 @@ make.features <- function(crf, n.nf = 1, n.ef = 1)
 
 #' Make CRF parameters
 #' 
-#' Make the data structure of parameters
+#' Make the data structure of CRF parameters
 #' 
 #' This function makes the data structure of parameters need for modeling and training CRF.
 #' The parameters are stored in \code{par}, which is a numeric vector of length \code{n.par}.
@@ -66,7 +66,7 @@ make.par <- function(crf, n.par = 1)
 
 #' Update MRF potentials
 #' 
-#' Update node.pot and edge.pot of MRF model 
+#' Update node and edge potentials of MRF model 
 #' 
 #' The function updates \code{node.pot} and \code{edge.pot} of MRF model.
 #' 
@@ -85,7 +85,7 @@ mrf.update <- function(crf)
 
 #' Update CRF potentials
 #' 
-#' Update node.pot and edge.pot of CRF model 
+#' Update node and edge potentials of CRF model
 #' 
 #' This function updates \code{node.pot} and \code{edge.pot} of CRF model by using 
 #' the current values of parameters and features.

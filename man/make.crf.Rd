@@ -49,7 +49,7 @@ as an environment. The assignment of environments will only
 copy the addresses instead of real data, therefore the
 variables using normal assignment will refer to the exactly
 same CRF. For complete duplication of the data, please use
-\code{\link{duplicate}}.
+\code{\link{duplicate.crf}}.
 }
 \examples{
 library(CRF)
@@ -78,7 +78,7 @@ for (i in 1:crf$n.edges)
 }
 }
 \seealso{
-\code{\link{duplicate}}, \code{\link{clamp.crf}},
+\code{\link{duplicate.crf}}, \code{\link{clamp.crf}},
 \code{\link{sub.crf}}
 }
 
