@@ -14,7 +14,7 @@ This function will directly modify the CRF and return the
 same CRF.
 }
 \description{
-Make the data structure of parameters
+Make the data structure of CRF parameters
 }
 \details{
 This function makes the data structure of parameters need

@@ -16,7 +16,7 @@ This function will directly modify the CRF and return the
 same CRF.
 }
 \description{
-Make the data structure of features
+Make the data structure of CRF features
 }
 \details{
 This function makes the data structure of features need for

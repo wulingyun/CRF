@@ -59,12 +59,24 @@
 #'   \item \code{\link{train.mrf}} Train MRF model
 #' }
 #' 
+#' Tools: Tools for building and manipulating CRF data
+#' \itemize{
+#'   \item \code{\link{make.crf}} Generate CRF from the adjacent matrix
+#'   \item \code{\link{make.features}} Make the data structure of CRF features
+#'   \item \code{\link{make.par}} Make the data structure of CRF parameters
+#'   \item \code{\link{duplicate.crf}} Duplicate an existing CRF
+#'   \item \code{\link{clamp.crf}} Generate clamped CRF by fixing the states of some nodes
+#'   \item \code{\link{clamp.reset}} Reset clamped CRF by changing the states of clamped nodes
+#'   \item \code{\link{sub.crf}} Generate sub CRF by selecting some nodes
+#'   \item \code{\link{mrf.update}} Update node and edge potentials of MRF model
+#'   \item \code{\link{crf.update}} Update node and edge potentials of CRF model
+#' }
+#' 
 #' @name CRF-package
 #' @aliases CRF-package CRF
 #' @docType package
 #' @keywords package
 #' @author Ling-Yun Wu \email{wulingyun@@gmail.com}
-#' @seealso \code{\link{make.crf}}
 #' 
 #' @references J. Lafferty, A. McCallum, and F. Pereira. Conditional random fields:
 #' Probabilistic models for segmenting and labeling sequence data. In \emph{the 

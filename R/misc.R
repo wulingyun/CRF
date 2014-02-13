@@ -9,7 +9,7 @@
 #' Since the CRF data are often very huge, CRF is implemented as an environment.
 #' The assignment of environments will only copy the addresses instead of real data,
 #' therefore the variables using normal assignment will refer to the exactly same CRF.
-#' For complete duplication of the data, please use \code{\link{duplicate}}. 
+#' For complete duplication of the data, please use \code{\link{duplicate.crf}}. 
 #' 
 #' @param adj.matrix The adjacent matrix of CRF network
 #' @param nstates The state numbers of nodes
@@ -33,7 +33,7 @@
 #'     \code{edge.pot[[i]]}, with dimension \code{(n.states[edges[i,1]],
 #'     n.states[edges[i,2]])}, denotes the edge potentials of the i-th edge.}
 #'
-#' @seealso \code{\link{duplicate}}, \code{\link{clamp.crf}}, \code{\link{sub.crf}}
+#' @seealso \code{\link{duplicate.crf}}, \code{\link{clamp.crf}}, \code{\link{sub.crf}}
 #'
 #' @examples
 #' 
@@ -105,7 +105,7 @@ make.crf <- function(adj.matrix, nstates)
 #' @seealso \code{\link{make.crf}}
 #'
 #' @export
-duplicate <- function(crf)
+duplicate.crf <- function(crf)
 {
 	data <- new.env()
 	for (i in ls(envir=crf)) assign(i, get(i, envir=crf), envir=data)

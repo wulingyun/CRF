@@ -12,7 +12,7 @@ This function will directly modify the CRF and return the
 same CRF.
 }
 \description{
-Update node.pot and edge.pot of MRF model
+Update node and edge potentials of MRF model
 }
 \details{
 The function updates \code{node.pot} and \code{edge.pot} of

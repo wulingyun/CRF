@@ -1,8 +1,8 @@
-\name{duplicate}
-\alias{duplicate}
+\name{duplicate.crf}
+\alias{duplicate.crf}
 \title{Duplicate CRF}
 \usage{
-duplicate(crf)
+duplicate.crf(crf)
 }
 \arguments{
   \item{crf}{The existing CRF}

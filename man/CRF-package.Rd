@@ -91,6 +91,21 @@ Training: Given data, computing the most likely estimates
 of the parameters \itemize{ \item \code{\link{train.crf}}
 Train CRF model \item \code{\link{train.mrf}} Train MRF
 model }
+
+Tools: Tools for building and manipulating CRF data
+\itemize{ \item \code{\link{make.crf}} Generate CRF from
+the adjacent matrix \item \code{\link{make.features}} Make
+the data structure of CRF features \item
+\code{\link{make.par}} Make the data structure of CRF
+parameters \item \code{\link{duplicate.crf}} Duplicate an
+existing CRF \item \code{\link{clamp.crf}} Generate clamped
+CRF by fixing the states of some nodes \item
+\code{\link{clamp.reset}} Reset clamped CRF by changing the
+states of clamped nodes \item \code{\link{sub.crf}}
+Generate sub CRF by selecting some nodes \item
+\code{\link{mrf.update}} Update node and edge potentials of
+MRF model \item \code{\link{crf.update}} Update node and
+edge potentials of CRF model }
 }
 \examples{
 library(CRF)
@@ -112,9 +127,6 @@ International Conference on Machine Learning (ICML)}, pp.
 Mark Schmidt. UGM: Matlab code for undirected graphical
 models.
 \url{http://www.di.ens.fr/~mschmidt/Software/UGM.html}
-}
-\seealso{
-\code{\link{make.crf}}
 }
 \keyword{package}
 
