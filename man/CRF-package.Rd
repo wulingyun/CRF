@@ -4,19 +4,18 @@
 \alias{CRF-package}
 \title{CRF - Conditional Random Fields}
 \description{
-Library to decode/infer/sample/train Conditional Random
-Fields
+Library of Conditional Random Fields model
 }
 \details{
 CRF is R package for various computational tasks of
 conditional random fields as well as other probabilistic
 undirected graphical models of discrete data with pairwise
-(and unary) potentials. The decoding/inference/sampling
-tasks are implemented for general discrete undirected
-graphical models with pairwise potentials. The training
-task is less general, focusing on conditional random fields
-with log-linear potentials and a fixed structure. The code
-is written entirely in R and C++. The initial version is
+and unary potentials. The decoding/inference/sampling tasks
+are implemented for general discrete undirected graphical
+models with pairwise potentials. The training task is less
+general, focusing on conditional random fields with
+log-linear potentials and a fixed structure. The code is
+written entirely in R and C++. The initial version is
 ported from UGM written by Mark Schmidt.
 
 Decoding: Computing the most likely configuration \itemize{

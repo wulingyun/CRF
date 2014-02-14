@@ -1,10 +1,10 @@
 #' CRF - Conditional Random Fields
 #' 
-#' Library to decode/infer/sample/train Conditional Random Fields
+#' Library of Conditional Random Fields model
 #' 
 #' CRF is R package for various computational tasks of conditional random
 #' fields as well as other probabilistic undirected graphical models of
-#' discrete data with pairwise (and unary) potentials. The
+#' discrete data with pairwise and unary potentials. The
 #' decoding/inference/sampling tasks are implemented for general discrete
 #' undirected graphical models with pairwise potentials. The training task is
 #' less general, focusing on conditional random fields with log-linear
