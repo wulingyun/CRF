@@ -77,9 +77,7 @@ make.par <- function(crf, n.par = 1)
 #' 
 #' @export
 mrf.update <- function(crf)
-{
   .Call(MRF_Update, crf)
-}
 
 
 
@@ -128,9 +126,7 @@ mrf.update <- function(crf)
 #' 
 #' @export
 crf.update <- function(crf, node.fea = NaN, edge.fea = NaN, node.ext = NaN, edge.ext = NaN)
-{
   .Call(CRF_Update, crf, node.fea, edge.fea, node.ext, edge.ext)
-}
 
 
 
@@ -151,9 +147,7 @@ crf.update <- function(crf, node.fea = NaN, edge.fea = NaN, node.ext = NaN, edge
 #' 
 #' @export
 mrf.stat <- function(crf, instances)
-{
   .Call(MRF_Stat, crf, instances)
-}
 
 
 
@@ -180,9 +174,7 @@ mrf.stat <- function(crf, instances)
 #' 
 #' @export
 mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
-{
   .Call(MRF_NLL, crf, par, instances, quote(infer.method(crf, ...)), environment())
-}
 
 
 
@@ -215,9 +207,7 @@ mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
 #' 
 #' @export
 crf.nll <- function(par, crf, instances, node.fea = NaN, edge.fea = NaN, node.ext = NaN, edge.ext = NaN, infer.method = infer.chain, ...)
-{
   .Call(CRF_NLL, crf, par, instances, node.fea, edge.fea, node.ext, edge.ext, quote(infer.method(crf, ...)), environment())
-}
 
 
 
