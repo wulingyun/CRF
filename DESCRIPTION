@@ -7,6 +7,7 @@ Description: This package implements modeling and computational tools for
     unary potentials.
 Authors@R: c(person("Ling-Yun", "Wu", role = c("aut", "cre"), email =
     "wulingyun@gmail.com"))
+ByteCompile: TRUE
 Depends:
     R (>= 2.12.0)
 Imports:
