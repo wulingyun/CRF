@@ -62,13 +62,14 @@
 #'    crf$edge.pot[[i]][2,] <- c(1, 2)
 #' }
 #' 
+#' @import Matrix
 #' 
 #' @export
 make.crf <- function(adj.matrix, nstates)
 {
 	data <- new.env()
-	if (!is.matrix(adj.matrix) || dim(adj.matrix)[1] != dim(adj.matrix)[2])
-		stop("'adj.matrix' should be a square matrix")
+	if (length(dim(adj.matrix)) != 2 || dim(adj.matrix)[1] != dim(adj.matrix)[2])
+		stop("Parameter 'adj.matrix' should be a square matrix")
 	data$n.nodes <- dim(adj.matrix)[1]
 
 	e <- which(adj.matrix != 0, arr.ind = TRUE)
