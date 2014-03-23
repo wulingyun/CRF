@@ -2,12 +2,16 @@
 \alias{make.crf}
 \title{Make CRF}
 \usage{
-make.crf(adj.matrix, nstates)
+make.crf(adj.matrix = NULL, n.states = 2, n.nodes = 2)
 }
 \arguments{
-  \item{adj.matrix}{The adjacent matrix of CRF network}
+  \item{adj.matrix}{The adjacent matrix of CRF network.}
 
-  \item{nstates}{The state numbers of nodes}
+  \item{n.states}{The state numbers of nodes.}
+
+  \item{n.nodes}{The number of nodes, which is only used to
+  generate linear chain CRF when \code{adj.matrix} is
+  NULL.}
 }
 \value{
 The function will return a new CRF, which is an environment
