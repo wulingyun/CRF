@@ -11,8 +11,9 @@
 #' therefore the variables using normal assignment will refer to the exactly same CRF.
 #' For complete duplication of the data, please use \code{\link{duplicate.crf}}. 
 #' 
-#' @param adj.matrix The adjacent matrix of CRF network
-#' @param nstates The state numbers of nodes
+#' @param adj.matrix The adjacent matrix of CRF network.
+#' @param n.states The state numbers of nodes.
+#' @param n.nodes The number of nodes, which is only used to generate linear chain CRF when \code{adj.matrix} is NULL.
 #' @return The function will return a new CRF, which is an environment with
 #' components: 
 #'   \item{n.nodes}{The number of nodes.} 
@@ -65,9 +66,13 @@
 #' @import Matrix
 #' 
 #' @export
-make.crf <- function(adj.matrix, nstates)
+make.crf <- function(adj.matrix = NULL, n.states = 2, n.nodes = 2)
 {
 	data <- new.env()
+  
+  if (is.null(adj.matrix))
+    adj.matrix <- sparseMatrix(1:(n.nodes-1), 2:n.nodes, x = T, dims = c(n.nodes, n.nodes))
+  
 	if (length(dim(adj.matrix)) != 2 || dim(adj.matrix)[1] != dim(adj.matrix)[2])
 		stop("Parameter 'adj.matrix' should be a square matrix")
 	data$n.nodes <- dim(adj.matrix)[1]
@@ -80,8 +85,8 @@ make.crf <- function(adj.matrix, nstates)
 
 	.Call(Make_AdjInfo, data)
 
-	data$n.states <- rep(nstates, length.out=data$n.nodes)
-	data$max.state <- max(nstates)
+	data$n.states <- rep(n.states, length.out=data$n.nodes)
+	data$max.state <- max(n.states)
 
 	data$node.pot <- array(1, dim=c(data$n.nodes, data$max.state))
 	data$edge.pot <- lapply(1:data$n.edges, function(i) array(1, dim=c(data$n.states[data$edges[i,1]], data$n.states[data$edges[i,2]])))

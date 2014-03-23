@@ -68,11 +68,11 @@ edge.ext[[1]][[4]][2:crf$n.edges] <- edge.ext[[1]][[4]][1]
 node.ext[2:dim(rain)[1]] <- node.ext[1]
 edge.ext[2:dim(rain)[1]] <- edge.ext[1]
 
-nll <- crf.nll(crf$par, crf, rain, NaN, NaN, node.ext, edge.ext)
+nll <- crf.nll(crf$par, crf, rain, NULL, NULL, node.ext, edge.ext)
 crf$nll
 crf$gradient
 
-crf <- train.crf(crf, rain, NaN, NaN, node.ext, edge.ext)
+crf <- train.crf(crf, rain, NULL, NULL, node.ext, edge.ext)
 crf$par
 crf$node.pot[1,]
 crf$edge.pot[[1]]
