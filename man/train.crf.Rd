@@ -2,8 +2,8 @@
 \alias{train.crf}
 \title{Train CRF model}
 \usage{
-train.crf(crf, instances, node.fea = NaN, edge.fea = NaN, node.ext = NaN,
-  edge.ext = NaN, nll = crf.nll, trace = 0)
+train.crf(crf, instances, node.fea = NULL, edge.fea = NULL,
+  node.ext = NULL, edge.ext = NULL, nll = crf.nll, trace = 0)
 }
 \arguments{
   \item{crf}{The CRF}
