@@ -125,7 +125,7 @@ mrf.update <- function(crf)
 #' @seealso \code{\link{crf.nll}}, \code{\link{train.crf}}
 #' 
 #' @export
-crf.update <- function(crf, node.fea = NaN, edge.fea = NaN, node.ext = NaN, edge.ext = NaN)
+crf.update <- function(crf, node.fea = NULL, edge.fea = NULL, node.ext = NULL, edge.ext = NULL)
   .Call(CRF_Update, crf, node.fea, edge.fea, node.ext, edge.ext)
 
 
@@ -206,7 +206,7 @@ mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
 #' @seealso \code{\link{crf.update}}, \code{\link{train.crf}}
 #' 
 #' @export
-crf.nll <- function(par, crf, instances, node.fea = NaN, edge.fea = NaN, node.ext = NaN, edge.ext = NaN, infer.method = infer.chain, ...)
+crf.nll <- function(par, crf, instances, node.fea = NULL, edge.fea = NULL, node.ext = NULL, edge.ext = NULL, infer.method = infer.chain, ...)
   .Call(CRF_NLL, crf, par, instances, node.fea, edge.fea, node.ext, edge.ext, quote(infer.method(crf, ...)), environment())
 
 
@@ -266,7 +266,7 @@ train.mrf <- function(crf, instances, nll = mrf.nll, trace = 0)
 #' @seealso \code{\link{crf.update}}, \code{\link{crf.nll}}, \code{\link{make.crf}}
 #' 
 #' @export
-train.crf <- function(crf, instances, node.fea = NaN, edge.fea = NaN, node.ext = NaN, edge.ext = NaN, nll = crf.nll, trace = 0)
+train.crf <- function(crf, instances, node.fea = NULL, edge.fea = NULL, node.ext = NULL, edge.ext = NULL, nll = crf.nll, trace = 0)
 {
   gradient <- function(par, crf, ...) { crf$gradient }
   solution <- optim(crf$par, nll, gradient, crf, instances, node.fea, edge.fea, node.ext, edge.ext, method = "L-BFGS-B", control = list(trace = trace))

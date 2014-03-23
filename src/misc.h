@@ -1,6 +1,11 @@
 #include <R.h>
 #include <Rdefines.h>
 
+/* macros */
+
+#define min(a, b) a < b ? a : b;
+#define max(a, b) a > b ? a : b;
+
 /* initialize the list */
 
 template <class T>
@@ -25,6 +30,12 @@ inline void SetVar(SEXP env, const char *name, SEXP var)
 };
 
 /* get/set the list element */
+
+inline SEXP GetListElement(SEXP list, int i)
+{
+  if (i >= 0 && i < length(list)) return VECTOR_ELT(list, i);
+  return R_NilValue;
+}
 
 SEXP GetListElement(SEXP list, const char *tag);
 void SetListElement(SEXP list, int i, const char *tag, SEXP value);

@@ -2,8 +2,8 @@
 \alias{crf.nll}
 \title{Calculate CRF negative log likelihood}
 \usage{
-crf.nll(par, crf, instances, node.fea = NaN, edge.fea = NaN,
-  node.ext = NaN, edge.ext = NaN, infer.method = infer.chain, ...)
+crf.nll(par, crf, instances, node.fea = NULL, edge.fea = NULL,
+  node.ext = NULL, edge.ext = NULL, infer.method = infer.chain, ...)
 }
 \arguments{
   \item{crf}{The CRF}
