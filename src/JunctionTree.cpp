@@ -655,7 +655,7 @@ void JunctionTree::SendMessages(bool maximize)
 	}
 
 	C_freeVector(nWaiting);
-	C_freeArray<int, 2>(waiting);
+	C_freeArray2<int>(waiting);
 	C_freeVector(sent);
 	C_freeVector(sender);
 	C_freeVector(receiver);
