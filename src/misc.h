@@ -185,12 +185,13 @@ template <class T, int n>
 inline void C_freeArray(T **array)
 {
 	void *p;
-	for (int i = 0; i < n; i++)
+	for (int i = 0; i < n-1; i++)
 	{
 		p = array;
 		array = (T **) array[0];
 		Free(p);
 	}
+  Free(array);
 };
 
 /* allocate 2D array with varied dim2 */
