@@ -242,7 +242,10 @@ JunctionTree::JunctionTree(CRF &crf)
 	{
 		nClusterStates[i] = 1;
 		for (int j = 0; j < nClusterNodes[i]; j++)
-			nClusterStates[i] *= nStates[clusterNodes[i][j]];
+		{
+		  nClusterStates[i] *= nStates[clusterNodes[i][j]];
+		  if (nClusterStates[i] <= 0) break;
+		}
 	}
 
 	/* number of seperator states */
@@ -252,7 +255,10 @@ JunctionTree::JunctionTree(CRF &crf)
 	{
 		nSeperatorStates[i] = 1;
 		for (int j = 0; j < nSeperatorNodes[i]; j++)
-			nSeperatorStates[i] *= nStates[seperatorNodes[i][j]];
+		{
+		  nSeperatorStates[i] *= nStates[seperatorNodes[i][j]];
+		  if (nSeperatorStates[i] <= 0) break;
+		}
 	}
 
 	/* beliefs of clusters and seperators */
