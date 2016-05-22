@@ -1,5 +1,5 @@
 Package: CRF
-Version: 0.3-8
+Version: 0.3-9
 Title: CRF - Conditional Random Fields
 Description: This package implements modeling and computational tools for
     conditional random fields model (CRF) as well as other probabilistic
@@ -15,3 +15,4 @@ Imports:
     Matrix (>= 1.1-2)
 License: GPL (>= 2)
 URL: http://r-forge.r-project.org/projects/crf/
+RoxygenNote: 5.0.1

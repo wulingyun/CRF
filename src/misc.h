@@ -203,7 +203,15 @@ inline T **R_allocArray2(int dim1, int *dim2)
 	int array_size;
 	array_size = 0;
 	for (int i = 0; i < dim1; i++)
-		array_size += dim2[i];
+	{
+	  if (dim2[i] >= 0)
+  	  array_size += dim2[i];
+	  else
+	  {
+	    array_size = -1;
+	    break;
+	  }
+	}
 	block = (T *) R_alloc(array_size, sizeof(T));
 	array = (T **) R_alloc(dim1, sizeof(T *));
 	for (int i = 0; i < dim1; i++)
@@ -223,7 +231,15 @@ inline T **C_allocArray2(int dim1, int *dim2)
 	int array_size;
 	array_size = 0;
 	for (int i = 0; i < dim1; i++)
-		array_size += dim2[i];
+	{
+	  if (dim2[i] >= 0)
+	    array_size += dim2[i];
+	  else
+	  {
+	    array_size = -1;
+	    break;
+	  }
+	}
 	block = (T *) Calloc(array_size, T);
 	array = (T **) Calloc(dim1, T *);
 	for (int i = 0; i < dim1; i++)
