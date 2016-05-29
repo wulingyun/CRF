@@ -348,7 +348,7 @@ decode.block <- function(crf, blocks, decode.method = decode.tree, restart = 0, 
 
 		if (iter < restart)
 		{
-			y <- ceiling(runif(crf$n.nodes) * crf$n.states)
+			y <- ceiling(stats::runif(crf$n.nodes) * crf$n.states)
 		}
 	}
 	decode
