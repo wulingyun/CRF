@@ -233,7 +233,7 @@ train.mrf <- function(crf, instances, nll = mrf.nll, trace = 0)
 {
   gradient <- function(par, crf, ...) { crf$gradient }
 	crf$par.stat <- mrf.stat(crf, instances)
-	solution <- optim(crf$par, nll, gradient, crf, instances, method = "L-BFGS-B", control = list(trace = trace))
+	solution <- stats::optim(crf$par, nll, gradient, crf, instances, method = "L-BFGS-B", control = list(trace = trace))
 	crf$par <- solution$par
 	mrf.update(crf)
 	crf
@@ -269,7 +269,7 @@ train.mrf <- function(crf, instances, nll = mrf.nll, trace = 0)
 train.crf <- function(crf, instances, node.fea = NULL, edge.fea = NULL, node.ext = NULL, edge.ext = NULL, nll = crf.nll, trace = 0)
 {
   gradient <- function(par, crf, ...) { crf$gradient }
-  solution <- optim(crf$par, nll, gradient, crf, instances, node.fea, edge.fea, node.ext, edge.ext, method = "L-BFGS-B", control = list(trace = trace))
+  solution <- stats::optim(crf$par, nll, gradient, crf, instances, node.fea, edge.fea, node.ext, edge.ext, method = "L-BFGS-B", control = list(trace = trace))
 	crf$par <- solution$par
 	crf.update(crf, node.fea[[1]], edge.fea[[1]], node.ext[[1]], edge.ext[[1]])
 	crf
