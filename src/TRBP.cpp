@@ -20,7 +20,7 @@ void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, in
 	double *outgoing = (double *) R_alloc(maxState, sizeof(double));
 
 	int s, r, e, n;
-	double *msg;
+	double *msg, sumBel;
 
 	for (int i = 0; i < nEdges; i++)
 	{
@@ -43,8 +43,11 @@ void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, in
 		{
 			/* gather incoming messages */
 
+			sumBel = 0;
 			for (int i = 0; i < nStates[s]; i++)
-				NodeBel(s, i) = NodePot(s, i);
+			  sumBel += NodeBel(s, i) = NodePot(s, i);
+			for (int i = 0; i < nStates[s]; i++)
+			  NodeBel(s, i) /= sumBel;
 			for (int i = 0; i < nAdj[s]; i++)
 			{
 				e = AdjEdges(s, i);
@@ -52,8 +55,11 @@ void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, in
 					msg = old_messages[0][e];
 				else
 					msg = old_messages[1][e];
+				sumBel = 0;
 				for (int k = 0; k < nStates[s]; k++)
-					NodeBel(s, k) *= R_pow(msg[k], mu[e]);
+				  sumBel += NodeBel(s, k) *= R_pow(msg[k], mu[e]);
+				for (int k = 0; k < nStates[s]; k++)
+				  NodeBel(s, k) /= sumBel;
 			}
 
 			/* send messages */
@@ -85,16 +91,6 @@ void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, in
 
 	if (difference > cutoff)
 		warning("Tree-Reweighted BP did not converge in %d iterations! (diff = %f)", maxIter, difference);
-
-	double sumBel;
-	for (int i = 0; i < nNodes; i++)
-	{
-		sumBel = 0;
-		for (int j = 0; j < nStates[i]; j++)
-			sumBel += NodeBel(i, j);
-		for (int j = 0; j < nStates[i]; j++)
-			NodeBel(i, j) /= sumBel;
-	}
 
 	swap(edgePot, scaleEdgePot);
 }
