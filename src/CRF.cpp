@@ -108,9 +108,9 @@ void CRF::Set_Data(SEXP _newcrf)
 	SEXP _temp;
 	for (int i = 0; i < nNodes; i++)
 	{
-		PROTECT(_temp = AS_INTEGER(VECTOR_ELT(_adjNodes, i)));
+	  SET_VECTOR_ELT(_adjNodes, i, _temp = AS_INTEGER(VECTOR_ELT(_adjNodes, i)));
 		adjNodes[i] = INTEGER_POINTER(_temp);
-		PROTECT(_temp = AS_INTEGER(VECTOR_ELT(_adjEdges, i)));
+		SET_VECTOR_ELT(_adjEdges, i, _temp = AS_INTEGER(VECTOR_ELT(_adjEdges, i)));
 		adjEdges[i] = INTEGER_POINTER(_temp);
 	}
 
@@ -121,12 +121,12 @@ void CRF::Set_Data(SEXP _newcrf)
 	nEdgeStates = (int *) R_alloc(nEdges, sizeof(int));
 	for (int i = 0; i < nEdges; i++)
 	{
-		PROTECT(_temp = AS_NUMERIC(VECTOR_ELT(_edgePot, i)));
+	  SET_VECTOR_ELT(_edgePot, i, _temp = AS_NUMERIC(VECTOR_ELT(_edgePot, i)));
 		edgePot[i] = NUMERIC_POINTER(_temp);
 		nEdgeStates[i] = nStates[EdgesBegin(i)] * nStates[EdgesEnd(i)];
 	}
 
-	numProtect = 10 + nNodes * 2 + nEdges;
+	numProtect = 10;
 }
 
 void CRF::Init_Labels()
