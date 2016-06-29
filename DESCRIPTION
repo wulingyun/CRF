@@ -13,5 +13,6 @@ Imports:
     Rglpk (>= 0.3-5),
     Matrix (>= 1.1-2)
 License: GPL (>= 2)
+BugReports: https://github.com/wulingyun/CRF/issues
 URL: https://github.com/wulingyun/CRF
 RoxygenNote: 5.0.1
