@@ -96,8 +96,8 @@ J. Lafferty, A. McCallum, and F. Pereira. Conditional random fields:
 Probabilistic models for segmenting and labeling sequence data. In \emph{the 
 proceedings of International Conference on Machine Learning (ICML)}, pp. 282-289, 2001.
 
-Mark Schmidt. UGM: Matlab code for undirected graphical models.
-\url{http://www.di.ens.fr/~mschmidt/Software/UGM.html}
+Mark Schmidt. UGM: A Matlab toolbox for probabilistic undirected graphical models.
+\url{http://www.cs.ubc.ca/~schmidtm/Software/UGM.html}, 2007.
 }
 \keyword{package}
 

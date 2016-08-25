@@ -17,8 +17,8 @@ data(Rain)
 This data set gives an example of rain data used to train CRF and MRF models
 }
 \references{
-Mark Schmidt. UGM: Matlab code for undirected graphical models.
-\url{http://www.di.ens.fr/~mschmidt/Software/UGM.html}
+Mark Schmidt. UGM: A Matlab toolbox for probabilistic undirected graphical models.
+\url{http://www.cs.ubc.ca/~schmidtm/Software/UGM.html}, 2007.
 }
 \keyword{datasets}
 
