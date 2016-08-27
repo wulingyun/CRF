@@ -1,0 +1,123 @@
+---
+title: "CRF Tutorial"
+author: "Ling-Yun Wu"
+date: "`r Sys.Date()`"
+output: 
+  pdf_document:
+    latex_engine: xelatex
+    number_sections: yes
+    toc: yes
+vignette: >
+  %\VignetteIndexEntry{CRF Tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+# Markov Chain Model
+
+In this section, we considered a Markov chain model. We represented this Markov chain model by a CRF object and generate the samples by using the sampling functions provided in CRF package. Finally, we learned a new CRF from the generated samples.
+
+## Build Markov chain model
+
+First we import the CRF package:
+```{r}
+library(CRF)
+```
+
+We set the parameters for Markov chain model:
+```{r}
+n.nodes <- 10
+n.states <- 2
+prior.prob <- c(0.9, 0.1)
+trans.prob <- matrix(c(0.2, 0.7, 0.8, 0.3), nrow=2, ncol=2)
+```
+
+The prior probability is 
+```{r}
+prior.prob
+```
+and the transition probability is 
+```{r}
+trans.prob
+```
+
+Then we construct the adjacent matrix of chain:
+```{r}
+adj <- matrix(0, n.nodes, n.nodes)
+for (i in 1:(n.nodes-1))
+{
+	adj[i, i+1] <- 1
+}
+```
+Note that the adjacent matrix will be automatically symmetrized when used to build the CRF object, therefore only the upper (or lower) triangular matrix is need here.
+
+```{r}
+adj
+```
+
+Now we can build the CRF object for Markov chain model:
+```{r}
+mc <- make.crf(adj, n.states)
+```
+and set the parameters:
+```{r}
+mc$node.pot[1,] <- prior.prob
+for (i in 1:mc$n.edges)
+{
+  mc$edge.pot[[i]] <- trans.prob
+}
+```
+
+## Generate samples
+
+We generated 1000 samples from the Markov chain model and displayed the first 10 samples:
+```{r}
+mc.samples <- sample.chain(mc, 1000)
+mc.samples[1:10, ]
+```
+
+## Learn Markov chain model from data
+
+In order to learn Markov chain model from generated data, we first build another CRF object:
+```{r}
+mc.new <- make.crf(adj, n.states)
+```
+and create the paramter structure:
+```{r}
+mc.new <- make.features(mc.new)
+mc.new <- make.par(mc.new, 4)
+```
+We only need four paramters, one for prior probability and three for transition probability, since the probabilities are summed to one.
+```{r}
+mc.new$node.par[1,1,] <- 1
+for (i in 1:mc.new$n.edges)
+{
+	mc.new$edge.par[[i]][1,1,] <- 2
+	mc.new$edge.par[[i]][1,2,] <- 3
+	mc.new$edge.par[[i]][2,1,] <- 4
+}
+```
+
+Then we train the model using `train.mrf` function:
+```{r}
+mc.new <- train.mrf(mc.new, mc.samples)
+```
+
+After training, we can check the parameter values:
+```{r}
+mc.new$par
+```
+
+We normalized the potentials in CRF to make it more like probability:
+```{r}
+mc.new$node.pot <- mc.new$node.pot / rowSums(mc.new$node.pot)
+mc.new$edge.pot[[1]] <- mc.new$edge.pot[[1]] / rowSums(mc.new$edge.pot[[1]])
+```
+
+Now we can check the learned prior probability
+```{r}
+mc.new$node.pot[1,]
+```
+and transition probability
+```{r}
+mc.new$edge.pot[[1]]
+```
