@@ -1,5 +1,5 @@
 Package: CRF
-Version: 0.3-11
+Version: 0.3-12
 Title: Conditional Random Fields
 Description: Implements modeling and computational tools for conditional
     random fields (CRF) model as well as other probabilistic undirected
@@ -7,14 +7,9 @@ Description: Implements modeling and computational tools for conditional
 Authors@R: c(person("Ling-Yun", "Wu", role = c("aut", "cre"), email =
     "wulingyun@gmail.com"))
 ByteCompile: TRUE
-Depends:
-    R (>= 2.12.0)
-Imports:
-    Rglpk (>= 0.3-5),
-    Matrix (>= 1.1-2)
-Suggests:
-    knitr,
-    rmarkdown
+Depends: R (>= 2.12.0)
+Imports: Matrix, Rglpk
+Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 License: GPL (>= 2)
 BugReports: https://github.com/wulingyun/CRF/issues
