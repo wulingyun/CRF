@@ -18,7 +18,7 @@ In this section, we considered a Markov chain example. We represented this Marko
 
 ## Build Markov chain model
 
-First we import the CRF package:
+First we imported the CRF package:
 ```{r}
 library(CRF)
 ```
@@ -41,7 +41,7 @@ and the transition probability is
 trans.prob
 ```
 
-Then we construct the adjacent matrix of chain:
+Then we constructed the adjacent matrix of chain:
 ```{r}
 adj <- matrix(0, n.nodes, n.nodes)
 for (i in 1:(n.nodes-1))
@@ -78,11 +78,11 @@ mc.samples[1:10, ]
 
 ## Learn Markov random field model from MC data
 
-In order to learn Markov random field model from generated data, we first build another CRF object:
+In order to learn Markov random field model from generated data, we first built another CRF object:
 ```{r}
 mrf.new <- make.crf(adj, n.states)
 ```
-and create the paramter structure:
+and created the paramter structure:
 ```{r}
 mrf.new <- make.features(mrf.new)
 mrf.new <- make.par(mrf.new, 4)
@@ -98,7 +98,7 @@ for (i in 1:mrf.new$n.edges)
 }
 ```
 
-Then we train the model using `train.mrf` function:
+Then we trained the model using `train.mrf` function:
 ```{r}
 mrf.new <- train.mrf(mrf.new, mc.samples)
 ```
@@ -147,11 +147,11 @@ hmm.samples[1:10,]
 
 ## Learn conditional random field model from HMM data
 
-Now we try to learn a CRF model from HMM data. We first build another CRF object:
+Now we try to learn a CRF model from HMM data. We first built another CRF object:
 ```{r}
 crf.new <- make.crf(adj, n.states)
 ```
-and create the paramter structure:
+and created the paramter structure:
 ```{r}
 crf.new <- make.features(crf.new, 5, 1)
 crf.new <- make.par(crf.new, 8)
@@ -184,7 +184,7 @@ for (i in 1:dim(hmm.samples)[1])
 hmm.ef <- lapply(1:dim(hmm.samples)[1], function(i) matrix(1, crf.new$n.ef, crf.new$n.edges))
 ```
 
-Then we train the model using `train.crf` function:
+Then we trained the model using `train.crf` function:
 ```{r}
 crf.new <- train.crf(crf.new, mc.samples, hmm.nf, hmm.ef)
 ```
@@ -194,7 +194,7 @@ After training, we can check the parameter values:
 crf.new$par
 ```
 
-With trained CRF model, we can infer the hidden states given an observation:
+With trained CRF model, we can infer the hidden states given the observations:
 ```{r}
 hmm.infer <- matrix(0, nrow=dim(hmm.samples)[1], ncol=dim(hmm.samples)[2])
 for (i in 1:dim(hmm.samples)[1])
@@ -203,7 +203,7 @@ for (i in 1:dim(hmm.samples)[1])
   hmm.infer[i,] <- decode.chain(crf.new)
 }
 ```
-Compared with the true hidden states:
+The inferred result was compared with the true hidden states:
 ```{r}
 sum(hmm.infer != mc.samples)
 ```
