@@ -5,12 +5,12 @@ CRF is an R package implemented modeling and computational tools for conditional
 ### How to install? ###
 
 * Stable version: The stable version of CRF is available in the following websites:
-    + CRAN: https://cran.r-project.org/web/packages/CRF/
+    + CRAN: https://CRAN.R-project.org/package=CRF
     
         R users can directly install CRF package in the R terminal using the command
         `install.packages("CRF")`
 
-    + R-Forge: http://r-forge.r-project.org/projects/crf/
+    + R-Forge: http://R-Forge.R-project.org/projects/crf/
     
         R users can also install CRF package in the R terminal using the command
         `install.packages("CRF", repos="http://R-Forge.R-project.org")`
