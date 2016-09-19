@@ -59,16 +59,6 @@ int Intersection(int *overlap, int *vector1, int size1, int *vector2, int size2)
 void Insert(int *vector, int &size, int v);
 void Remove(int *vector, int &size, int v);
 
-/* swap variables */
-
-template <class T>
-inline void swap(T &a, T &b)
-{
-	T temp = a;
-	a = b;
-	b = temp;
-};
-
 /* allocate vector */
 
 template <class T>
