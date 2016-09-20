@@ -34,7 +34,7 @@ void CRF::LoopyBP(int maxIter, double cutoff, int verbose, bool maximize)
 	{
 		R_CheckUserInterrupt();
 
-		swap(old_messages, messages);
+		swap2(old_messages, messages);
 
 		for (s = 0; s < nNodes; s++)
 		{

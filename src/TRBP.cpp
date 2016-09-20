@@ -5,7 +5,7 @@
 
 void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, int verbose, bool maximize)
 {
-	swap(edgePot, scaleEdgePot);
+	swap2(edgePot, scaleEdgePot);
 
 	messages = (double ***) R_allocArray<double>(2, nEdges, maxState);
 	double ***old_messages = (double ***) R_allocArray<double>(2, nEdges, maxState);
@@ -37,7 +37,7 @@ void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, in
 	{
 		R_CheckUserInterrupt();
 
-		swap(old_messages, messages);
+		swap2(old_messages, messages);
 
 		for (s = 0; s < nNodes; s++)
 		{
@@ -92,7 +92,7 @@ void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, in
 	if (difference > cutoff)
 		warning("Tree-Reweighted BP did not converge in %d iterations! (diff = %f)", maxIter, difference);
 
-	swap(edgePot, scaleEdgePot);
+	swap2(edgePot, scaleEdgePot);
 }
 
 /* Edge beliefs */
