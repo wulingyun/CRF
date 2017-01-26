@@ -158,8 +158,9 @@ void CRF::Init_EdgeBel()
 		edgeBel[i] = NUMERIC_POINTER(_temp);
 		SetValues(_temp, edgeBel[i], 0.0);
 		SET_VECTOR_ELT(_edgeBel, i, _temp);
+		UNPROTECT(1);
 	}
-	numProtect += nEdges + 1;
+	numProtect++;
 }
 
 void CRF::Init_LogZ()
