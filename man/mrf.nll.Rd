@@ -15,7 +15,7 @@ mrf.nll(par, crf, instances, infer.method = infer.chain, ...)
 
 \item{infer.method}{The inference method used to compute the likelihood}
 
-\item{...}{Other parameters need by the inference method}
+\item{...}{Extra parameters need by the inference method}
 }
 \value{
 This function will return the value of MRF negative log-likilihood.

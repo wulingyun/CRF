@@ -24,7 +24,7 @@ crf.nll(par, crf, instances, node.fea = NULL, edge.fea = NULL,
 
 \item{infer.method}{The inference method used to compute the likelihood}
 
-\item{...}{Other parameters need by the inference method}
+\item{...}{Extra parameters need by the inference method}
 }
 \value{
 This function will return the value of CRF negative log-likelihood.

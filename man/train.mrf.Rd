@@ -4,7 +4,8 @@
 \alias{train.mrf}
 \title{Train MRF model}
 \usage{
-train.mrf(crf, instances, nll = mrf.nll, trace = 0)
+train.mrf(crf, instances, nll = mrf.nll, infer.method = infer.chain, ...,
+  trace = 0)
 }
 \arguments{
 \item{crf}{The CRF}
@@ -12,6 +13,10 @@ train.mrf(crf, instances, nll = mrf.nll, trace = 0)
 \item{instances}{The training data matrix of CRF model}
 
 \item{nll}{The function to calculate negative log likelihood}
+
+\item{infer.method}{The inference method used to compute the likelihood}
+
+\item{...}{Extra parameters need by the inference method}
 
 \item{trace}{Non-negative integer to control the tracing informtion of the optimization process}
 }

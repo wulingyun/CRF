@@ -207,3 +207,11 @@ The inferred result was compared with the true hidden states:
 ```{r}
 sum(hmm.infer != mc.samples)
 ```
+
+## Use other inference methods in the training
+
+The default inference method used in the `train.mrf` and `train.crf` functions is `infer.chain`, which can only handle chain-structured graphs. We can provide the preferred inference method when calling the training functions. For example, use the loopy brief propagation algorithm:
+```{r}
+crf.new <- train.crf(crf.new, mc.samples, hmm.nf, hmm.ef, infer.method = infer.lbp)
+```
+In a more complicated way, we can redefine the functions for calculating the negative log-likelihood, i.e., the functions `mrf.nll` and `crf.nll`, respectively.

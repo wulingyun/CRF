@@ -167,7 +167,7 @@ mrf.stat <- function(crf, instances)
 #' @param par The parameter vector of CRF
 #' @param instances The training data matrix of MRF model
 #' @param infer.method The inference method used to compute the likelihood
-#' @param ... Other parameters need by the inference method
+#' @param ... Extra parameters need by the inference method
 #' @return This function will return the value of MRF negative log-likilihood.
 #' 
 #' @seealso \code{\link{mrf.stat}}, \code{\link{mrf.update}}, \code{\link{train.mrf}}
@@ -200,7 +200,7 @@ mrf.nll <- function(par, crf, instances, infer.method = infer.chain, ...)
 #' @param node.ext The list of extended information of node features
 #' @param edge.ext The list of extended information of edge features
 #' @param infer.method The inference method used to compute the likelihood
-#' @param ... Other parameters need by the inference method
+#' @param ... Extra parameters need by the inference method
 #' @return This function will return the value of CRF negative log-likelihood.
 #' 
 #' @seealso \code{\link{crf.update}}, \code{\link{train.crf}}
@@ -223,17 +223,19 @@ crf.nll <- function(par, crf, instances, node.fea = NULL, edge.fea = NULL, node.
 #' @param crf The CRF
 #' @param instances The training data matrix of CRF model
 #' @param nll The function to calculate negative log likelihood
+#' @param infer.method The inference method used to compute the likelihood
+#' @param ... Extra parameters need by the inference method
 #' @param trace Non-negative integer to control the tracing informtion of the optimization process
 #' @return This function will directly modify the CRF and return the same CRF.
 #' 
 #' @seealso \code{\link{mrf.update}}, \code{\link{mrf.stat}}, \code{\link{mrf.nll}}, \code{\link{make.crf}}
 #' 
 #' @export
-train.mrf <- function(crf, instances, nll = mrf.nll, trace = 0)
+train.mrf <- function(crf, instances, nll = mrf.nll, infer.method = infer.chain, ..., trace = 0)
 {
   gradient <- function(par, crf, ...) { crf$gradient }
 	crf$par.stat <- mrf.stat(crf, instances)
-	solution <- stats::optim(crf$par, nll, gradient, crf, instances, method = "L-BFGS-B", control = list(trace = trace))
+	solution <- stats::optim(crf$par, nll, gradient, crf, instances, infer.method, ..., method = "L-BFGS-B", control = list(trace = trace))
 	crf$par <- solution$par
 	mrf.update(crf)
 	crf
@@ -260,16 +262,18 @@ train.mrf <- function(crf, instances, nll = mrf.nll, trace = 0)
 #' @param node.ext The list of extended information of node features
 #' @param edge.ext The list of extended information of edge features
 #' @param nll The function to calculate negative log likelihood
+#' @param infer.method The inference method used to compute the likelihood
+#' @param ... Extra parameters need by the inference method
 #' @param trace Non-negative integer to control the tracing informtion of the optimization process
 #' @return This function will directly modify the CRF and return the same CRF.
 #' 
 #' @seealso \code{\link{crf.update}}, \code{\link{crf.nll}}, \code{\link{make.crf}}
 #' 
 #' @export
-train.crf <- function(crf, instances, node.fea = NULL, edge.fea = NULL, node.ext = NULL, edge.ext = NULL, nll = crf.nll, trace = 0)
+train.crf <- function(crf, instances, node.fea = NULL, edge.fea = NULL, node.ext = NULL, edge.ext = NULL, nll = crf.nll, infer.method = infer.chain, ..., trace = 0)
 {
   gradient <- function(par, crf, ...) { crf$gradient }
-  solution <- stats::optim(crf$par, nll, gradient, crf, instances, node.fea, edge.fea, node.ext, edge.ext, method = "L-BFGS-B", control = list(trace = trace))
+  solution <- stats::optim(crf$par, nll, gradient, crf, instances, node.fea, edge.fea, node.ext, edge.ext, infer.method, ..., method = "L-BFGS-B", control = list(trace = trace))
 	crf$par <- solution$par
 	crf.update(crf, node.fea[[1]], edge.fea[[1]], node.ext[[1]], edge.ext[[1]])
 	crf

@@ -5,7 +5,8 @@
 \title{Train CRF model}
 \usage{
 train.crf(crf, instances, node.fea = NULL, edge.fea = NULL,
-  node.ext = NULL, edge.ext = NULL, nll = crf.nll, trace = 0)
+  node.ext = NULL, edge.ext = NULL, nll = crf.nll,
+  infer.method = infer.chain, ..., trace = 0)
 }
 \arguments{
 \item{crf}{The CRF}
@@ -21,6 +22,10 @@ train.crf(crf, instances, node.fea = NULL, edge.fea = NULL,
 \item{edge.ext}{The list of extended information of edge features}
 
 \item{nll}{The function to calculate negative log likelihood}
+
+\item{infer.method}{The inference method used to compute the likelihood}
+
+\item{...}{Extra parameters need by the inference method}
 
 \item{trace}{Non-negative integer to control the tracing informtion of the optimization process}
 }
