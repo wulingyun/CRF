@@ -21,4 +21,3 @@ The function updates \code{node.pot} and \code{edge.pot} of MRF model.
 \seealso{
 \code{\link{mrf.nll}}, \code{\link{train.mrf}}
 }
-

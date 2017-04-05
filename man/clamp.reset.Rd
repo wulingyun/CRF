@@ -35,4 +35,3 @@ clamp.reset(crf, c(0,0,2,2))
 \seealso{
 \code{\link{make.crf}}, \code{\link{clamp.crf}}
 }
-

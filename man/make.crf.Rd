@@ -78,4 +78,3 @@ for (i in 1:crf$n.edges)
 \seealso{
 \code{\link{duplicate.crf}}, \code{\link{clamp.crf}}, \code{\link{sub.crf}}
 }
-

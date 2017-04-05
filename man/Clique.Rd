@@ -22,4 +22,3 @@ data(Clique)
 This data set gives a clique CRF example
 }
 \keyword{datasets}
-

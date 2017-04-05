@@ -31,4 +31,3 @@ data(Small)
 d <- decode.trbp(Small$crf)
 
 }
-

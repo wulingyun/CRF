@@ -24,4 +24,3 @@ The parameters are stored in \code{par}, which is a numeric vector of length \co
 \seealso{
 \code{\link{crf.update}}, \code{\link{make.features}}, \code{\link{make.crf}}
 }
-

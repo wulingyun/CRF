@@ -32,4 +32,3 @@ data(Small)
 d <- decode.cutset(Small$crf, c(2))
 
 }
-

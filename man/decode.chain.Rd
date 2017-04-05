@@ -25,4 +25,3 @@ data(Small)
 d <- decode.chain(Small$crf)
 
 }
-

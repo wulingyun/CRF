@@ -28,4 +28,3 @@ data(Small)
 s <- sample.junction(Small$crf, 100)
 
 }
-

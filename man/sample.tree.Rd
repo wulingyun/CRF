@@ -28,4 +28,3 @@ data(Small)
 s <- sample.tree(Small$crf, 100)
 
 }
-

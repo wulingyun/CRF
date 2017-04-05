@@ -22,4 +22,3 @@ data(Small)
 This data set gives a small CRF example
 }
 \keyword{datasets}
-

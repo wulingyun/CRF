@@ -33,4 +33,3 @@ data(Small)
 i <- infer.sample(Small$crf, sample.exact, 10000)
 
 }
-

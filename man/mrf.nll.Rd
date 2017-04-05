@@ -35,4 +35,3 @@ each column corresponds a node in CRF.
 \seealso{
 \code{\link{mrf.stat}}, \code{\link{mrf.update}}, \code{\link{train.mrf}}
 }
-

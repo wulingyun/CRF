@@ -29,4 +29,3 @@ data(Small)
 i <- infer.tree(Small$crf)
 
 }
-

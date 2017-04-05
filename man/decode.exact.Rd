@@ -25,4 +25,3 @@ data(Small)
 d <- decode.exact(Small$crf)
 
 }
-

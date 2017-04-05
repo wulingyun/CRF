@@ -23,4 +23,3 @@ real data. This function will generate a new CRF and really copy all data.
 \seealso{
 \code{\link{make.crf}}
 }
-

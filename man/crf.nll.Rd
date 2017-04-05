@@ -46,4 +46,3 @@ defined as in \code{\link{crf.update}} respectively.
 \seealso{
 \code{\link{crf.update}}, \code{\link{train.crf}}
 }
-

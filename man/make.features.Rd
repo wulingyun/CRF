@@ -41,4 +41,3 @@ please see \code{\link{crf.update}}.
 \seealso{
 \code{\link{crf.update}}, \code{\link{make.par}}, \code{\link{make.crf}}
 }
-

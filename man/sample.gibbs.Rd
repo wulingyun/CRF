@@ -33,4 +33,3 @@ data(Small)
 s <- sample.gibbs(Small$crf, 100)
 
 }
-

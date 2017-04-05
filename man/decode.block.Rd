@@ -36,4 +36,3 @@ data(Small)
 d <- decode.block(Small$crf, list(c(1,3), c(2,4)))
 
 }
-

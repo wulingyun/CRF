@@ -41,4 +41,3 @@ crf <- clamp.crf(Small$crf, c(0, 0, 1, 1))
 \seealso{
 \code{\link{make.crf}}, \code{\link{sub.crf}}, \code{\link{clamp.reset}}
 }
-

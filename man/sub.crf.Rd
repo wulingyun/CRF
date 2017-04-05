@@ -40,4 +40,3 @@ crf <- sub.crf(Small$crf, c(2, 3))
 \seealso{
 \code{\link{make.crf}}, \code{\link{clamp.crf}}
 }
-

@@ -33,4 +33,3 @@ data(Small)
 i <- infer.cutset(Small$crf, c(2))
 
 }
-

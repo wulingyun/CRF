@@ -29,4 +29,3 @@ data(Small)
 d <- decode.greedy(Small$crf)
 
 }
-

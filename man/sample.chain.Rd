@@ -28,4 +28,3 @@ data(Small)
 s <- sample.chain(Small$crf, 100)
 
 }
-

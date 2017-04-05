@@ -27,4 +27,3 @@ data(Small)
 d <- decode.ilp(Small$crf)
 
 }
-

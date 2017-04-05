@@ -25,4 +25,3 @@ data(Small)
 d <- decode.tree(Small$crf)
 
 }
-

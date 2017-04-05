@@ -2,8 +2,8 @@
 % Please edit documentation in R/CRF-package.R
 \docType{package}
 \name{CRF-package}
-\alias{CRF}
 \alias{CRF-package}
+\alias{CRF}
 \title{CRF - Conditional Random Fields}
 \description{
 Library of Conditional Random Fields model
@@ -88,9 +88,6 @@ infer.exact(Small$crf)
 sample.exact(Small$crf, 100)
 
 }
-\author{
-Ling-Yun Wu \email{wulingyun@gmail.com}
-}
 \references{
 J. Lafferty, A. McCallum, and F. Pereira. Conditional random fields:
 Probabilistic models for segmenting and labeling sequence data. In \emph{the 
@@ -99,5 +96,7 @@ proceedings of International Conference on Machine Learning (ICML)}, pp. 282-289
 Mark Schmidt. UGM: A Matlab toolbox for probabilistic undirected graphical models.
 \url{http://www.cs.ubc.ca/~schmidtm/Software/UGM.html}, 2007.
 }
+\author{
+Ling-Yun Wu \email{wulingyun@gmail.com}
+}
 \keyword{package}
-

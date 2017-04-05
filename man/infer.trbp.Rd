@@ -35,4 +35,3 @@ data(Small)
 i <- infer.trbp(Small$crf)
 
 }
-

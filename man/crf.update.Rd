@@ -58,4 +58,3 @@ edge.pot[[e]][i,j] = \sum_{f} par[edge.par[[e]][i,j,f]] * edge.fea[f,e] + \sum_{
 \seealso{
 \code{\link{crf.nll}}, \code{\link{train.crf}}
 }
-

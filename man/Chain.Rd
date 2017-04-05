@@ -22,4 +22,3 @@ data(Chain)
 This data set gives a chain CRF example
 }
 \keyword{datasets}
-

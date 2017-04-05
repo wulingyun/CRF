@@ -26,4 +26,3 @@ each column corresponds a node in CRF.
 \seealso{
 \code{\link{mrf.nll}}, \code{\link{train.mrf}}
 }
-

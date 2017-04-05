@@ -22,4 +22,3 @@ data(Loop)
 This data set gives a loop CRF example
 }
 \keyword{datasets}
-

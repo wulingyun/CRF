@@ -22,4 +22,3 @@ data(Tree)
 This data set gives a tree CRF example
 }
 \keyword{datasets}
-

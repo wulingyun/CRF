@@ -24,4 +24,3 @@ i.e., the assigned states of nodes in the CRF.
 \seealso{
 \code{\link{get.potential}}
 }
-

@@ -21,4 +21,3 @@ Mark Schmidt. UGM: A Matlab toolbox for probabilistic undirected graphical model
 \url{http://www.cs.ubc.ca/~schmidtm/Software/UGM.html}, 2007.
 }
 \keyword{datasets}
-

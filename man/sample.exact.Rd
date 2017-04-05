@@ -28,4 +28,3 @@ data(Small)
 s <- sample.exact(Small$crf, 100)
 
 }
-

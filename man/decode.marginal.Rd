@@ -29,4 +29,3 @@ data(Small)
 d <- decode.marginal(Small$crf, infer.exact)
 
 }
-

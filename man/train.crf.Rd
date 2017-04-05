@@ -47,4 +47,3 @@ defined as in \code{\link{crf.update}} respectively.
 \seealso{
 \code{\link{crf.update}}, \code{\link{crf.nll}}, \code{\link{make.crf}}
 }
-

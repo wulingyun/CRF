@@ -32,4 +32,3 @@ data(Small)
 s <- sample.cutset(Small$crf, 100, c(2))
 
 }
-
