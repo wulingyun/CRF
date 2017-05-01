@@ -41,6 +41,7 @@ const R_CallMethodDef callMethods[] = {
 void R_init_CRF(DllInfo *info)
 {
   R_registerRoutines(info, NULL, callMethods, NULL, NULL);
+  R_useDynamicSymbols(info, TRUE);
 }
 
 CRF::CRF()
