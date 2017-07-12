@@ -106,13 +106,13 @@ mrf.update <- function(crf)
 #' In detail, the node potential is updated as follows:
 #' 
 #' \deqn{
-#' node.pot[n,i] = \sum_{f} par[node.par[n,i,f]] * node.fea[f,n] + \sum_{k} par[k] * node.ext[[k]][n,i]
+#' node.pot[n,i] = exp( \sum_{f} par[node.par[n,i,f]] * node.fea[f,n] + \sum_{k} par[k] * node.ext[[k]][n,i] )
 #' }
 #' 
 #' and the edge potential is updated as follows:
 #' 
 #' \deqn{
-#' edge.pot[[e]][i,j] = \sum_{f} par[edge.par[[e]][i,j,f]] * edge.fea[f,e] + \sum_{k} par[k] * edge.ext[[k]][[e]][i,j]
+#' edge.pot[[e]][i,j] = exp( \sum_{f} par[edge.par[[e]][i,j,f]] * edge.fea[f,e] + \sum_{k} par[k] * edge.ext[[k]][[e]][i,j] )
 #' }
 #' 
 #' @param crf The CRF
