@@ -207,6 +207,41 @@ void CRF::Set_Samples(SEXP _otherSamples)
 	numProtect++;
 }
 
+void CRF::Normalize_NodePot()
+{
+  double maxPot;
+  for (int i = 0; i < nNodes; i++)
+  {
+    maxPot = 0;
+    for (int j = 0; j < nStates[i]; j++)
+      maxPot = max(maxPot, NodePot(i, j));
+    for (int j = 0; j < nStates[i]; j++)
+      NodePot(i, j) /= maxPot;
+  }
+}
+
+void CRF::Normalize_EdgePot()
+{
+  int n1, n2;
+  double maxPot;
+  for (int i = 0; i < nEdges; i++)
+  {
+    n1 = EdgesBegin(i);
+    n2 = EdgesEnd(i);
+    maxPot = 0;
+    for (int j = 0; j < nStates[n2]; j++)
+    {
+      for (int k = 0; k < nStates[n1]; k++)
+        maxPot = max(maxPot, EdgePot(i, k, j));
+    }
+    for (int j = 0; j < nStates[n2]; j++)
+    {
+      for (int k = 0; k < nStates[n1]; k++)
+        EdgePot(i, k, j) /= maxPot;
+    }
+  }
+}
+
 void CRF::Normalize_NodeBel()
 {
 	double sumBel;

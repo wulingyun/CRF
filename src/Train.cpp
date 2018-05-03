@@ -4,6 +4,8 @@ SEXP MRF_Update(SEXP _crf)
 {
 	CRF crf(_crf);
 	crf.Update_Pot();
+	crf.Normalize_NodePot();
+	crf.Normalize_EdgePot();
 	return (_crf);
 }
 
@@ -11,6 +13,8 @@ SEXP CRF_Update(SEXP _crf, SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _ed
 {
 	CRF crf(_crf);
 	crf.Update_Pot(_nodeFea, _edgeFea, _nodeExt, _edgeExt);
+	crf.Normalize_NodePot();
+	crf.Normalize_EdgePot();
 	return (_crf);
 }
 
