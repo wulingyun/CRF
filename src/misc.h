@@ -13,21 +13,21 @@ inline void SetValues(SEXP r, T *c, T v)
 {
 	for (int i = 0; i < length(r); i++)
 		c[i] = v;
-};
+}
 
 /* get the variable */
 
 inline SEXP GetVar(SEXP env, const char *name)
 {
 	return findVar(install(name), env);
-};
+}
 
 /* get the variable */
 
 inline void SetVar(SEXP env, const char *name, SEXP var)
 {
 	defineVar(install(name), var, env);
-};
+}
 
 /* get/set the list element */
 
@@ -67,7 +67,7 @@ inline void swap2(T &a, T &b)
 	T temp = a;
 	a = b;
 	b = temp;
-};
+}
 
 /* allocate vector */
 
@@ -76,7 +76,7 @@ inline T *R_allocVector(int n)
 {
 	T *vector = (T *) R_alloc(n, sizeof(T));
 	return vector;
-};
+}
 
 /* allocate vector (Calloc version) */
 
@@ -85,13 +85,13 @@ inline T *C_allocVector(int n)
 {
 	T *vector = (T *) Calloc(n, T);
 	return vector;
-};
+}
 
 template <class T>
 inline void C_freeVector(T *vector)
 {
 	Free(vector);
-};
+}
 
 /* allocate multidimensional array */
 
@@ -121,21 +121,21 @@ inline T **R_allocArray(int dim[n])
 		block += dim[n-1];
 	}
 	return array;
-};
+}
 
 template <class T>
 inline T **R_allocArray(int dim1, int dim2)
 {
 	int dim[] = {dim1, dim2};
 	return R_allocArray<T, 2>(dim);
-};
+}
 
 template <class T>
 inline T **R_allocArray(int dim1, int dim2, int dim3)
 {
 	int dim[] = {dim1, dim2, dim3};
 	return R_allocArray<T, 3>(dim);
-};
+}
 
 /* allocate multidimensional array (Calloc version) */
 
@@ -165,21 +165,21 @@ inline T **C_allocArray(int dim[n])
 		block += dim[n-1];
 	}
 	return array;
-};
+}
 
 template <class T>
 inline T **C_allocArray(int dim1, int dim2)
 {
 	int dim[] = {dim1, dim2};
 	return C_allocArray<T, 2>(dim);
-};
+}
 
 template <class T>
 inline T **C_allocArray(int dim1, int dim2, int dim3)
 {
 	int dim[] = {dim1, dim2, dim3};
 	return C_allocArray<T, 3>(dim);
-};
+}
 
 template <class T, int n>
 inline void C_freeArray(T **array)
@@ -192,7 +192,7 @@ inline void C_freeArray(T **array)
 		Free(p);
 	}
   Free(array);
-};
+}
 
 /* allocate 2D array with varied dim2 */
 
@@ -220,7 +220,7 @@ inline T **R_allocArray2(int dim1, int *dim2)
 		block += dim2[i];
 	}
 	return array;
-};
+}
 
 /* allocate 2D array with varied dim2 (Calloc version) */
 
@@ -248,11 +248,11 @@ inline T **C_allocArray2(int dim1, int *dim2)
 		block += dim2[i];
 	}
 	return array;
-};
+}
 
 template <class T>
 inline void C_freeArray2(T **array)
 {
 	Free(array[0]);
 	Free(array);
-};
+}
