@@ -6,13 +6,19 @@ test.decode <- function(name, decode.method, dataset, ...)
   answer <- dataset$answer
 
   cat("  ", name, ": Decoding ... ", sep="")
-  decode <- decode.method(crf, ...)
-  
-  if (all(decode == answer$decode)) {
-    cat("Passed.\n")
-  } else {
-    cat("Failed ***\n")
-    warning(name, ": Decoding is incorrect!")
+
+  if (identical(decode.method, decode.ilp) && !requireNamespace("Rglpk", quietly = TRUE)) {
+    cat("Skipped.\n")
+  }
+  else {
+    decode <- decode.method(crf, ...)
+    
+    if (all(decode == answer$decode)) {
+      cat("Passed.\n")
+    } else {
+      cat("Failed ***\n")
+      warning(name, ": Decoding is incorrect!")
+    }
   }
 }
 

@@ -22,8 +22,10 @@ Exact decoding with an integer linear programming formulation and approximate us
 }
 \examples{
 
+\dontrun{
 library(CRF)
 data(Small)
 d <- decode.ilp(Small$crf)
+}
 
 }
