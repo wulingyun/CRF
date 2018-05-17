@@ -117,6 +117,7 @@ public:
 	void Update_Pot();
 	double Get_Potential(int *configuration);
 	double Get_LogPotential(int *configuration);
+	void Normalize_Pot_Exp();
 	void Normalize_NodePot();
 	void Normalize_EdgePot();
 	void Normalize_NodeBel();

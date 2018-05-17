@@ -4,8 +4,6 @@ SEXP MRF_Update(SEXP _crf)
 {
 	CRF crf(_crf);
 	crf.Update_Pot();
-	crf.Normalize_NodePot();
-	crf.Normalize_EdgePot();
 	return (_crf);
 }
 
@@ -13,8 +11,6 @@ SEXP CRF_Update(SEXP _crf, SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _ed
 {
 	CRF crf(_crf);
 	crf.Update_Pot(_nodeFea, _edgeFea, _nodeExt, _edgeExt);
-	crf.Normalize_NodePot();
-	crf.Normalize_EdgePot();
 	return (_crf);
 }
 
@@ -145,11 +141,7 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 		}
 	}
 
-	for (int i = 0; i < nNodes * maxState; i++)
-		nodePot[i] = exp(nodePot[i]);
-	for (int i = 0; i < nEdges; i++)
-		for (int j = 0; j < nEdgeStates[i]; j++)
-			edgePot[i][j] = exp(edgePot[i][j]);
+	Normalize_Pot_Exp();
 
 	UNPROTECT(1);
 }
@@ -197,11 +189,7 @@ void CRF::Update_Pot()
 		UNPROTECT(1);
 	}
 
-	for (int i = 0; i < nNodes * maxState; i++)
-		nodePot[i] = exp(nodePot[i]);
-	for (int i = 0; i < nEdges; i++)
-		for (int j = 0; j < nEdgeStates[i]; j++)
-			edgePot[i][j] = exp(edgePot[i][j]);
+	Normalize_Pot_Exp();
 
 	UNPROTECT(3);
 }
