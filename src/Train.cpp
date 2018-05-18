@@ -141,7 +141,7 @@ void CRF::Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt)
 		}
 	}
 
-	Normalize_Pot_Exp();
+	Update_Pot_Finalize();
 
 	UNPROTECT(1);
 }
@@ -189,9 +189,46 @@ void CRF::Update_Pot()
 		UNPROTECT(1);
 	}
 
-	Normalize_Pot_Exp();
+	Update_Pot_Finalize();
 
 	UNPROTECT(3);
+}
+
+void CRF::Update_Pot_Finalize()
+{
+  double maxPot;
+  for (int i = 0; i < nNodes; i++)
+  {
+    maxPot = 0;
+    for (int j = 0; j < nStates[i]; j++)
+      maxPot = max(maxPot, NodePot(i, j));
+    for (int j = 0; j < nStates[i]; j++)
+      NodePot(i, j) -= maxPot;
+  }
+  
+  int n1, n2;
+  for (int i = 0; i < nEdges; i++)
+  {
+    n1 = EdgesBegin(i);
+    n2 = EdgesEnd(i);
+    maxPot = 0;
+    for (int j = 0; j < nStates[n2]; j++)
+    {
+      for (int k = 0; k < nStates[n1]; k++)
+        maxPot = max(maxPot, EdgePot(i, k, j));
+    }
+    for (int j = 0; j < nStates[n2]; j++)
+    {
+      for (int k = 0; k < nStates[n1]; k++)
+        EdgePot(i, k, j) -= maxPot;
+    }
+  }
+  
+  for (int i = 0; i < nNodes * maxState; i++)
+    nodePot[i] = max(exp(nodePot[i]), 1e-8);
+  for (int i = 0; i < nEdges; i++)
+    for (int j = 0; j < nEdgeStates[i]; j++)
+      edgePot[i][j] = max(exp(edgePot[i][j]), 1e-8);
 }
 
 SEXP MRF_Stat(SEXP _crf, SEXP _instances)

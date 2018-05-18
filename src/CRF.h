@@ -115,9 +115,9 @@ public:
 	/* Utils */
 	void Update_Pot(SEXP _nodeFea, SEXP _edgeFea, SEXP _nodeExt, SEXP _edgeExt);
 	void Update_Pot();
+	void Update_Pot_Finalize();
 	double Get_Potential(int *configuration);
 	double Get_LogPotential(int *configuration);
-	void Normalize_Pot_Exp();
 	void Normalize_NodePot();
 	void Normalize_EdgePot();
 	void Normalize_NodeBel();
