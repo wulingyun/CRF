@@ -1,4 +1,5 @@
 #include "CRF.h"
+#include <Rmath.h>
 
 /* Residual BP */
 
@@ -19,14 +20,22 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
   
   int s, r, e, n;
 
+  double sumMsg;
   for (int i = 0; i < nEdges; i++)
   {
+    sumMsg = 0;
     n = EdgesBegin(i);
     for (int j = 0; j < nStates[n]; j++)
-      messages[0][i][j] = 1.0 / nStates[n];
+      sumMsg += messages[0][i][j] = 1; //runif(0, 1);
+    for (int j = 0; j < nStates[n]; j++)
+      messages[0][i][j] /= sumMsg;
+
+    sumMsg = 0;
     n = EdgesEnd(i);
     for (int j = 0; j < nStates[n]; j++)
-      messages[1][i][j] = 1.0 / nStates[n];
+      sumMsg += messages[1][i][j] = 1; //runif(0, 1);
+    for (int j = 0; j < nStates[n]; j++)
+      messages[1][i][j] /= sumMsg;
   }
 
   /* compute possible message update */
@@ -59,7 +68,6 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
     q = 0;
     for (int i = 0; i < nEdges; i++)
     {
-      Rprintf("   %d, %f, %f, %f\n", i, q, priority[0][i], priority[1][i]);
       if (priority[0][i] > q)
       {
         q = priority[0][i];
@@ -76,18 +84,18 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
 
     if (d == 0)
     {
-      s = EdgesBegin(e);
-      r = EdgesEnd(e);
+      s = EdgesEnd(e);
+      r = EdgesBegin(e);
       msg = messages[0][e];
-      new_msg = messages[0][e];
+      new_msg = new_messages[0][e];
       priority[d][e] = 0;
     }
     else
     {
-      s = EdgesEnd(e);
-      r = EdgesBegin(e);
+      s = EdgesBegin(e);
+      r = EdgesEnd(e);
       msg = messages[1][e];
-      new_msg = messages[1][e];
+      new_msg = new_messages[1][e];
       priority[d][e] = 0;
     }
     
@@ -99,8 +107,6 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
 
     GatherIncomingMessages(r, messages);
 
-    Rprintf("Iter %d: %d, %d, %d\n", iter, s, r, e);
-        
     int r0, e0;    
     for (int i = 0; i < nAdj[r]; i++)
     {
@@ -112,7 +118,7 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
           ComputeMessagesMax(r, r0, e0, outgoing, messages, new_messages);
         else
           ComputeMessagesSum(r, r0, e0, outgoing, messages, new_messages);
-        
+                
         UpdateMessagePriority(r, r0, e0, messages, new_messages, priority);
       }
     }
@@ -140,7 +146,7 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
 void CRF::UpdateMessagePriority(int s, int r, int e, double ***messages, double ***new_messages, double **priority)
 {
   double *msg, *new_msg, *pri, res;
-  if (EdgesBegin(e) == s)
+  if (EdgesBegin(e) == r)
   {
     msg = messages[0][e];
     new_msg = new_messages[0][e];
