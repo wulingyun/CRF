@@ -26,14 +26,14 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
     sumMsg = 0;
     n = EdgesBegin(i);
     for (int j = 0; j < nStates[n]; j++)
-      sumMsg += messages[0][i][j] = 1; //runif(0, 1);
+      sumMsg += messages[0][i][j] = runif(0, 1);
     for (int j = 0; j < nStates[n]; j++)
       messages[0][i][j] /= sumMsg;
 
     sumMsg = 0;
     n = EdgesEnd(i);
     for (int j = 0; j < nStates[n]; j++)
-      sumMsg += messages[1][i][j] = 1; //runif(0, 1);
+      sumMsg += messages[1][i][j] = runif(0, 1);
     for (int j = 0; j < nStates[n]; j++)
       messages[1][i][j] /= sumMsg;
   }
@@ -64,62 +64,65 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
   for (int iter = 1; iter <= maxIter; iter++)
   {
     R_CheckUserInterrupt();
-
-    q = 0;
-    for (int i = 0; i < nEdges; i++)
-    {
-      if (priority[0][i] > q)
-      {
-        q = priority[0][i];
-        e = i;
-        d = 0;
-      }
-      if (priority[1][i] > q)
-      {
-        q = priority[1][i];
-        e = i;
-        d = 1;
-      }
-    }
-
-    if (d == 0)
-    {
-      s = EdgesEnd(e);
-      r = EdgesBegin(e);
-      msg = messages[0][e];
-      new_msg = new_messages[0][e];
-      priority[d][e] = 0;
-    }
-    else
-    {
-      s = EdgesBegin(e);
-      r = EdgesEnd(e);
-      msg = messages[1][e];
-      new_msg = new_messages[1][e];
-      priority[d][e] = 0;
-    }
     
-    
-    for (int i = 0; i < nStates[r]; i++)
+    for (int iterI = 0; iterI < nEdges; iterI++)
     {
-      msg[i] = new_msg[i];
-    }
-
-    GatherIncomingMessages(r, messages);
-
-    int r0, e0;    
-    for (int i = 0; i < nAdj[r]; i++)
-    {
-      r0 = AdjNodes(r, i);
-      e0 = AdjEdges(r, i);
-      if (r0 != s)
+      q = 0;
+      for (int i = 0; i < nEdges; i++)
       {
-        if (maximize)
-          ComputeMessagesMax(r, r0, e0, outgoing, messages, new_messages);
-        else
-          ComputeMessagesSum(r, r0, e0, outgoing, messages, new_messages);
-                
-        UpdateMessagePriority(r, r0, e0, messages, new_messages, priority);
+        if (priority[0][i] > q)
+        {
+          q = priority[0][i];
+          e = i;
+          d = 0;
+        }
+        if (priority[1][i] > q)
+        {
+          q = priority[1][i];
+          e = i;
+          d = 1;
+        }
+      }
+      
+      if (d == 0)
+      {
+        s = EdgesEnd(e);
+        r = EdgesBegin(e);
+        msg = messages[0][e];
+        new_msg = new_messages[0][e];
+        priority[d][e] = 0;
+      }
+      else
+      {
+        s = EdgesBegin(e);
+        r = EdgesEnd(e);
+        msg = messages[1][e];
+        new_msg = new_messages[1][e];
+        priority[d][e] = 0;
+      }
+      
+      
+      for (int i = 0; i < nStates[r]; i++)
+      {
+        msg[i] = new_msg[i];
+      }
+      
+      GatherIncomingMessages(r, messages);
+      
+      int r0, e0;    
+      for (int i = 0; i < nAdj[r]; i++)
+      {
+        r0 = AdjNodes(r, i);
+        e0 = AdjEdges(r, i);
+        if (r0 != s)
+        {
+          if (maximize)
+            ComputeMessagesMax(r, r0, e0, outgoing, messages, new_messages);
+          else
+            ComputeMessagesSum(r, r0, e0, outgoing, messages, new_messages);
+          
+          UpdateMessagePriority(r, r0, e0, messages, new_messages, priority);
+        }
       }
     }
 
