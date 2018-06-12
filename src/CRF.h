@@ -139,7 +139,7 @@ public:
 	void BetheFreeEnergy();
 	double *ComputeMessagesSum(int s, int r, int e, double *outgoing, double ***old_messages, double ***new_messages);
 	double *ComputeMessagesMax(int s, int r, int e, double *outgoing, double ***old_messages, double ***new_messages);
-	void UpdateMessagePriority(int s, int r, int e, double ***messages, double ***new_messages, double **priority);
+	double UpdateMessagePriority(int s, int r, int e, double ***messages, double ***new_messages);
 	void GatherIncomingMessages(int s, double ***old_messages);
 	
 	void TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, int verbose, bool maximize = false);

@@ -1,5 +1,58 @@
 #include "CRF.h"
+#include "FibHeap.h"
 #include <Rmath.h>
+
+// for using FibHeap
+
+class HeapNode: public FibHeapNode
+{
+  double m_priority;
+  int m_dir, m_index;
+  
+public:
+  HeapNode() : FibHeapNode() { m_priority = 0; };
+  
+  virtual void operator =(FibHeapNode& RHS);
+  virtual int  operator ==(FibHeapNode& RHS);
+  virtual int  operator <(FibHeapNode& RHS);
+  
+  virtual void operator =(double key);
+  
+  double getKeyValue() { return m_priority; }
+  void setKeyValue(double key) { m_priority = key; }
+  
+  int getDirValue() { return m_dir; }
+  void setDirValue(int i) { m_dir = i; }
+  int getIndexValue() { return m_index; }
+  void setIndexValue(int i) { m_index = i; }
+};
+
+void HeapNode::operator =(double priority)
+{
+  HeapNode temp;
+  temp.m_priority = m_priority = priority;
+  FHN_assign(temp);
+}
+
+void HeapNode::operator =(FibHeapNode& RHS)
+{
+  FHN_assign(RHS);
+  m_priority = ((HeapNode&) RHS).m_priority;
+}
+
+int  HeapNode::operator ==(FibHeapNode& RHS)
+{
+  if (FHN_compare(RHS)) return 0;
+  return m_priority == ((HeapNode&) RHS).m_priority ? 1 : 0;
+}
+
+int  HeapNode::operator <(FibHeapNode& RHS)
+{
+  int X;
+  
+  if ((X=FHN_compare(RHS)) != 0) return X < 0 ? 1 : 0;
+  return m_priority < ((HeapNode&) RHS).m_priority ? 1 : 0;
+}
 
 /* Residual BP */
 
@@ -7,15 +60,20 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
 {
   messages = (double ***) R_allocArray<double>(2, nEdges, maxState);
   double ***new_messages = (double ***) R_allocArray<double>(2, nEdges, maxState);
-  double **priority = (double **) R_allocArray<double>(2, nEdges);
-
+  HeapNode *priority[2];
+  FibHeap priority_heap;
+  int d;
+  
+  priority[0] = new HeapNode [nEdges];
+  priority[1] = new HeapNode [nEdges];
+  
   for (int i = 0; i < nEdges; i++)
     for (int j = 0; j < maxState; j++)
     {
       messages[0][i][j] = new_messages[0][i][j] = 0;
       messages[1][i][j] = new_messages[1][i][j] = 0;
     }
-    
+
   double *outgoing = (double *) R_alloc(maxState, sizeof(double));
   
   int s, r, e, n;
@@ -54,12 +112,15 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
       else
         ComputeMessagesSum(s, r, e, outgoing, messages, new_messages);
 
-      UpdateMessagePriority(s, r, e, messages, new_messages, priority);
+      d = EdgesBegin(e) == s ? 1 : 0;
+      priority[d][e].setKeyValue(UpdateMessagePriority(s, r, e, messages, new_messages));
+      priority[d][e].setDirValue(d);
+      priority[d][e].setIndexValue(e);
+      priority_heap.insert(&priority[d][e]);
     }
   }
 
-  int d;
-  double q, *msg, *new_msg;
+  double *msg, *new_msg;
   double difference = 0;
   for (int iter = 1; iter <= maxIter; iter++)
   {
@@ -67,22 +128,12 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
     
     for (int iterI = 0; iterI < nEdges; iterI++)
     {
-      q = 0;
-      for (int i = 0; i < nEdges; i++)
-      {
-        if (priority[0][i] > q)
-        {
-          q = priority[0][i];
-          e = i;
-          d = 0;
-        }
-        if (priority[1][i] > q)
-        {
-          q = priority[1][i];
-          e = i;
-          d = 1;
-        }
-      }
+      HeapNode *p = (HeapNode *) priority_heap.extractMin();
+      p->setKeyValue(0);
+      priority_heap.insert(p);
+      
+      d = p->getDirValue();
+      e = p->getIndexValue();
       
       if (d == 0)
       {
@@ -90,7 +141,6 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
         r = EdgesBegin(e);
         msg = messages[0][e];
         new_msg = new_messages[0][e];
-        priority[d][e] = 0;
       }
       else
       {
@@ -98,7 +148,6 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
         r = EdgesEnd(e);
         msg = messages[1][e];
         new_msg = new_messages[1][e];
-        priority[d][e] = 0;
       }
       
       
@@ -121,7 +170,10 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
           else
             ComputeMessagesSum(r, r0, e0, outgoing, messages, new_messages);
           
-          UpdateMessagePriority(r, r0, e0, messages, new_messages, priority);
+          d = EdgesBegin(e0) == r ? 1 : 0;
+          priority_heap.remove(&priority[d][e0]);
+          priority[d][e0].setKeyValue(UpdateMessagePriority(r, r0, e0, messages, new_messages));
+          priority_heap.insert(&priority[d][e0]);
         }
       }
     }
@@ -146,26 +198,26 @@ void CRF::ResidualBP(int maxIter, double cutoff, int verbose, bool maximize)
     warning("Residual BP did not converge in %d iterations! (diff = %f)", maxIter, difference);
 }
 
-void CRF::UpdateMessagePriority(int s, int r, int e, double ***messages, double ***new_messages, double **priority)
+double CRF::UpdateMessagePriority(int s, int r, int e, double ***messages, double ***new_messages)
 {
-  double *msg, *new_msg, *pri, res;
+  double *msg, *new_msg, priority, res;
   if (EdgesBegin(e) == r)
   {
     msg = messages[0][e];
     new_msg = new_messages[0][e];
-    pri = priority[0];
   }
   else
   {
     msg = messages[1][e];
     new_msg = new_messages[1][e];
-    pri = priority[1];
   }
   
-  pri[e] = 0;
+  priority = 0;
   for (int i = 0; i < nStates[r]; i++)
   {
     res = fabs(msg[i] - new_msg[i]);
-    if (res > pri[e]) pri[e] = res;
+    if (res > priority) priority = res;
   }
+  
+  return(-priority);
 }
