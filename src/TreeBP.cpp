@@ -85,9 +85,9 @@ void CRF::TreeBP(bool maximize)
 				sender[senderTail++] = r;
 
 			if (maximize)
-				msg = SendMessagesMax(s, r, e, outgoing, messages);
+				msg = ComputeMessagesMax(s, r, e, outgoing, messages, messages);
 			else
-				msg = SendMessagesSum(s, r, e, outgoing, messages);
+				msg = ComputeMessagesSum(s, r, e, outgoing, messages, messages);
 
 			sumBel = 0;
 			for (int j = 0; j < nStates[r]; j++)

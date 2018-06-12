@@ -17,7 +17,6 @@ void CRF::LoopyBP(int maxIter, double cutoff, int verbose, bool maximize)
 	double *outgoing = (double *) R_alloc(maxState, sizeof(double));
 
 	int s, r, e, n;
-	double *msg, sumBel;
 
 	for (int i = 0; i < nEdges; i++)
 	{
@@ -38,26 +37,7 @@ void CRF::LoopyBP(int maxIter, double cutoff, int verbose, bool maximize)
 
 		for (s = 0; s < nNodes; s++)
 		{
-			/* gather incoming messages */
-
-			sumBel = 0;
-			for (int i = 0; i < nStates[s]; i++)
-			  sumBel += NodeBel(s, i) = NodePot(s, i);
-			for (int i = 0; i < nStates[s]; i++)
-			  NodeBel(s, i) /= sumBel;
-			for (int i = 0; i < nAdj[s]; i++)
-			{
-				e = AdjEdges(s, i);
-				if (EdgesBegin(e) == s)
-					msg = old_messages[0][e];
-				else
-					msg = old_messages[1][e];
-				sumBel = 0;
-				for (int k = 0; k < nStates[s]; k++)
-				  sumBel += NodeBel(s, k) *= msg[k];
-				for (int k = 0; k < nStates[s]; k++)
-				  NodeBel(s, k) /= sumBel;
-			}
+      GatherIncomingMessages(s, old_messages);
 
 			/* send messages */
 
@@ -67,9 +47,9 @@ void CRF::LoopyBP(int maxIter, double cutoff, int verbose, bool maximize)
 				e = AdjEdges(s, i);
 
 				if (maximize)
-					SendMessagesMax(s, r, e, outgoing, old_messages);
+					ComputeMessagesMax(s, r, e, outgoing, old_messages, messages);
 				else
-					SendMessagesSum(s, r, e, outgoing, old_messages);
+					ComputeMessagesSum(s, r, e, outgoing, old_messages, messages);
 			}
 		}
 

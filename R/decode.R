@@ -207,7 +207,31 @@ decode.marginal <- function(crf, infer.method, ...)
 #'
 #' @export 
 decode.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
-	.Call(Decode_LBP, crf, max.iter, cutoff, verbose)
+  .Call(Decode_LBP, crf, max.iter, cutoff, verbose)
+
+
+
+#' Decoding method using residual belief propagation
+#' 
+#' Computing the most likely configuration for CRF
+#' 
+#' Approximate decoding using max-product residual belief propagation 
+#' 
+#' @param crf The CRF
+#' @param max.iter The maximum allowed iterations of termination criteria
+#' @param cutoff The convergence cutoff of termination criteria
+#' @param verbose Non-negative integer to control the tracing informtion in algorithm
+#' @return This function will return the most likely configuration, which is a vector of length \code{crf$n.nodes}.
+#' 
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' d <- decode.rbp(Small$crf)
+#'
+#' @export 
+decode.rbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
+  .Call(Decode_RBP, crf, max.iter, cutoff, verbose)
 
 
 

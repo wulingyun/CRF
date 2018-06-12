@@ -232,6 +232,34 @@ infer.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 
 
 
+#' Inference method using residual belief propagation
+#' 
+#' Computing the partition function and marginal probabilities
+#' 
+#' Approximate inference using sum-product residual belief propagation 
+#' 
+#' @param crf The CRF
+#' @param max.iter The maximum allowed iterations of termination criteria
+#' @param cutoff The convergence cutoff of termination criteria
+#' @param verbose Non-negative integer to control the tracing informtion in algorithm
+#' @return This function will return a list with components:
+#'   \item{node.bel}{Node belief. It is a matrix with \code{crf$n.nodes} rows and \code{crf$max.state} columns.}
+#'   \item{edge.bel}{Edge belief. It is a list of matrices. The size of list is \code{crf$n.edges} and 
+#'     the matrix \code{i} has \code{crf$n.states[crf$edges[i,1]]} rows and \code{crf$n.states[crf$edges[i,2]]} columns.}
+#'   \item{logZ}{The logarithmic value of CRF normalization factor Z.}
+#' 
+#' @examples
+#' 
+#' library(CRF)
+#' data(Small)
+#' i <- infer.rbp(Small$crf)
+#' 
+#' @export
+infer.rbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
+  .Call(Infer_RBP, crf, max.iter, cutoff, verbose)
+
+
+
 #' Inference method using tree-reweighted belief propagation
 #' 
 #' Computing the partition function and marginal probabilities

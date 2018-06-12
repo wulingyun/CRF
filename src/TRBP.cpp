@@ -70,9 +70,9 @@ void CRF::TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, in
 				e = AdjEdges(s, i);
 
 				if (maximize)
-					SendMessagesMax(s, r, e, outgoing, old_messages);
+					ComputeMessagesMax(s, r, e, outgoing, old_messages, messages);
 				else
-					SendMessagesSum(s, r, e, outgoing, old_messages);
+					ComputeMessagesSum(s, r, e, outgoing, old_messages, messages);
 			}
 		}
 

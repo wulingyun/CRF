@@ -18,6 +18,7 @@ extern "C" {
 	SEXP Decode_Junction(SEXP _crf);
 	SEXP Decode_Sample(SEXP _crf, SEXP _samples);
 	SEXP Decode_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
+	SEXP Decode_RBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Decode_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Decode_Greedy(SEXP _crf, SEXP _restart, SEXP _start);
 	SEXP Decode_ICM(SEXP _crf, SEXP _restart, SEXP _start);
@@ -30,6 +31,7 @@ extern "C" {
 	SEXP Infer_Junction(SEXP _crf);
 	SEXP Infer_Sample(SEXP _crf, SEXP _samples);
 	SEXP Infer_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
+	SEXP Infer_RBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 	SEXP Infer_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
 
 	/* Sampling */
@@ -130,11 +132,16 @@ public:
 	/* BP functions */
 	void TreeBP(bool maximize = false);
 	void LoopyBP(int maxIter, double cutoff, int verbose, bool maximize = false);
+	void ResidualBP(int maxIter, double cutoff, int verbose, bool maximize = false);
+
 	void Messages2EdgeBel();
 	void MaxOfMarginals();
 	void BetheFreeEnergy();
-	double *SendMessagesSum(int s, int r, int e, double *outgoing, double ***old_messages);
-	double *SendMessagesMax(int s, int r, int e, double *outgoing, double ***old_messages);
+	double *ComputeMessagesSum(int s, int r, int e, double *outgoing, double ***old_messages, double ***new_messages);
+	double *ComputeMessagesMax(int s, int r, int e, double *outgoing, double ***old_messages, double ***new_messages);
+	void UpdateMessagePriority(int s, int r, int e, double ***messages, double ***new_messages, double **priority);
+	void GatherIncomingMessages(int s, double ***old_messages);
+	
 	void TRBP(double *mu, double **scaleEdgePot, int maxIter, double cutoff, int verbose, bool maximize = false);
 	void TRBP_Messages2EdgeBel(double *mu, double **scaleEdgePot);
 	void TRBP_BetheFreeEnergy(double *mu);
@@ -147,6 +154,7 @@ public:
 	void Decode_Junction();
 	void Decode_Sample();
 	void Decode_LBP(int maxIter, double cutoff, int verbose);
+	void Decode_RBP(int maxIter, double cutoff, int verbose);
 	void Decode_TRBP(int maxIter, double cutoff, int verbose);
 	void Decode_Greedy(int restart = 0, int *start = 0);
 	void Decode_ICM(int restart = 0, int *start = 0);
@@ -158,6 +166,7 @@ public:
 	void Infer_Junction();
 	void Infer_Sample();
 	void Infer_LBP(int maxIter, double cutoff, int verbose);
+	void Infer_RBP(int maxIter, double cutoff, int verbose);
 	void Infer_TRBP(int maxIter, double cutoff, int verbose);
 
 	/* Sampling methods */

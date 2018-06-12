@@ -110,16 +110,16 @@ void CRF::BetheFreeEnergy()
 	*logZ = - (nodeEnergy + edgeEnergy - nodeEntropy - edgeEntropy);
 }
 
-/* send sum-product messages */
+/* compute sum-product messages */
 
-double *CRF::SendMessagesSum(int s, int r, int e, double *outgoing, double ***old_messages)
+double *CRF::ComputeMessagesSum(int s, int r, int e, double *outgoing, double ***old_messages, double ***new_messages)
 {
 	double *msg, sumMsg = 0;
 	if (EdgesBegin(e) == s)
 	{
 		for (int j = 0; j < nStates[s]; j++)
 			outgoing[j] = old_messages[0][e][j] == 0 ? 0 : NodeBel(s, j) / old_messages[0][e][j];
-		msg = messages[1][e];
+		msg = new_messages[1][e];
 		for (int j = 0; j < nStates[r]; j++)
 		{
 			msg[j] = 0;
@@ -132,7 +132,7 @@ double *CRF::SendMessagesSum(int s, int r, int e, double *outgoing, double ***ol
 	{
 		for (int j = 0; j < nStates[s]; j++)
 			outgoing[j] = old_messages[1][e][j] == 0 ? 0 : NodeBel(s, j) / old_messages[1][e][j];
-		msg = messages[0][e];
+		msg = new_messages[0][e];
 		for (int j = 0; j < nStates[r]; j++)
 		{
 			msg[j] = 0;
@@ -146,16 +146,16 @@ double *CRF::SendMessagesSum(int s, int r, int e, double *outgoing, double ***ol
 	return msg;
 }
 
-/* send max-product messages */
+/* compute max-product messages */
 
-double *CRF::SendMessagesMax(int s, int r, int e, double *outgoing, double ***old_messages)
+double *CRF::ComputeMessagesMax(int s, int r, int e, double *outgoing, double ***old_messages, double ***new_messages)
 {
 	double *msg, m, sumMsg = 0;
 	if (EdgesBegin(e) == s)
 	{
 		for (int j = 0; j < nStates[s]; j++)
 			outgoing[j] = old_messages[0][e][j] == 0 ? 0 : NodeBel(s, j) / old_messages[0][e][j];
-		msg = messages[1][e];
+		msg = new_messages[1][e];
 		for (int j = 0; j < nStates[r]; j++)
 		{
 			msg[j] = 0;
@@ -172,7 +172,7 @@ double *CRF::SendMessagesMax(int s, int r, int e, double *outgoing, double ***ol
 	{
 		for (int j = 0; j < nStates[s]; j++)
 			outgoing[j] = old_messages[1][e][j] == 0 ? 0 : NodeBel(s, j) / old_messages[1][e][j];
-		msg = messages[0][e];
+		msg = new_messages[0][e];
 		for (int j = 0; j < nStates[r]; j++)
 		{
 			msg[j] = 0;
@@ -188,4 +188,28 @@ double *CRF::SendMessagesMax(int s, int r, int e, double *outgoing, double ***ol
 	for (int j = 0; j < nStates[r]; j++)
 		msg[j] /= sumMsg;
 	return msg;
+}
+
+void CRF::GatherIncomingMessages(int s, double ***old_messages)
+{
+  double sumBel, *msg;
+  int e;
+  sumBel = 0;
+  for (int i = 0; i < nStates[s]; i++)
+    sumBel += NodeBel(s, i) = NodePot(s, i);
+  for (int i = 0; i < nStates[s]; i++)
+    NodeBel(s, i) /= sumBel;
+  for (int i = 0; i < nAdj[s]; i++)
+  {
+    e = AdjEdges(s, i);
+    if (EdgesBegin(e) == s)
+      msg = old_messages[0][e];
+    else
+      msg = old_messages[1][e];
+    sumBel = 0;
+    for (int k = 0; k < nStates[s]; k++)
+      sumBel += NodeBel(s, k) *= msg[k];
+    for (int k = 0; k < nStates[s]; k++)
+      NodeBel(s, k) /= sumBel;
+  }
 }
