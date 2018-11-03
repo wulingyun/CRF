@@ -4,8 +4,8 @@
 \alias{decode.cutset}
 \title{Decoding method for graphs with a small cutset}
 \usage{
-decode.cutset(crf, cutset, engine = "default", start = apply(crf$node.pot,
-  1, which.max))
+decode.cutset(crf, cutset, engine = "default",
+  start = apply(crf$node.pot, 1, which.max))
 }
 \arguments{
 \item{crf}{The CRF}

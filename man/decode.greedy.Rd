@@ -4,7 +4,8 @@
 \alias{decode.greedy}
 \title{Decoding method using greedy algorithm}
 \usage{
-decode.greedy(crf, restart = 0, start = apply(crf$node.pot, 1, which.max))
+decode.greedy(crf, restart = 0, start = apply(crf$node.pot, 1,
+  which.max))
 }
 \arguments{
 \item{crf}{The CRF}
