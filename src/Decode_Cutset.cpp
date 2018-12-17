@@ -2,16 +2,18 @@
 
 SEXP Decode_Cutset(SEXP _crf, SEXP _engine, SEXP _start)
 {
-	PROTECT(_start = AS_INTEGER(_start));
-	int *start = INTEGER_POINTER(_start);
-
 	CRFclamped crf(_crf);
 	crf.Init_Labels();
 	crf.Init_NodeBel();
 	crf.original.Init_Labels();
+	
+	PROTECT(_start = AS_INTEGER(_start));
+	int *start = INTEGER_POINTER(_start);
+
 	crf.Decode_Cutset(INTEGER_POINTER(AS_INTEGER(_engine))[0], start);
 
-	UNPROTECT_PTR(_start);
+	UNPROTECT(1);
+
 	return(crf.original._labels);
 }
 

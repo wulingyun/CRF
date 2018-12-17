@@ -24,7 +24,7 @@ void SetListElement(SEXP list, int i, const char *tag, SEXP value)
 		PROTECT(_names = NEW_STRING(length(list)));
 		SET_STRING_ELT(_names, i, mkChar(tag));
 		setAttrib(list, R_NamesSymbol, _names);
-		UNPROTECT_PTR(_names);
+		UNPROTECT(1);
 	}
 	else
 		SET_STRING_ELT(_names, i, mkChar(tag));
@@ -40,7 +40,7 @@ void SetDim2(SEXP array, int x1, int x2)
 	INTEGER_POINTER(_dim)[0] = x1;
 	INTEGER_POINTER(_dim)[1] = x2;
 	SET_DIM(array, _dim);
-	UNPROTECT_PTR(_dim);
+	UNPROTECT(1);
 }
 
 void SetDim3(SEXP array, int x1, int x2, int x3)
@@ -51,7 +51,7 @@ void SetDim3(SEXP array, int x1, int x2, int x3)
 	INTEGER_POINTER(_dim)[1] = x2;
 	INTEGER_POINTER(_dim)[2] = x3;
 	SET_DIM(array, _dim);
-	UNPROTECT_PTR(_dim);
+	UNPROTECT(1);
 }
 
 /* sample from discret distribution */

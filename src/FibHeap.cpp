@@ -47,6 +47,7 @@
 //#include <iostream.h>
 #include <stdio.h>
 //#include <conio.h>
+#include <R.h>
 
 #include "FibHeap.h"
 
@@ -377,15 +378,15 @@ void FibHeap::print(FibHeapNode *Tree, FibHeapNode *them_parent)
   
   Temp = Tree;
   do {
-    if (Temp->m_left == NULL) printf( "(m_left is NULL)" );
+    if (Temp->m_left == NULL) Rprintf( "(m_left is NULL)" );
     Temp->print();
     if (Temp->m_parent != them_parent)
-      printf("(m_parent is incorrect)" );
+      Rprintf("(m_parent is incorrect)" );
     if (Temp->m_right == NULL)
-      printf( "(m_right is NULL)" );
+      Rprintf( "(m_right is NULL)" );
     else if (Temp->m_right->m_left != Temp)
-      printf( "(Error in m_left link m_left) ->" );
-    else printf( " <-> " );
+      Rprintf( "(Error in m_left link m_left) ->" );
+    else Rprintf( " <-> " );
     
     Temp = Temp->m_right;
     
@@ -394,14 +395,14 @@ void FibHeap::print(FibHeapNode *Tree, FibHeapNode *them_parent)
     //			if (getch() == 27) break;
     //		}
   } while (Temp != NULL && Temp != Tree);
-  printf( "\n" );
+  Rprintf( "\n" );
   
   Temp = Tree;
   do {
-    printf( "m_children of " );
+    Rprintf( "m_children of " );
     Temp->print();
-    printf( ": " );
-    if (Temp->m_child == NULL) printf( "NONE\n" );
+    Rprintf( ": " );
+    if (Temp->m_child == NULL) Rprintf( "NONE\n" );
     else print(Temp->m_child, Temp);
     Temp = Temp->m_right;
   } while (Temp!=NULL && Temp != Tree);
@@ -409,7 +410,7 @@ void FibHeap::print(FibHeapNode *Tree, FibHeapNode *them_parent)
   if (them_parent == NULL) {
     //		char ch;
     
-    printf( "\n\n\n" );
+    Rprintf( "\n\n\n" );
     //		cin >> ch;
   }
 }

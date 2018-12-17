@@ -3,23 +3,23 @@
 SEXP Sample_Gibbs(SEXP _crf, SEXP _size, SEXP _burnIn, SEXP _start)
 {
 	int burnIn = INTEGER_POINTER(AS_INTEGER(_burnIn))[0];
-	PROTECT(_start = AS_INTEGER(_start));
-	int *start = INTEGER_POINTER(_start);
 
 	CRF crf(_crf);
 	crf.Init_Samples(_size);
+
+	PROTECT(_start = AS_INTEGER(_start));
+	int *start = INTEGER_POINTER(_start);
+
 	crf.Sample_Gibbs(burnIn, start);
 
-	UNPROTECT_PTR(_start);
+	UNPROTECT(1);
+
 	return(crf._samples);
 }
 
-void CRF::Sample_Gibbs(int burnIn, int *start, int size)
+void CRF::Sample_Gibbs(int burnIn, int *start)
 {
-	if (size <= 0)
-		size = nSamples;
-	else if (size > nSamples)
-		Init_Samples(size);
+	int	size = nSamples;
 
 	int *y = (int *) R_alloc(nNodes, sizeof(int));
 	double max;

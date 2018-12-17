@@ -174,7 +174,7 @@ public:
 	void Sample_Chain(int size = 0);
 	void Sample_Tree(int size = 0);
 	void Sample_Junction(int size = 0);
-	void Sample_Gibbs(int burnIn, int *start, int size = 0);
+	void Sample_Gibbs(int burnIn, int *start);
 };
 
 class CRFclamped: public CRF {

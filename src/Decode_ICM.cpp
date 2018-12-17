@@ -3,14 +3,17 @@
 SEXP Decode_ICM(SEXP _crf, SEXP _restart, SEXP _start)
 {
 	int restart = INTEGER_POINTER(AS_INTEGER(_restart))[0];
-	PROTECT(_start = AS_INTEGER(_start));
-	int *start = INTEGER_POINTER(_start);
 
 	CRF crf(_crf);
 	crf.Init_Labels();
+
+	PROTECT(_start = AS_INTEGER(_start));
+	int *start = INTEGER_POINTER(_start);
+
 	crf.Decode_ICM(restart, start);
 
-	UNPROTECT_PTR(_start);
+	UNPROTECT(1);
+
 	return(crf._labels);
 }
 
