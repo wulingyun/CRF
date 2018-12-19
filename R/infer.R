@@ -214,6 +214,7 @@ infer.sample <- function(crf, sample.method, ...)
 #' @param max.iter The maximum allowed iterations of termination criteria
 #' @param cutoff The convergence cutoff of termination criteria
 #' @param verbose Non-negative integer to control the tracing informtion in algorithm
+#' @param maximize Logical variable to indicate using max-product instead of sum-product
 #' @return This function will return a list with components:
 #'   \item{node.bel}{Node belief. It is a matrix with \code{crf$n.nodes} rows and \code{crf$max.state} columns.}
 #'   \item{edge.bel}{Edge belief. It is a list of matrices. The size of list is \code{crf$n.edges} and 
@@ -227,8 +228,8 @@ infer.sample <- function(crf, sample.method, ...)
 #' i <- infer.lbp(Small$crf)
 #' 
 #' @export
-infer.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
-	.Call(Infer_LBP, crf, max.iter, cutoff, verbose)
+infer.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0, maximize = FALSE)
+	.Call(Infer_LBP, crf, max.iter, cutoff, verbose, maximize)
 
 
 
@@ -242,6 +243,7 @@ infer.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 #' @param max.iter The maximum allowed iterations of termination criteria
 #' @param cutoff The convergence cutoff of termination criteria
 #' @param verbose Non-negative integer to control the tracing informtion in algorithm
+#' @param maximize Logical variable to indicate using max-product instead of sum-product
 #' @return This function will return a list with components:
 #'   \item{node.bel}{Node belief. It is a matrix with \code{crf$n.nodes} rows and \code{crf$max.state} columns.}
 #'   \item{edge.bel}{Edge belief. It is a list of matrices. The size of list is \code{crf$n.edges} and 
@@ -255,8 +257,8 @@ infer.lbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 #' i <- infer.rbp(Small$crf)
 #' 
 #' @export
-infer.rbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
-  .Call(Infer_RBP, crf, max.iter, cutoff, verbose)
+infer.rbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0, maximize = FALSE)
+  .Call(Infer_RBP, crf, max.iter, cutoff, verbose, maximize)
 
 
 
@@ -270,6 +272,7 @@ infer.rbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 #' @param max.iter The maximum allowed iterations of termination criteria
 #' @param cutoff The convergence cutoff of termination criteria
 #' @param verbose Non-negative integer to control the tracing informtion in algorithm
+#' @param maximize Logical variable to indicate using max-product instead of sum-product
 #' @return This function will return a list with components:
 #'   \item{node.bel}{Node belief. It is a matrix with \code{crf$n.nodes} rows and \code{crf$max.state} columns.}
 #'   \item{edge.bel}{Edge belief. It is a list of matrices. The size of list is \code{crf$n.edges} and 
@@ -283,5 +286,5 @@ infer.rbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
 #' i <- infer.trbp(Small$crf)
 #' 
 #' @export
-infer.trbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0)
-	.Call(Infer_TRBP, crf, max.iter, cutoff, verbose)
+infer.trbp <- function(crf, max.iter = 10000, cutoff = 1e-4, verbose = 0, maximize = FALSE)
+	.Call(Infer_TRBP, crf, max.iter, cutoff, verbose, maximize)

@@ -4,7 +4,8 @@
 \alias{infer.rbp}
 \title{Inference method using residual belief propagation}
 \usage{
-infer.rbp(crf, max.iter = 10000, cutoff = 1e-04, verbose = 0)
+infer.rbp(crf, max.iter = 10000, cutoff = 1e-04, verbose = 0,
+  maximize = FALSE)
 }
 \arguments{
 \item{crf}{The CRF}
@@ -14,6 +15,8 @@ infer.rbp(crf, max.iter = 10000, cutoff = 1e-04, verbose = 0)
 \item{cutoff}{The convergence cutoff of termination criteria}
 
 \item{verbose}{Non-negative integer to control the tracing informtion in algorithm}
+
+\item{maximize}{Logical variable to indicate using max-product instead of sum-product}
 }
 \value{
 This function will return a list with components:

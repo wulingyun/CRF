@@ -30,9 +30,9 @@ extern "C" {
 	SEXP Infer_Cutset(SEXP _crf, SEXP _engine);
 	SEXP Infer_Junction(SEXP _crf);
 	SEXP Infer_Sample(SEXP _crf, SEXP _samples);
-	SEXP Infer_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
-	SEXP Infer_RBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
-	SEXP Infer_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose);
+	SEXP Infer_LBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose, SEXP _maximize);
+	SEXP Infer_RBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose, SEXP _maximize);
+	SEXP Infer_TRBP(SEXP _crf, SEXP _maxIter, SEXP _cutoff, SEXP _verbose, SEXP _maximize);
 
 	/* Sampling */
 	SEXP Sample_Exact(SEXP _crf, SEXP _size);
@@ -165,9 +165,9 @@ public:
 	void Infer_Tree();
 	void Infer_Junction();
 	void Infer_Sample();
-	void Infer_LBP(int maxIter, double cutoff, int verbose);
-	void Infer_RBP(int maxIter, double cutoff, int verbose);
-	void Infer_TRBP(int maxIter, double cutoff, int verbose);
+	void Infer_LBP(int maxIter, double cutoff, int verbose, bool maximize = false);
+	void Infer_RBP(int maxIter, double cutoff, int verbose, bool maximize = false);
+	void Infer_TRBP(int maxIter, double cutoff, int verbose, bool maximize = false);
 
 	/* Sampling methods */
 	void Sample_Exact(int size = 0);
