@@ -22,6 +22,33 @@ inline SEXP GetVar(SEXP env, const char *name)
 	return findVar(install(name), env);
 }
 
+inline SEXP GetVarAsInteger(SEXP env, const char *name)
+{
+  SEXP temp, var;
+  PROTECT(temp = GetVar(env, name));
+  var = AS_INTEGER(temp);
+  UNPROTECT(1);
+  return(var);
+}
+
+inline SEXP GetVarAsNumeric(SEXP env, const char *name)
+{
+  SEXP temp, var;
+  PROTECT(temp = GetVar(env, name));
+  var = AS_NUMERIC(temp);
+  UNPROTECT(1);
+  return(var);
+}
+
+inline SEXP GetVarAsList(SEXP env, const char *name)
+{
+  SEXP temp, var;
+  PROTECT(temp = GetVar(env, name));
+  var = AS_LIST(temp);
+  UNPROTECT(1);
+  return(var);
+}
+
 /* get the variable */
 
 inline void SetVar(SEXP env, const char *name, SEXP var)

@@ -5,9 +5,9 @@ SEXP Make_AdjInfo(SEXP _crf)
 	SEXP _nNodes, _nEdges, _edges;
 	int nNodes, nEdges, *edges;
 
-	PROTECT(_nNodes = AS_INTEGER(GetVar(_crf, "n.nodes")));
-	PROTECT(_nEdges = AS_INTEGER(GetVar(_crf, "n.edges")));
-	PROTECT(_edges = AS_INTEGER(GetVar(_crf, "edges")));
+	PROTECT(_nNodes = GetVarAsInteger(_crf, "n.nodes"));
+	PROTECT(_nEdges = GetVarAsInteger(_crf, "n.edges"));
+	PROTECT(_edges = GetVarAsInteger(_crf, "edges"));
 	nNodes = INTEGER_POINTER(_nNodes)[0];
 	nEdges = INTEGER_POINTER(_nEdges)[0];
 	edges = INTEGER_POINTER(_edges);

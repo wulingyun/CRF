@@ -92,20 +92,20 @@ CRF::~CRF()
 void CRF::Set_Data(SEXP _newcrf)
 {
 	_crf = _newcrf;
-	PROTECT(_nNodes = AS_INTEGER(GetVar(_crf, "n.nodes")));
-	PROTECT(_nEdges = AS_INTEGER(GetVar(_crf, "n.edges")));
-	PROTECT(_edges = AS_INTEGER(GetVar(_crf, "edges")));
-	PROTECT(_nStates = AS_INTEGER(GetVar(_crf, "n.states")));
-	PROTECT(_maxState = AS_INTEGER(GetVar(_crf, "max.state")));
+	PROTECT(_nNodes = GetVarAsInteger(_crf, "n.nodes"));
+	PROTECT(_nEdges = GetVarAsInteger(_crf, "n.edges"));
+	PROTECT(_edges = GetVarAsInteger(_crf, "edges"));
+	PROTECT(_nStates = GetVarAsInteger(_crf, "n.states"));
+	PROTECT(_maxState = GetVarAsInteger(_crf, "max.state"));
 	nNodes = INTEGER_POINTER(_nNodes)[0];
 	nEdges = INTEGER_POINTER(_nEdges)[0];
 	edges = INTEGER_POINTER(_edges);
 	nStates = INTEGER_POINTER(_nStates);
 	maxState = INTEGER_POINTER(_maxState)[0];
 
-	PROTECT(_nAdj = AS_INTEGER(GetVar(_crf, "n.adj")));
-	PROTECT(_adjNodes = AS_LIST(GetVar(_crf, "adj.nodes")));
-	PROTECT(_adjEdges = AS_LIST(GetVar(_crf, "adj.edges")));
+	PROTECT(_nAdj = GetVarAsInteger(_crf, "n.adj"));
+	PROTECT(_adjNodes = GetVarAsList(_crf, "adj.nodes"));
+	PROTECT(_adjEdges = GetVarAsList(_crf, "adj.edges"));
 	nAdj = INTEGER_POINTER(_nAdj);
 	adjNodes = (int **) R_alloc(nNodes, sizeof(int *));
 	adjEdges = (int **) R_alloc(nNodes, sizeof(int *));
@@ -118,8 +118,8 @@ void CRF::Set_Data(SEXP _newcrf)
 		adjEdges[i] = INTEGER_POINTER(_temp);
 	}
 
-	PROTECT(_nodePot = AS_NUMERIC(GetVar(_crf, "node.pot")));
-	PROTECT(_edgePot = AS_LIST(GetVar(_crf, "edge.pot")));
+	PROTECT(_nodePot = GetVarAsNumeric(_crf, "node.pot"));
+	PROTECT(_edgePot = GetVarAsList(_crf, "edge.pot"));
 	nodePot = NUMERIC_POINTER(_nodePot);
 	edgePot = (double **) R_alloc(nEdges, sizeof(double *));
 	nEdgeStates = (int *) R_alloc(nEdges, sizeof(int));

@@ -10,22 +10,22 @@ SEXP Clamp_Reset(SEXP _crf)
 CRFclamped::CRFclamped(SEXP _crf)
 : CRF(_crf)
 {
-	_original = GetVar(_crf, "original");
+	PROTECT(_original = GetVar(_crf, "original"));
 	original.Set_Data(_original);
 
-	PROTECT(_nodeId = AS_INTEGER(GetVar(_crf, "node.id")));
-	PROTECT(_nodeMap = AS_INTEGER(GetVar(_crf, "node.map")));
-	PROTECT(_edgeId = AS_INTEGER(GetVar(_crf, "edge.id")));
-	PROTECT(_edgeMap = AS_INTEGER(GetVar(_crf, "edge.map")));
+	PROTECT(_nodeId = GetVarAsInteger(_crf, "node.id"));
+	PROTECT(_nodeMap = GetVarAsInteger(_crf, "node.map"));
+	PROTECT(_edgeId = GetVarAsInteger(_crf, "edge.id"));
+	PROTECT(_edgeMap = GetVarAsInteger(_crf, "edge.map"));
 	nodeId = INTEGER_POINTER(_nodeId);
 	nodeMap = INTEGER_POINTER(_nodeMap);
 	edgeId = INTEGER_POINTER(_edgeId);
 	edgeMap = INTEGER_POINTER(_edgeMap);
 
-	PROTECT(_clamped = AS_INTEGER(GetVar(_crf, "clamped")));
+	PROTECT(_clamped = GetVarAsInteger(_crf, "clamped"));
 	clamped = INTEGER_POINTER(_clamped);
 
-	numProtect += 5;
+	numProtect += 6;
 }
 
 void CRFclamped::Reset_NodePot()
