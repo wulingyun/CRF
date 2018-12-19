@@ -12,9 +12,9 @@ class HeapNode: public FibHeapNode
 public:
   HeapNode() : FibHeapNode() { m_priority = 0; };
   
-  virtual void operator =(FibHeapNode& RHS);
-  virtual int  operator ==(FibHeapNode& RHS);
-  virtual int  operator <(FibHeapNode& RHS);
+  virtual void operator =(HeapNode& RHS);
+  virtual int  operator ==(HeapNode& RHS);
+  virtual int  operator <(HeapNode& RHS);
   
   virtual void operator =(double key);
   
@@ -34,24 +34,24 @@ void HeapNode::operator =(double priority)
   FHN_assign(temp);
 }
 
-void HeapNode::operator =(FibHeapNode& RHS)
+void HeapNode::operator =(HeapNode& RHS)
 {
   FHN_assign(RHS);
-  m_priority = ((HeapNode&) RHS).m_priority;
+  m_priority = RHS.m_priority;
 }
 
-int  HeapNode::operator ==(FibHeapNode& RHS)
+int  HeapNode::operator ==(HeapNode& RHS)
 {
   if (FHN_compare(RHS)) return 0;
-  return m_priority == ((HeapNode&) RHS).m_priority ? 1 : 0;
+  return m_priority == RHS.m_priority ? 1 : 0;
 }
 
-int  HeapNode::operator <(FibHeapNode& RHS)
+int  HeapNode::operator <(HeapNode& RHS)
 {
   int X;
   
   if ((X=FHN_compare(RHS)) != 0) return X < 0 ? 1 : 0;
-  return m_priority < ((HeapNode&) RHS).m_priority ? 1 : 0;
+  return m_priority < RHS.m_priority ? 1 : 0;
 }
 
 /* Residual BP */
