@@ -420,16 +420,20 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 
 	int *y = (int *) R_allocVector<int>(crf.nNodes);
 
-	SEXP _nodeFeaN = _nodeFea;
-	SEXP _edgeFeaN = _edgeFea;
-	SEXP _nodeExtN = _nodeExt;
-	SEXP _edgeExtN = _edgeExt;
+	SEXP _nodeFeaN, _edgeFeaN, _nodeExtN, _edgeExtN;
+	PROTECT_INDEX ipx1, ipx2, ipx3, ipx4;	
+
+	PROTECT_WITH_INDEX(_nodeFeaN = _nodeFea, &ipx1);
+	PROTECT_WITH_INDEX(_edgeFeaN = _edgeFea, &ipx2);
+	PROTECT_WITH_INDEX(_nodeExtN = _nodeExt, &ipx3);
+	PROTECT_WITH_INDEX(_edgeExtN = _edgeExt, &ipx4);
+	
 	for (int n = 0; n < nInstances; n++)
 	{
-		if (!isNull(_nodeFea) && isNewList(_nodeFea)) _nodeFeaN = GetListElement(_nodeFea, n);
-		if (!isNull(_edgeFea) && isNewList(_edgeFea)) _edgeFeaN = GetListElement(_edgeFea, n);
-		if (!isNull(_nodeExt) && isNewList(_nodeExt)) _nodeExtN = GetListElement(_nodeExt, n);
-		if (!isNull(_edgeExt) && isNewList(_edgeExt)) _edgeExtN = GetListElement(_edgeExt, n);
+		if (!isNull(_nodeFea) && isNewList(_nodeFea)) REPROTECT(_nodeFeaN = GetListElement(_nodeFea, n), ipx1);
+		if (!isNull(_edgeFea) && isNewList(_edgeFea)) REPROTECT(_edgeFeaN = GetListElement(_edgeFea, n), ipx2);
+		if (!isNull(_nodeExt) && isNewList(_nodeExt)) REPROTECT(_nodeExtN = GetListElement(_nodeExt, n), ipx3);
+		if (!isNull(_edgeExt) && isNewList(_edgeExt)) REPROTECT(_edgeExtN = GetListElement(_edgeExt, n), ipx4);
 
 		crf.Update_Pot(_nodeFeaN, _edgeFeaN, _nodeExtN, _edgeExtN);
 
@@ -458,7 +462,7 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 
     if (!isNull(_nodeFeaN))
     {
-  		PROTECT(_nodeFeaN = AS_NUMERIC(_nodeFeaN));
+  		REPROTECT(_nodeFeaN = AS_NUMERIC(_nodeFeaN), ipx1);
   		double *nodeFea = NUMERIC_POINTER(_nodeFeaN);
   		if (!ISNAN(nodeFea[0]))
   		{
@@ -486,12 +490,11 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
   				}
   			}
   		}
-      UNPROTECT(1);
     }
 
     if (!isNull(_edgeFeaN))
     {
-  		PROTECT(_edgeFeaN = AS_NUMERIC(_edgeFeaN));
+  		REPROTECT(_edgeFeaN = AS_NUMERIC(_edgeFeaN), ipx2);
   		double *edgeFea = NUMERIC_POINTER(_edgeFeaN);
   		if (!ISNAN(edgeFea[0]))
   		{
@@ -519,7 +522,6 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
   				}
   			}
   		}
-      UNPROTECT(1);
     }
 
 		if (!isNull(_nodeExtN) && isNewList(_nodeExtN))
@@ -589,7 +591,7 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 		UNPROTECT(4);
 	}
 
-	UNPROTECT(7);
+	UNPROTECT(11);
 
 	return(_nll);
 }
