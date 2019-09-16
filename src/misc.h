@@ -6,6 +6,16 @@
 #define min(a, b) a < b ? a : b;
 #define max(a, b) a > b ? a : b;
 
+/* swap variables */
+
+template <class T>
+inline void swap2(T &a, T &b)
+{
+  T temp = a;
+  a = b;
+  b = temp;
+}
+
 /* initialize the list */
 
 template <class T>
@@ -56,7 +66,7 @@ inline void SetVar(SEXP env, const char *name, SEXP var)
 	defineVar(install(name), var, env);
 }
 
-/* get/set the list element */
+/* get the list element */
 
 inline SEXP GetListElement(SEXP list, int i)
 {
@@ -64,36 +74,58 @@ inline SEXP GetListElement(SEXP list, int i)
   return R_NilValue;
 }
 
-SEXP GetListElement(SEXP list, const char *tag);
-void SetListElement(SEXP list, int i, const char *tag, SEXP value);
+/* get the list element named tag, or return NULL */
+
+inline SEXP GetListElement(SEXP list, const char *tag)
+{
+  SEXP value = R_NilValue, names = getAttrib(list, R_NamesSymbol);
+  for (int i = 0; i < length(list); i++)
+    if (strcmp(CHAR(STRING_ELT(names, i)), tag) == 0)
+    {
+      value = VECTOR_ELT(list, i);
+      break;
+    }
+    return value;
+}
+
+/* set the list element */
+
+inline void SetListElement(SEXP list, int i, const char *tag, SEXP value)
+{
+  SEXP _names = getAttrib(list, R_NamesSymbol);
+  if (_names == R_NilValue)
+  {
+    PROTECT(_names = NEW_STRING(length(list)));
+    SET_STRING_ELT(_names, i, mkChar(tag));
+    setAttrib(list, R_NamesSymbol, _names);
+    UNPROTECT(1);
+  }
+  else
+    SET_STRING_ELT(_names, i, mkChar(tag));
+  SET_VECTOR_ELT(list, i, value);
+}
 
 /* set dim of array */
 
-void SetDim2(SEXP array, int x1, int x2);
-void SetDim3(SEXP array, int x1, int x2, int x3);
-
-/* sample from discrete distribution */
-
-int SampleFrom(int n, double *prob);
-
-/* minimum weight spanning tree using Kruskal algorithm */
-
-int MinSpanTree(int *tree, int nNodes, int nEdges, int *edges, double *costs, int node_index_from = 1);
-
-/* utils for ascending ordered vector */
-
-int Intersection(int *overlap, int *vector1, int size1, int *vector2, int size2);
-void Insert(int *vector, int &size, int v);
-void Remove(int *vector, int &size, int v);
-
-/* swap variables */
-
-template <class T>
-inline void swap2(T &a, T &b)
+inline void SetDim2(SEXP array, int x1, int x2)
 {
-	T temp = a;
-	a = b;
-	b = temp;
+  SEXP _dim;
+  PROTECT(_dim = NEW_INTEGER(2));
+  INTEGER_POINTER(_dim)[0] = x1;
+  INTEGER_POINTER(_dim)[1] = x2;
+  SET_DIM(array, _dim);
+  UNPROTECT(1);
+}
+
+inline void SetDim3(SEXP array, int x1, int x2, int x3)
+{
+  SEXP _dim;
+  PROTECT(_dim = NEW_INTEGER(3));
+  INTEGER_POINTER(_dim)[0] = x1;
+  INTEGER_POINTER(_dim)[1] = x2;
+  INTEGER_POINTER(_dim)[2] = x3;
+  SET_DIM(array, _dim);
+  UNPROTECT(1);
 }
 
 /* allocate vector */
