@@ -79,8 +79,8 @@ emmis.prob
 
 ## ------------------------------------------------------------------------
 hmm.samples <- mc.samples
-hmm.samples[mc.samples == 1] <- sample.int(4, sum(mc.samples == 1), replace=T, prob=emmis.prob[1,])
-hmm.samples[mc.samples == 2] <- sample.int(4, sum(mc.samples == 2), replace=T, prob=emmis.prob[2,])
+hmm.samples[mc.samples == 1] <- sample.int(4, sum(mc.samples == 1), replace = TRUE, prob=emmis.prob[1,])
+hmm.samples[mc.samples == 2] <- sample.int(4, sum(mc.samples == 2), replace = TRUE, prob=emmis.prob[2,])
 hmm.samples[1:10,]
 
 ## ------------------------------------------------------------------------

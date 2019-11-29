@@ -71,7 +71,7 @@ make.crf <- function(adj.matrix = NULL, n.states = 2, n.nodes = 2)
 	data <- new.env()
   
   if (is.null(adj.matrix))
-    adj.matrix <- sparseMatrix(1:(n.nodes-1), 2:n.nodes, x = T, dims = c(n.nodes, n.nodes))
+    adj.matrix <- sparseMatrix(1:(n.nodes-1), 2:n.nodes, x = TRUE, dims = c(n.nodes, n.nodes))
   
 	if (length(dim(adj.matrix)) != 2 || dim(adj.matrix)[1] != dim(adj.matrix)[2])
 		stop("Parameter 'adj.matrix' should be a square matrix")
