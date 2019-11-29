@@ -4,8 +4,13 @@
 \alias{infer.trbp}
 \title{Inference method using tree-reweighted belief propagation}
 \usage{
-infer.trbp(crf, max.iter = 10000, cutoff = 1e-04, verbose = 0,
-  maximize = FALSE)
+infer.trbp(
+  crf,
+  max.iter = 10000,
+  cutoff = 1e-04,
+  verbose = 0,
+  maximize = FALSE
+)
 }
 \arguments{
 \item{crf}{The CRF}

@@ -4,8 +4,13 @@
 \alias{crf.update}
 \title{Update CRF potentials}
 \usage{
-crf.update(crf, node.fea = NULL, edge.fea = NULL, node.ext = NULL,
-  edge.ext = NULL)
+crf.update(
+  crf,
+  node.fea = NULL,
+  edge.fea = NULL,
+  node.ext = NULL,
+  edge.ext = NULL
+)
 }
 \arguments{
 \item{crf}{The CRF}

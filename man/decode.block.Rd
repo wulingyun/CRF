@@ -4,8 +4,14 @@
 \alias{decode.block}
 \title{Decoding method using block iterated conditional modes algorithm}
 \usage{
-decode.block(crf, blocks, decode.method = decode.tree, restart = 0,
-  start = apply(crf$node.pot, 1, which.max), ...)
+decode.block(
+  crf,
+  blocks,
+  decode.method = decode.tree,
+  restart = 0,
+  start = apply(crf$node.pot, 1, which.max),
+  ...
+)
 }
 \arguments{
 \item{crf}{The CRF}

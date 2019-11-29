@@ -4,8 +4,14 @@
 \alias{train.mrf}
 \title{Train MRF model}
 \usage{
-train.mrf(crf, instances, nll = mrf.nll, infer.method = infer.chain,
-  ..., trace = 0)
+train.mrf(
+  crf,
+  instances,
+  nll = mrf.nll,
+  infer.method = infer.chain,
+  ...,
+  trace = 0
+)
 }
 \arguments{
 \item{crf}{The CRF}

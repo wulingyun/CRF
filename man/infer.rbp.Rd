@@ -4,8 +4,7 @@
 \alias{infer.rbp}
 \title{Inference method using residual belief propagation}
 \usage{
-infer.rbp(crf, max.iter = 10000, cutoff = 1e-04, verbose = 0,
-  maximize = FALSE)
+infer.rbp(crf, max.iter = 10000, cutoff = 1e-04, verbose = 0, maximize = FALSE)
 }
 \arguments{
 \item{crf}{The CRF}

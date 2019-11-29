@@ -4,8 +4,12 @@
 \alias{sample.gibbs}
 \title{Sampling method using single-site Gibbs sampler}
 \usage{
-sample.gibbs(crf, size, burn.in = 1000, start = apply(crf$node.pot, 1,
-  which.max))
+sample.gibbs(
+  crf,
+  size,
+  burn.in = 1000,
+  start = apply(crf$node.pot, 1, which.max)
+)
 }
 \arguments{
 \item{crf}{The CRF}
