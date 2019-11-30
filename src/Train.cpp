@@ -591,7 +591,7 @@ SEXP CRF_NLL(SEXP _crf, SEXP _par, SEXP _instances, SEXP _nodeFea, SEXP _edgeFea
 		UNPROTECT(4);
 	}
 
-	UNPROTECT(11);
+	UNPROTECT(12);
 
 	return(_nll);
 }
